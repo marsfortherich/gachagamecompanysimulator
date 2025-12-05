@@ -20,7 +20,7 @@ export default defineConfig(({ mode }) => {
       // PWA Plugin for service worker and manifest
       VitePWA({
         registerType: 'autoUpdate',
-        includeAssets: ['favicon.ico', 'robots.txt', 'icons/*.png'],
+        includeAssets: ['favicon.svg'],
         manifest: false, // Use existing manifest.json in public/
         workbox: {
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
