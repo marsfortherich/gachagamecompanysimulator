@@ -1,0 +1,61 @@
+{
+  "name": "gacha-game-company-simulator",
+  "version": "1.0.0",
+  "description": "A web-based simulation game where you run a gacha game company",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "build:analyze": "VITE_SOURCEMAP=true npm run build && npx source-map-explorer dist/assets/js/*.js",
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:build": "npm run build && npm run test:run",
+    "lint": "eslint src --ext ts,tsx",
+    "lint:fix": "eslint src --ext ts,tsx --fix",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css,json}\"",
+    "typecheck": "tsc --noEmit",
+    "validate": "npm run typecheck && npm run lint && npm run test:run",
+    "prepare:deploy": "npm run validate && npm run build"
+  },
+  "keywords": [
+    "gacha",
+    "simulator",
+    "game",
+    "company"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1",
+    "recharts": "^3.5.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@tailwindcss/postcss": "^4.1.17",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@types/node": "^22.19.1",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.1",
+    "autoprefixer": "^10.4.22",
+    "eslint": "^9.39.1",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.24",
+    "fast-check": "^4.3.0",
+    "globals": "^16.5.0",
+    "jsdom": "^27.2.0",
+    "postcss": "^8.5.6",
+    "prettier": "^3.7.4",
+    "tailwindcss": "^4.1.17",
+    "terser": "^5.44.1",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.48.1",
+    "vite": "^7.2.6",
+    "vite-plugin-pwa": "^1.2.0",
+    "vitest": "^4.0.15"
+  }
+}

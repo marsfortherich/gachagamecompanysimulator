@@ -1,0 +1,56 @@
+# Netlify Configuration
+# https://docs.netlify.com/configure-builds/file-based-configuration/
+
+[build]
+  # Build command
+  command = "npm run build"
+  
+  # Output directory
+  publish = "dist"
+  
+  # Node.js version
+  environment = { NODE_VERSION = "20" }
+
+[build.environment]
+  # Production environment variables
+  VITE_BASE_URL = "/"
+  VITE_DROP_CONSOLE = "true"
+  VITE_ENABLE_ANALYTICS = "true"
+
+# Single Page Application support - redirect all requests to index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Security headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self'"
+
+# Cache static assets aggressively
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Service worker must not be cached
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+# Preview/branch deploys
+[context.deploy-preview]
+  command = "npm run build"
+  [context.deploy-preview.environment]
+    VITE_ENABLE_DEBUG_CONSOLE = "true"
+    VITE_DROP_CONSOLE = "false"
+
+[context.branch-deploy]
+  command = "npm run build"
