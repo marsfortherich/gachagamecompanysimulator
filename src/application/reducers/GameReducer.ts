@@ -21,7 +21,7 @@ import {
   getHiringCost,
   GENRE_CONFIGS,
 } from '../../domain';
-import { calculateMaintenanceEffect } from '../../domain/game/LiveGameImprovement';
+import { calculateMaintenanceEffect, IMPROVEMENT_TASKS, getImprovementPriority, calculateImprovementSpeed } from '../../domain/game/LiveGameImprovement';
 import { GameState, createInitialState, EmployeeTraining } from '../state';
 import { GameAction } from '../actions';
 import { TRAINING_CONFIGS, completeTraining } from '../../domain';
@@ -560,7 +560,7 @@ function processLiveGames(state: GameState): GameState {
     });
 
     // Apply maintenance effect from assigned staff (other than marketers)
-    // Having developers on a live game helps maintain satisfaction
+    // Having developers on a live game helps maintain satisfaction AND improve quality
     let finalGame = result.game;
     const maintenanceStaff = assignedEmployees.filter(e => e.role !== 'Marketer');
     if (maintenanceStaff.length > 0) {
@@ -575,6 +575,34 @@ function processLiveGames(state: GameState): GameState {
           playerSatisfaction: newSatisfaction,
         },
       };
+
+      // Apply gradual quality improvements based on team working on the game
+      // Get the highest priority improvement for this game
+      const priorities = getImprovementPriority(finalGame);
+      if (priorities.length > 0) {
+        const currentFocus = priorities[0];
+        const task = IMPROVEMENT_TASKS[currentFocus];
+        
+        // Calculate improvement speed based on team skills
+        const speed = calculateImprovementSpeed(task, maintenanceStaff);
+        
+        // Progress = 100% / durationDays * speed modifier
+        // Apply a fraction of the quality boosts each day
+        const dailyProgress = (1 / task.durationDays) * speed;
+        
+        // Apply scaled quality improvements
+        const qualityUpdates: Record<string, number> = {};
+        for (const [key, boost] of Object.entries(task.qualityBoosts)) {
+          const qualityKey = key as keyof typeof finalGame.quality;
+          const dailyBoost = (boost as number) * dailyProgress;
+          // Cap quality at 100
+          qualityUpdates[key] = Math.min(100, 
+            finalGame.quality[qualityKey] + dailyBoost
+          );
+        }
+        
+        finalGame = updateQuality(finalGame, qualityUpdates);
+      }
     }
 
     totalRevenue += result.dailyRevenue;
