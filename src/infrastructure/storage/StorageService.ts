@@ -38,7 +38,25 @@ export class LocalStorageService implements IStorageService {
       if (!serialized) {
         return null;
       }
-      return JSON.parse(serialized) as GameState;
+      const parsed = JSON.parse(serialized);
+      
+      // Reconstruct Set from serialized data (could be array, object, or already Set)
+      let unlockedGenres: Set<string>;
+      if (parsed.unlockedGenres instanceof Set) {
+        unlockedGenres = parsed.unlockedGenres;
+      } else if (Array.isArray(parsed.unlockedGenres)) {
+        unlockedGenres = new Set(parsed.unlockedGenres);
+      } else if (parsed.unlockedGenres && typeof parsed.unlockedGenres === 'object') {
+        // Handle case where Set was serialized as empty object {}
+        unlockedGenres = new Set(Object.values(parsed.unlockedGenres));
+      } else {
+        unlockedGenres = new Set();
+      }
+      
+      return {
+        ...parsed,
+        unlockedGenres,
+      } as GameState;
     } catch (error) {
       console.error('Failed to load game state:', error);
       return null;
