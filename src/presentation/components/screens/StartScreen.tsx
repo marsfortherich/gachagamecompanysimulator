@@ -91,10 +91,11 @@ export function StartScreen() {
               />
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="headquarters-select" className="block text-sm font-medium text-gray-300 mb-2">
                   Headquarters
                 </label>
                 <select
+                  id="headquarters-select"
                   value={headquarters}
                   onChange={(e) => setHeadquarters(e.target.value)}
                   className="w-full px-4 py-2 bg-gray-700 text-white border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-gacha-purple"

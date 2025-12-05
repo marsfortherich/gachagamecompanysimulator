@@ -455,6 +455,7 @@ export function GamesView() {
                 <div className="space-y-2">
                   {availableEmployees.length > 0 && (
                     <select
+                      aria-label="Assign employee to game"
                       className="w-full px-3 py-2 bg-gray-700 text-white rounded-lg text-sm"
                       onChange={(e) => {
                         if (e.target.value) {
@@ -578,6 +579,7 @@ export function GamesView() {
                     {/* Assign Staff */}
                     {availableEmployees.length > 0 && (
                       <select
+                        aria-label="Assign staff to live game"
                         className="w-full px-3 py-2 bg-gray-700 text-white rounded-lg text-sm"
                         onChange={(e) => {
                           if (e.target.value) {

@@ -234,6 +234,7 @@ export function MarketingView() {
                       <div>
                         <p className="text-sm text-gray-400 mb-2">Add Marketer</p>
                         <select
+                          aria-label="Select a marketer to assign"
                           className="w-full px-3 py-2 bg-gray-700 text-white rounded-lg"
                           onChange={(e) => {
                             if (e.target.value) {

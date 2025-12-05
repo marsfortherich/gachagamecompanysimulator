@@ -61,6 +61,7 @@ export const EmployeeFilterBar: React.FC<EmployeeFilterBarProps> = ({
 
       {/* Role Filter */}
       <select
+        aria-label="Filter by role"
         value={filters.role || ''}
         onChange={(e) => onFilterChange({ 
           ...filters, 
@@ -76,6 +77,7 @@ export const EmployeeFilterBar: React.FC<EmployeeFilterBarProps> = ({
 
       {/* Sort By */}
       <select
+        aria-label="Sort employees by"
         value={filters.sortBy || 'name'}
         onChange={(e) => onFilterChange({ 
           ...filters, 
