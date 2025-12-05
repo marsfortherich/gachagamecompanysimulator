@@ -54,6 +54,44 @@ export function GamesView() {
   const [showHelp, setShowHelp] = useState(false);
   const [newGameName, setNewGameName] = useState('');
   const [selectedGenre, setSelectedGenre] = useState<GameGenre>('idle'); // Start with an unlocked genre
+  const [collapsedGames, setCollapsedGames] = useState<Set<string>>(new Set());
+
+  const toggleGameCollapse = (gameId: string) => {
+    setCollapsedGames(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(gameId)) {
+        newSet.delete(gameId);
+      } else {
+        newSet.add(gameId);
+      }
+      return newSet;
+    });
+  };
+
+  const collapseAllGames = () => {
+    setCollapsedGames(new Set(games.map(g => g.id)));
+  };
+
+  const expandAllGames = () => {
+    setCollapsedGames(new Set());
+  };
+
+  // Auto-determine if a game needs attention (shouldn't be collapsed)
+  const gameNeedsAttention = (game: typeof games[0]) => {
+    // In development with no team assigned
+    if (game.status !== 'live' && game.status !== 'shutdown' && game.assignedEmployees.length === 0) {
+      return true;
+    }
+    // Low satisfaction
+    if (game.status === 'live' && game.monetization.playerSatisfaction < 40) {
+      return true;
+    }
+    // Ready to launch
+    if (game.developmentProgress >= 100 && game.status !== 'live' && game.status !== 'shutdown') {
+      return true;
+    }
+    return false;
+  };
 
   const handleCreateGame = () => {
     if (newGameName.trim()) {
@@ -85,9 +123,19 @@ export function GamesView() {
 
   return (
     <div className="p-4 md:p-6 space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center flex-wrap gap-2">
         <h2 className="text-2xl font-bold text-white">Game Projects</h2>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
+          {games.length > 1 && (
+            <>
+              <Button variant="secondary" size="sm" onClick={collapseAllGames}>
+                <Icon name="chevronUp" size="xs" className="mr-1" /> Collapse All
+              </Button>
+              <Button variant="secondary" size="sm" onClick={expandAllGames}>
+                <Icon name="chevronDown" size="xs" className="mr-1" /> Expand All
+              </Button>
+            </>
+          )}
           <Button variant="secondary" onClick={() => setShowHelp(true)}>
             ? Help
           </Button>
@@ -268,13 +316,25 @@ export function GamesView() {
                 role: emp.role,
               }));
             const teamBreakdown = calculateTeamEffectivenessBreakdown(teamMembers);
+            
+            const isCollapsed = collapsedGames.has(game.id);
+            const needsAttention = gameNeedsAttention(game);
 
             return (
-            <Card key={game.id}>
-              <div className="flex justify-between items-start mb-3">
-                <div>
-                  <h3 className="text-lg font-bold text-white">{game.name}</h3>
-                  <div className="flex gap-2 mt-1 items-center">
+            <Card key={game.id} className={needsAttention ? 'ring-2 ring-yellow-500/50' : ''}>
+              {/* Collapsible Header */}
+              <div 
+                className="flex justify-between items-start cursor-pointer"
+                onClick={() => toggleGameCollapse(game.id)}
+              >
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-lg font-bold text-white">{game.name}</h3>
+                    {needsAttention && (
+                      <Icon name="warning" size="sm" className="text-yellow-400" />
+                    )}
+                  </div>
+                  <div className="flex gap-2 mt-1 items-center flex-wrap">
                     <span className="text-xs px-2 py-0.5 rounded bg-gray-700 text-gray-300 capitalize">
                       {game.genre}
                     </span>
@@ -282,30 +342,70 @@ export function GamesView() {
                       <span className={`text-xs px-2 py-0.5 rounded capitalize cursor-help flex items-center gap-1 ${
                         game.status === 'live' 
                           ? 'bg-green-900 text-green-300'
-                          : 'bg-gray-700 text-gray-300'
+                          : game.status === 'shutdown'
+                          ? 'bg-red-900 text-red-300'
+                          : 'bg-blue-900 text-blue-300'
                       }`}>
                         {game.status.replace('_', ' ')} <Icon name="question" size="xs" className="text-gray-400" />
                       </span>
                     </PhaseInfoTooltip>
+                    {/* Quick stats when collapsed */}
+                    {isCollapsed && game.status === 'live' && (
+                      <>
+                        <span className="text-xs text-gray-400">
+                          DAU: {game.monetization.dailyActiveUsers.toLocaleString()}
+                        </span>
+                        <span className="text-xs text-gacha-gold">
+                          ${game.monetization.monthlyRevenue.toLocaleString()}/mo
+                        </span>
+                        <span className={`text-xs ${
+                          game.monetization.playerSatisfaction >= 70 ? 'text-green-400' :
+                          game.monetization.playerSatisfaction >= 40 ? 'text-yellow-400' : 'text-red-400'
+                        }`}>
+                          {Math.round(game.monetization.playerSatisfaction)}% sat
+                        </span>
+                      </>
+                    )}
+                    {isCollapsed && game.status !== 'live' && game.status !== 'shutdown' && (
+                      <span className="text-xs text-purple-400">
+                        {Math.round(game.developmentProgress)}% done
+                      </span>
+                    )}
                   </div>
                 </div>
+                <button 
+                  className="p-1 hover:bg-gray-700 rounded transition-colors ml-2"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleGameCollapse(game.id);
+                  }}
+                >
+                  <Icon 
+                    name={isCollapsed ? 'chevronDown' : 'chevronUp'} 
+                    size="sm" 
+                    className="text-gray-400" 
+                  />
+                </button>
               </div>
 
-              {/* Development Progress with Breakdown */}
-              {game.status !== 'live' && game.status !== 'shutdown' && (
-                <div className="mb-4 space-y-2">
-                  <ProgressBar
-                    value={game.developmentProgress}
-                    color="purple"
-                    showLabel
-                    label="Development"
-                  />
-                  <ProgressBreakdownPanel
-                    breakdown={teamBreakdown}
-                    currentPhase={game.status}
-                  />
-                </div>
-              )}
+              {/* Collapsible Content */}
+              {!isCollapsed && (
+                <>
+                  {/* Development Progress with Breakdown */}
+                  {game.status !== 'live' && game.status !== 'shutdown' && (
+                    <div className="mb-4 space-y-2 mt-3">
+                      <ProgressBar
+                        value={game.developmentProgress}
+                        color="purple"
+                        showLabel
+                        label="Development"
+                      />
+                      <ProgressBreakdownPanel
+                        breakdown={teamBreakdown}
+                        currentPhase={game.status}
+                      />
+                    </div>
+                  )}
 
               {/* Quality Metrics */}
               <div className="grid grid-cols-5 gap-1 mb-4">
@@ -542,6 +642,8 @@ export function GamesView() {
                 <div className="pt-3 border-t border-gray-700">
                   <p className="text-sm text-red-400 text-center flex items-center justify-center gap-2"><Icon name="blocked" size="sm" className="text-red-400" /> Game has been shutdown</p>
                 </div>
+              )}
+                </>
               )}
             </Card>
             );

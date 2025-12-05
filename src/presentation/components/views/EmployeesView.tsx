@@ -36,6 +36,27 @@ export function EmployeesView() {
   const [selectedTier, setSelectedTier] = useState<EmployeeTier>('junior');
   const [selectedRole, setSelectedRole] = useState<EmployeeRole>('Programmer');
   const [trainingEmployeeId, setTrainingEmployeeId] = useState<string | null>(null);
+  const [collapsedEmployees, setCollapsedEmployees] = useState<Set<string>>(new Set());
+
+  const toggleEmployeeCollapse = (employeeId: string) => {
+    setCollapsedEmployees(prev => {
+      const next = new Set(prev);
+      if (next.has(employeeId)) {
+        next.delete(employeeId);
+      } else {
+        next.add(employeeId);
+      }
+      return next;
+    });
+  };
+
+  const collapseAllEmployees = () => {
+    setCollapsedEmployees(new Set(employees.map(e => e.id)));
+  };
+
+  const expandAllEmployees = () => {
+    setCollapsedEmployees(new Set());
+  };
 
   const handleHire = () => {
     const config = TIER_CONFIGS[selectedTier];
@@ -81,7 +102,19 @@ export function EmployeesView() {
             {employees.length} employees · ${totalSalaries.toLocaleString()}/month
           </p>
         </div>
-        <Button onClick={() => setShowHireModal(true)}>+ Hire Employee</Button>
+        <div className="flex gap-2 items-center">
+          {employees.length > 0 && (
+            <>
+              <Button variant="secondary" size="sm" onClick={expandAllEmployees}>
+                <Icon name="chevronDown" size="xs" className="mr-1" /> Expand All
+              </Button>
+              <Button variant="secondary" size="sm" onClick={collapseAllEmployees}>
+                <Icon name="chevronUp" size="xs" className="mr-1" /> Collapse All
+              </Button>
+            </>
+          )}
+          <Button onClick={() => setShowHireModal(true)}>+ Hire Employee</Button>
+        </div>
       </div>
 
       {/* Hire Modal */}
@@ -283,13 +316,16 @@ export function EmployeesView() {
           {employees.map((employee) => {
             const primarySkill = getPrimarySkill(employee);
             const assignedGame = getAssignedGame(employee.id);
+            const isCollapsed = collapsedEmployees.has(employee.id);
+            const training = getEmployeeTraining(employee.id);
 
             return (
               <Card key={employee.id}>
-                <div className="flex justify-between items-start mb-3">
-                  <div>
+                {/* Always visible header */}
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
                     <h3 className="font-bold text-white">{employee.name}</h3>
-                    <div className="flex gap-2 mt-1">
+                    <div className="flex gap-2 mt-1 flex-wrap">
                       <span className="text-xs px-2 py-0.5 rounded bg-gray-700 text-gray-300 capitalize">
                         {primarySkill.replace('_', ' ')}
                       </span>
@@ -300,18 +336,47 @@ export function EmployeesView() {
                       }`}>
                         {employee.isAvailable ? 'Available' : 'Assigned'}
                       </span>
+                      {training && (
+                        <span className="text-xs px-2 py-0.5 rounded bg-blue-900 text-blue-300">
+                          Training
+                        </span>
+                      )}
+                      {employee.morale < 40 && (
+                        <span className="text-xs px-2 py-0.5 rounded bg-red-900 text-red-300">
+                          Low Morale
+                        </span>
+                      )}
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-gacha-gold font-semibold">
-                      ${employee.salary.toLocaleString()}
-                    </p>
-                    <p className="text-xs text-gray-400">/month</p>
+                  <div className="text-right flex items-start gap-2">
+                    <div>
+                      <p className="text-gacha-gold font-semibold">
+                        ${employee.salary.toLocaleString()}
+                      </p>
+                      <p className="text-xs text-gray-400">/month</p>
+                    </div>
+                    <button
+                      className="p-1 hover:bg-gray-700 rounded transition-colors"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleEmployeeCollapse(employee.id);
+                      }}
+                    >
+                      <Icon 
+                        name={isCollapsed ? 'chevronDown' : 'chevronUp'} 
+                        size="sm" 
+                        className="text-gray-400" 
+                      />
+                    </button>
                   </div>
                 </div>
 
+                {/* Collapsible Content */}
+                {!isCollapsed && (
+                  <>
+
                 {/* Skills */}
-                <div className="space-y-2 mb-4">
+                <div className="space-y-2 mb-4 mt-3">
                   {(Object.entries(employee.skills) as [SkillType, number][])
                     .sort(([, a], [, b]) => b - a)
                     .slice(0, 3)
@@ -357,7 +422,6 @@ export function EmployeesView() {
 
                 {/* Training Status */}
                 {(() => {
-                  const training = getEmployeeTraining(employee.id);
                   if (training) {
                     const config = TRAINING_CONFIGS[training.trainingType];
                     const progress = Math.min(100, ((state.currentTick - training.startTick) / config.durationDays) * 100);
@@ -411,6 +475,8 @@ export function EmployeesView() {
                     Fire
                   </Button>
                 </div>
+                  </>
+                )}
               </Card>
             );
           })}
