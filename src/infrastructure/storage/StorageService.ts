@@ -23,6 +23,7 @@ export class LocalStorageService implements IStorageService {
       const serializableState = {
         ...state,
         unlockedGenres: Array.from(state.unlockedGenres),
+        usedNames: Array.from(state.usedNames),
       };
       const serialized = JSON.stringify(serializableState);
       localStorage.setItem(STORAGE_KEY, serialized);
@@ -40,22 +41,18 @@ export class LocalStorageService implements IStorageService {
       }
       const parsed = JSON.parse(serialized);
       
-      // Reconstruct Set from serialized data (could be array, object, or already Set)
-      let unlockedGenres: Set<string>;
-      if (parsed.unlockedGenres instanceof Set) {
-        unlockedGenres = parsed.unlockedGenres;
-      } else if (Array.isArray(parsed.unlockedGenres)) {
-        unlockedGenres = new Set(parsed.unlockedGenres);
-      } else if (parsed.unlockedGenres && typeof parsed.unlockedGenres === 'object') {
-        // Handle case where Set was serialized as empty object {}
-        unlockedGenres = new Set(Object.values(parsed.unlockedGenres));
-      } else {
-        unlockedGenres = new Set();
-      }
+      // Helper to reconstruct Set from serialized data
+      const reconstructSet = <T>(data: unknown): Set<T> => {
+        if (data instanceof Set) return data;
+        if (Array.isArray(data)) return new Set(data);
+        if (data && typeof data === 'object') return new Set(Object.values(data) as T[]);
+        return new Set();
+      };
       
       return {
         ...parsed,
-        unlockedGenres,
+        unlockedGenres: reconstructSet<string>(parsed.unlockedGenres),
+        usedNames: reconstructSet<string>(parsed.usedNames),
       } as GameState;
     } catch (error) {
       console.error('Failed to load game state:', error);
