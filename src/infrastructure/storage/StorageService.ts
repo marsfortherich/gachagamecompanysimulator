@@ -19,7 +19,12 @@ export interface IStorageService {
 export class LocalStorageService implements IStorageService {
   async save(state: GameState): Promise<void> {
     try {
-      const serialized = JSON.stringify(state);
+      // Convert Sets to arrays for JSON serialization
+      const serializableState = {
+        ...state,
+        unlockedGenres: Array.from(state.unlockedGenres),
+      };
+      const serialized = JSON.stringify(serializableState);
       localStorage.setItem(STORAGE_KEY, serialized);
     } catch (error) {
       console.error('Failed to save game state:', error);

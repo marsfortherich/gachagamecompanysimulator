@@ -427,7 +427,24 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     }
 
     case 'LOAD_STATE': {
-      return action.payload.state;
+      const loadedState = action.payload.state;
+      // Ensure unlockedGenres is a Set (JSON serialization converts Set to array or object)
+      let unlockedGenres: Set<GameGenre>;
+      if (loadedState.unlockedGenres instanceof Set) {
+        unlockedGenres = loadedState.unlockedGenres;
+      } else if (Array.isArray(loadedState.unlockedGenres)) {
+        unlockedGenres = new Set(loadedState.unlockedGenres);
+      } else if (loadedState.unlockedGenres && typeof loadedState.unlockedGenres === 'object') {
+        // Handle case where Set was serialized as object with numeric keys
+        unlockedGenres = new Set(Object.values(loadedState.unlockedGenres) as GameGenre[]);
+      } else {
+        unlockedGenres = new Set<GameGenre>();
+      }
+      
+      return {
+        ...loadedState,
+        unlockedGenres,
+      };
     }
 
     case 'RESET_STATE': {
