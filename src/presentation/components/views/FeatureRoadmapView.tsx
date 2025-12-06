@@ -14,15 +14,17 @@ function formatCurrency(value: number): string {
   return `$${value.toLocaleString()}`;
 }
 
-const FEATURE_ICONS: Record<FeatureType, string> = {
-  content_update: '📦',
-  seasonal_event: '🎄',
-  dlc_expansion: '🎮',
-  quality_of_life: '🔧',
-  monetization_update: '💰',
-  collaboration: '🤝',
-  anniversary: '🎂',
-  balance_patch: '⚖️',
+import { IconName } from '../common/Icon';
+
+const FEATURE_ICONS: Record<FeatureType, IconName> = {
+  content_update: 'package',
+  seasonal_event: 'tree',
+  dlc_expansion: 'games',
+  quality_of_life: 'wrench',
+  monetization_update: 'money',
+  collaboration: 'handshake',
+  anniversary: 'cake',
+  balance_patch: 'balance',
 };
 
 export function FeatureRoadmapView() {
@@ -141,7 +143,7 @@ export function FeatureRoadmapView() {
                       onClick={() => setSelectedFeatureType(type)}
                     >
                       <div className="flex items-center gap-2">
-                        <span>{FEATURE_ICONS[type]}</span>
+                        <Icon name={FEATURE_ICONS[type]} size="sm" className="text-gacha-gold" />
                         <span className="text-sm text-white">{config.name}</span>
                       </div>
                       <div className="text-xs text-gray-400 mt-1">
@@ -268,7 +270,7 @@ export function FeatureRoadmapView() {
                       >
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex items-start gap-3">
-                            <span className="text-2xl">{FEATURE_ICONS[feature.type]}</span>
+                            <Icon name={FEATURE_ICONS[feature.type]} size="lg" className="text-gacha-gold" />
                             <div>
                               <div className="flex items-center gap-2">
                                 <h4 className="font-semibold text-white">{feature.name}</h4>

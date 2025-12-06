@@ -188,7 +188,7 @@ export function StartScreen() {
                       <ul className="mt-1 space-y-0.5">
                         {LOCATION_INFO[headquarters].bonuses.map((bonus, i) => (
                           <li key={i} className="text-xs text-green-400 flex items-center gap-1">
-                            <span>✓</span> {bonus}
+                            <Icon name="check" size="sm" /> {bonus}
                           </li>
                         ))}
                       </ul>

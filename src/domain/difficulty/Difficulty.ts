@@ -103,7 +103,7 @@ export const DIFFICULTY_CONFIGS: Record<DifficultyMode, DifficultyConfig> = {
     id: 'casual',
     name: 'Casual',
     description: 'A relaxed experience with generous bonuses and forgiving mechanics. Perfect for learning.',
-    icon: '🌴',
+    icon: 'palm-tree',
     color: 'green',
     modifiers: {
       ...DEFAULT_MODIFIERS,
@@ -142,7 +142,7 @@ export const DIFFICULTY_CONFIGS: Record<DifficultyMode, DifficultyConfig> = {
     id: 'standard',
     name: 'Standard',
     description: 'The intended experience with balanced challenge and progression.',
-    icon: '⚖️',
+    icon: 'balance',
     color: 'blue',
     modifiers: { ...DEFAULT_MODIFIERS },
     features: {
@@ -157,7 +157,7 @@ export const DIFFICULTY_CONFIGS: Record<DifficultyMode, DifficultyConfig> = {
     id: 'hardcore',
     name: 'Hardcore',
     description: 'Punishing difficulty for experienced players. Every decision matters.',
-    icon: '💀',
+    icon: 'skull',
     color: 'red',
     modifiers: {
       ...DEFAULT_MODIFIERS,
@@ -196,7 +196,7 @@ export const DIFFICULTY_CONFIGS: Record<DifficultyMode, DifficultyConfig> = {
     id: 'sandbox',
     name: 'Sandbox',
     description: 'Unlimited resources and no failure. Experiment freely!',
-    icon: '🏖️',
+    icon: 'beach',
     color: 'yellow',
     modifiers: {
       ...DEFAULT_MODIFIERS,

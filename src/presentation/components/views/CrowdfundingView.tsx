@@ -25,12 +25,14 @@ function calculateProgress(campaign: CrowdfundingCampaign): number {
   return Math.min(100, (campaign.currentPledges / campaign.fundingGoal) * 100);
 }
 
-const TIER_ICONS: Record<string, string> = {
-  'Supporter': '🤝',
-  'Early Bird': '🐦',
-  'Founder': '⭐',
-  'Patron': '🏆',
-  'Executive Producer': '👑',
+import { IconName } from '../common/Icon';
+
+const TIER_ICONS: Record<string, IconName> = {
+  'Supporter': 'handshake',
+  'Early Bird': 'bird',
+  'Founder': 'star',
+  'Patron': 'trophy',
+  'Executive Producer': 'crown',
 };
 
 export function CrowdfundingView() {
@@ -141,7 +143,7 @@ export function CrowdfundingView() {
                               milestone.completed ? 'text-green-400' : 'text-gray-400'
                             }`}
                           >
-                            <span>{milestone.completed ? '✅' : '⏳'}</span>
+                            <Icon name={milestone.completed ? 'complete' : 'hourglass'} size="sm" />
                             <span>{milestone.name}</span>
                             <span>-</span>
                             <span>{milestone.description}</span>
@@ -157,7 +159,7 @@ export function CrowdfundingView() {
                     {campaign.rewardTiers.map((tier) => (
                       <div key={tier.id} className="p-2 bg-gray-800/50 rounded text-sm">
                         <div className="flex items-center gap-1">
-                          <span>{TIER_ICONS[tier.name] ?? '🎁'}</span>
+                          <Icon name={TIER_ICONS[tier.name] ?? 'gift'} size="sm" className="text-gacha-gold" />
                           <span className="font-semibold text-white">{tier.name}</span>
                           <span className="text-gray-400 ml-auto">{formatCurrency(tier.pledgeAmount)}</span>
                         </div>
@@ -215,7 +217,7 @@ export function CrowdfundingView() {
       {activeCampaigns.length === 0 && crowdfundingCampaigns.filter(c => c.status === 'planning').length === 0 && (
         <Card>
           <div className="text-center py-8">
-            <span className="text-6xl mb-4 block">🚀</span>
+            <Icon name="rocket" size="xl" className="mb-4 mx-auto text-gacha-purple" />
             <h3 className="text-xl font-semibold text-white mb-2">No Active Campaigns</h3>
             <p className="text-gray-400 mb-4">
               Launch a crowdfunding campaign to raise funds for your next game!
@@ -235,7 +237,7 @@ export function CrowdfundingView() {
             {fundedCampaigns.map(campaign => (
               <Card key={campaign.id} className="border-green-600/30">
                 <div className="flex items-center gap-2">
-                  <span className="text-2xl">🎉</span>
+                  <Icon name="confetti" size="lg" className="text-yellow-400" />
                   <div>
                     <h4 className="font-semibold text-white">{campaign.name}</h4>
                     <p className="text-xs text-gray-400">{campaign.genre}</p>
@@ -262,7 +264,7 @@ export function CrowdfundingView() {
             {failedCampaigns.map(campaign => (
               <Card key={campaign.id} className="border-red-600/30">
                 <div className="flex items-center gap-2">
-                  <span className="text-2xl">😔</span>
+                  <Icon name="frown" size="lg" className="text-red-400" />
                   <div>
                     <h4 className="font-semibold text-white">{campaign.name}</h4>
                     <p className="text-xs text-gray-400">{campaign.genre}</p>
@@ -288,7 +290,7 @@ export function CrowdfundingView() {
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-bold text-white">New Crowdfunding Campaign</h3>
               <Button variant="secondary" size="sm" onClick={() => setShowCreateModal(false)}>
-                ✕
+                <Icon name="times" size="sm" />
               </Button>
             </div>
             

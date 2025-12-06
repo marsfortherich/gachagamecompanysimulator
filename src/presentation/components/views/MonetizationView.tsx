@@ -20,23 +20,25 @@ function formatCurrency(value: number): string {
   return `$${value.toLocaleString()}`;
 }
 
-const STRATEGY_ICONS: Record<MonetizationStrategy, string> = {
-  gacha: '🎰',
-  monthly_pass: '📅',
-  battle_pass: '⚔️',
-  ad_free: '🚫',
-  cosmetic_shop: '👗',
-  starter_pack: '🎁',
-  vip_subscription: '👑',
-  energy_system: '⚡',
+import { IconName } from '../common/Icon';
+
+const STRATEGY_ICONS: Record<MonetizationStrategy, IconName> = {
+  gacha: 'casino',
+  monthly_pass: 'pass',
+  battle_pass: 'sword',
+  ad_free: 'no-ads',
+  cosmetic_shop: 'shirt',
+  starter_pack: 'gift',
+  vip_subscription: 'crown',
+  energy_system: 'energy',
 };
 
-const AD_ICONS: Record<AdType, string> = {
-  banner_ad: '📰',
-  interstitial: '📺',
-  rewarded_video: '🎬',
-  native_ad: '📱',
-  sponsored_content: '🤝',
+const AD_ICONS: Record<AdType, IconName> = {
+  banner_ad: 'newspaper',
+  interstitial: 'tv',
+  rewarded_video: 'film',
+  native_ad: 'phone',
+  sponsored_content: 'handshake',
 };
 
 export function MonetizationView() {
@@ -175,7 +177,7 @@ export function MonetizationView() {
                 className={isEnabled ? 'border-green-600/30' : isPending ? 'border-yellow-600/30' : ''}
               >
                 <div className="flex items-start gap-3">
-                  <span className="text-3xl">{STRATEGY_ICONS[strategy]}</span>
+                  <Icon name={STRATEGY_ICONS[strategy]} size="xl" className="text-gacha-gold" />
                   <div className="flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
                       <h4 className="font-semibold text-white">{config.name}</h4>
@@ -290,7 +292,7 @@ export function MonetizationView() {
                     }`}
                   >
                     <div className="flex items-start gap-3">
-                      <span className="text-2xl">{AD_ICONS[adType]}</span>
+                      <Icon name={AD_ICONS[adType]} size="lg" className="text-gacha-gold" />
                       <div className="flex-1">
                         <h4 className="font-semibold text-white">{config.name}</h4>
                         <p className="text-xs text-gray-400">{config.description}</p>

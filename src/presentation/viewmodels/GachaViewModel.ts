@@ -178,10 +178,10 @@ const ITEM_TYPE_LABELS: Record<ItemType, string> = {
 };
 
 const ITEM_TYPE_ICONS: Record<ItemType, string> = {
-  character: '👤',
-  weapon: '⚔️',
-  artifact: '💎',
-  costume: '👗',
+  character: 'character',
+  weapon: 'weapon',
+  artifact: 'artifact',
+  costume: 'costume',
 };
 
 const CELEBRATION_LEVELS: Record<Rarity, CelebrationLevel> = {
@@ -253,8 +253,8 @@ function toPullCostDisplay(cost: PullCost): PullCostDisplay {
     gemsFormatted: formatNumber(cost.gems),
     tickets: cost.tickets,
     ticketsFormatted: formatNumber(cost.tickets),
-    singlePullCost: `${formatNumber(cost.gems)} 💎`,
-    tenPullCost: `${formatNumber(cost.gems * 10)} 💎`,
+    singlePullCost: `${formatNumber(cost.gems)}`,
+    tenPullCost: `${formatNumber(cost.gems * 10)}`,
   };
 }
 

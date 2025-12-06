@@ -40,7 +40,7 @@ export const CAMPAIGN_DEFINITIONS: Record<CampaignType, CampaignDefinition> = {
   social_media: {
     type: 'social_media',
     name: 'Social Media Campaign',
-    icon: '📱',
+    icon: 'phone',
     description: 'Boost visibility through targeted social media ads and viral content',
     baseCost: 5000,
     costScaling: 0.5,
@@ -53,7 +53,7 @@ export const CAMPAIGN_DEFINITIONS: Record<CampaignType, CampaignDefinition> = {
   collaboration: {
     type: 'collaboration',
     name: 'Game Collaboration',
-    icon: '🤝',
+    icon: 'handshake',
     description: 'Cross-promotion event with another popular game',
     baseCost: 15000,
     costScaling: 1.0,
@@ -66,7 +66,7 @@ export const CAMPAIGN_DEFINITIONS: Record<CampaignType, CampaignDefinition> = {
   livestream: {
     type: 'livestream',
     name: 'Livestream Event',
-    icon: '🎬',
+    icon: 'film',
     description: 'Live developer stream with giveaways and exclusive reveals',
     baseCost: 2000,
     costScaling: 0.2,
@@ -79,7 +79,7 @@ export const CAMPAIGN_DEFINITIONS: Record<CampaignType, CampaignDefinition> = {
   ad_campaign: {
     type: 'ad_campaign',
     name: 'Ad Campaign',
-    icon: '📺',
+    icon: 'tv',
     description: 'Traditional advertising across platforms and app stores',
     baseCost: 25000,
     costScaling: 1.5,
@@ -92,7 +92,7 @@ export const CAMPAIGN_DEFINITIONS: Record<CampaignType, CampaignDefinition> = {
   influencer_short: {
     type: 'influencer_short',
     name: 'Influencer Deal (Short)',
-    icon: '⭐',
+    icon: 'star',
     description: 'One-time sponsored content from popular streamers and content creators',
     baseCost: 8000,
     costScaling: 0.8,
@@ -105,7 +105,7 @@ export const CAMPAIGN_DEFINITIONS: Record<CampaignType, CampaignDefinition> = {
   influencer_long: {
     type: 'influencer_long',
     name: 'Influencer Partnership',
-    icon: '🌟',
+    icon: 'star',
     description: 'Long-term partnership with influencers for ongoing content and promotion',
     baseCost: 50000,
     costScaling: 2.0,

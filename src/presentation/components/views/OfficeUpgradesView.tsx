@@ -59,12 +59,14 @@ export function OfficeUpgradesView() {
       {/* Current Office Status */}
       <Card>
         <div className="flex items-center gap-4">
-          <div className="text-4xl">
-            {company.officeLevel === 1 ? '🏠' : 
-             company.officeLevel === 2 ? '🏢' :
-             company.officeLevel === 3 ? '🏬' :
-             company.officeLevel === 4 ? '🏛️' : '🌆'}
-          </div>
+          <Icon 
+            name={company.officeLevel === 1 ? 'home' : 
+                 company.officeLevel === 2 ? 'building' :
+                 company.officeLevel === 3 ? 'office-building' :
+                 company.officeLevel === 4 ? 'government' : 'cityscape'}
+            size="xl"
+            className="text-gacha-gold"
+          />
           <div className="flex-1">
             <h3 className="text-xl font-bold text-white">{currentTier.name}</h3>
             <p className="text-sm text-gray-400">
@@ -152,19 +154,21 @@ export function OfficeUpgradesView() {
               return (
                 <Card key={upgrade.type} className={!meetsLevel ? 'opacity-60' : ''}>
                   <div className="flex items-start gap-3">
-                    <div className="text-2xl">
-                      {upgrade.type === 'workstations' ? '💻' :
-                       upgrade.type === 'meeting_room' ? '🗣️' :
-                       upgrade.type === 'server_room' ? '🖥️' :
-                       upgrade.type === 'break_room' ? '☕' :
-                       upgrade.type === 'training_center' ? '📚' :
-                       upgrade.type === 'recording_studio' ? '🎵' :
-                       upgrade.type === 'art_studio' ? '🎨' :
-                       upgrade.type === 'motion_capture' ? '📹' :
-                       upgrade.type === 'cafeteria' ? '🍽️' :
-                       upgrade.type === 'gym' ? '💪' :
-                       upgrade.type === 'rooftop_garden' ? '🌿' : '🏢'}
-                    </div>
+                    <Icon 
+                      name={upgrade.type === 'workstations' ? 'workstation' :
+                           upgrade.type === 'meeting_room' ? 'meeting-room' :
+                           upgrade.type === 'server_room' ? 'server' :
+                           upgrade.type === 'break_room' ? 'coffee' :
+                           upgrade.type === 'training_center' ? 'training' :
+                           upgrade.type === 'recording_studio' ? 'music' :
+                           upgrade.type === 'art_studio' ? 'palette' :
+                           upgrade.type === 'motion_capture' ? 'video-camera' :
+                           upgrade.type === 'cafeteria' ? 'utensils' :
+                           upgrade.type === 'gym' ? 'dumbbell' :
+                           upgrade.type === 'rooftop_garden' ? 'plant' : 'building'}
+                      size="lg"
+                      className="text-gacha-gold"
+                    />
                     <div className="flex-1">
                       <h4 className="font-semibold text-white">{upgrade.name}</h4>
                       <p className="text-xs text-gray-400 mt-1">{upgrade.description}</p>
@@ -226,19 +230,21 @@ export function OfficeUpgradesView() {
             purchasedUpgrades.map(upgrade => (
               <Card key={upgrade.type} className="border-green-600/30">
                 <div className="flex items-start gap-3">
-                  <div className="text-2xl">
-                    {upgrade.type === 'workstations' ? '💻' :
-                     upgrade.type === 'meeting_room' ? '🗣️' :
-                     upgrade.type === 'server_room' ? '🖥️' :
-                     upgrade.type === 'break_room' ? '☕' :
-                     upgrade.type === 'training_center' ? '📚' :
-                     upgrade.type === 'recording_studio' ? '🎵' :
-                     upgrade.type === 'art_studio' ? '🎨' :
-                     upgrade.type === 'motion_capture' ? '📹' :
-                     upgrade.type === 'cafeteria' ? '🍽️' :
-                     upgrade.type === 'gym' ? '💪' :
-                     upgrade.type === 'rooftop_garden' ? '🌿' : '🏢'}
-                  </div>
+                  <Icon 
+                    name={upgrade.type === 'workstations' ? 'workstation' :
+                         upgrade.type === 'meeting_room' ? 'meeting-room' :
+                         upgrade.type === 'server_room' ? 'server' :
+                         upgrade.type === 'break_room' ? 'coffee' :
+                         upgrade.type === 'training_center' ? 'training' :
+                         upgrade.type === 'recording_studio' ? 'music' :
+                         upgrade.type === 'art_studio' ? 'palette' :
+                         upgrade.type === 'motion_capture' ? 'video-camera' :
+                         upgrade.type === 'cafeteria' ? 'utensils' :
+                         upgrade.type === 'gym' ? 'dumbbell' :
+                         upgrade.type === 'rooftop_garden' ? 'plant' : 'building'}
+                    size="lg"
+                    className="text-green-400"
+                  />
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <h4 className="font-semibold text-white">{upgrade.name}</h4>

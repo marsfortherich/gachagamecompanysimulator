@@ -124,27 +124,27 @@ function toReputationDisplay(reputation: number): ReputationDisplay {
     tier = 'terrible';
     tierLabel = 'Terrible';
     color = '#EF4444';
-    icon = '💀';
+    icon = 'skull';
   } else if (reputation < 40) {
     tier = 'poor';
     tierLabel = 'Poor';
     color = '#F59E0B';
-    icon = '😟';
+    icon = 'worried';
   } else if (reputation < 60) {
     tier = 'average';
     tierLabel = 'Average';
     color = '#6B7280';
-    icon = '😐';
+    icon = 'neutral';
   } else if (reputation < 80) {
     tier = 'good';
     tierLabel = 'Good';
     color = '#22C55E';
-    icon = '😊';
+    icon = 'happy';
   } else {
     tier = 'excellent';
     tierLabel = 'Excellent';
     color = '#10B981';
-    icon = '🌟';
+    icon = 'star';
   }
 
   return {
@@ -212,7 +212,7 @@ function calculateFinancials(
   if (!isProfit && monthlyExpenses > 0) {
     runwayMonths = Math.floor(totalFunds / monthlyExpenses);
     if (runwayMonths < 3) {
-      runwayLabel = `⚠️ ${runwayMonths} months left`;
+      runwayLabel = `${runwayMonths} months left`;
     } else if (runwayMonths < 12) {
       runwayLabel = `${runwayMonths} months runway`;
     } else {

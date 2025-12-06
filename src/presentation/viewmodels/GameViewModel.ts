@@ -92,13 +92,13 @@ const GENRE_LABELS: Record<GameGenre, string> = {
 };
 
 const GENRE_ICONS: Record<GameGenre, string> = {
-  rpg: '⚔️',
-  action: '💥',
-  puzzle: '🧩',
-  strategy: '♟️',
-  idle: '💤',
-  card: '🃏',
-  rhythm: '🎵',
+  rpg: 'rpg',
+  action: 'action',
+  puzzle: 'puzzle',
+  strategy: 'strategy',
+  idle: 'idle',
+  card: 'card',
+  rhythm: 'rhythm',
 };
 
 const STATUS_LABELS: Record<GameStatus, string> = {
@@ -122,21 +122,21 @@ const STATUS_COLORS: Record<GameStatus, string> = {
 };
 
 const PHASE_ICONS: Record<GameStatus, string> = {
-  planning: '📋',
-  development: '💻',
-  testing: '🔍',
-  soft_launch: '🚀',
-  live: '🎮',
-  maintenance: '🔧',
-  shutdown: '⛔',
+  planning: 'planning',
+  development: 'development',
+  testing: 'testing',
+  soft_launch: 'launch',
+  live: 'live',
+  maintenance: 'maintenance',
+  shutdown: 'shutdown',
 };
 
 const QUALITY_METRICS: { key: keyof GameQuality; name: string; icon: string; color: string }[] = [
-  { key: 'graphics', name: 'Graphics', icon: '🎨', color: '#A855F7' },
-  { key: 'gameplay', name: 'Gameplay', icon: '🎮', color: '#22C55E' },
-  { key: 'story', name: 'Story', icon: '📖', color: '#3B82F6' },
-  { key: 'sound', name: 'Sound', icon: '🎵', color: '#06B6D4' },
-  { key: 'polish', name: 'Polish', icon: '✨', color: '#F59E0B' },
+  { key: 'graphics', name: 'Graphics', icon: 'graphics', color: '#A855F7' },
+  { key: 'gameplay', name: 'Gameplay', icon: 'gameplay', color: '#22C55E' },
+  { key: 'story', name: 'Story', icon: 'story', color: '#3B82F6' },
+  { key: 'sound', name: 'Sound', icon: 'sound', color: '#06B6D4' },
+  { key: 'polish', name: 'Polish', icon: 'polish', color: '#F59E0B' },
 ];
 
 const ROLE_COLORS: Record<string, string> = {

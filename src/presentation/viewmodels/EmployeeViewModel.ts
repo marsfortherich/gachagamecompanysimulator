@@ -67,13 +67,13 @@ const SKILL_COLORS: Record<SkillType, string> = {
 };
 
 const SKILL_ICONS: Record<SkillType, string> = {
-  programming: '💻',
-  art: '🎨',
-  game_design: '🎮',
-  marketing: '📢',
-  management: '📋',
-  sound: '🎵',
-  writing: '✍️',
+  programming: 'programmer',
+  art: 'artist',
+  game_design: 'games',
+  marketing: 'megaphone',
+  management: 'document',
+  sound: 'sound',
+  writing: 'edit',
 };
 
 const SKILL_LABELS: Record<SkillType, string> = {
@@ -95,11 +95,11 @@ const ROLE_LABELS: Record<EmployeeRole, string> = {
 };
 
 const ROLE_ICONS: Record<EmployeeRole, string> = {
-  Programmer: '💻',
-  Artist: '🎨',
-  Designer: '🎮',
-  Producer: '📋',
-  Marketer: '📢',
+  Programmer: 'programmer',
+  Artist: 'artist',
+  Designer: 'games',
+  Producer: 'document',
+  Marketer: 'megaphone',
 };
 
 // =============================================================================
@@ -133,27 +133,27 @@ function toMoraleDisplay(morale: number): MoraleDisplay {
   if (morale < 20) {
     status = 'critical';
     color = '#EF4444';
-    icon = '😢';
+    icon = 'depressed';
     label = 'Critical';
   } else if (morale < 40) {
     status = 'low';
     color = '#F59E0B';
-    icon = '😔';
+    icon = 'sad';
     label = 'Low';
   } else if (morale < 70) {
     status = 'normal';
     color = '#6B7280';
-    icon = '😐';
+    icon = 'neutral';
     label = 'Normal';
   } else if (morale < 90) {
     status = 'high';
     color = '#22C55E';
-    icon = '😊';
+    icon = 'happy';
     label = 'High';
   } else {
     status = 'excellent';
     color = '#10B981';
-    icon = '🤩';
+    icon = 'ecstatic';
     label = 'Excellent';
   }
 
