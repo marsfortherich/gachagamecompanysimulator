@@ -22,8 +22,50 @@ import {
   GENRE_CONFIGS,
   calculateTeamSynergy,
   createGachaBanner,
+  OFFICE_TIERS,
+  OfficeLevel,
 } from '../../domain';
 import { calculateMaintenanceEffect, IMPROVEMENT_TASKS, getImprovementPriority, calculateImprovementSpeed } from '../../domain/game/LiveGameImprovement';
+import { 
+  createScheduledFeature, 
+  startFeatureDevelopment, 
+  updateFeatureProgress, 
+  releaseFeature, 
+  cancelFeature, 
+  createFeatureBoost,
+  FEATURE_TYPE_CONFIGS,
+  calculateCombinedBoosts,
+} from '../../domain/game/FeatureRoadmap';
+import { 
+  OFFICE_UPGRADES, 
+  canPurchaseUpgrade, 
+} from '../../domain/company/OfficeUpgrades';
+import { 
+  createCrowdfundingCampaign as createCrowdfund, 
+  launchCampaign as launchCrowdfund,
+  simulateDailyPledges,
+  finalizeCampaign,
+  completeMilestone,
+} from '../../domain/economy/Crowdfunding';
+import { 
+  createGameAdConfig, 
+  enableAdType, 
+  disableAdType, 
+  calculateDailyAdEffects,
+  acceptSponsorship,
+  rejectSponsorship,
+  AD_TYPE_CONFIGS,
+} from '../../domain/economy/Advertising';
+import { 
+  createDefaultMonetizationSetup, 
+  startMonetizationImplementation,
+  completeMonetizationImplementation,
+  upgradeMonetizationLevel,
+  calculateDailyMonetizationRevenue,
+  processBattlePassTick,
+  MONETIZATION_CONFIGS,
+} from '../../domain/economy/Monetization';
+import { LAUNCH_PHASE_CONFIGS, createLaunchState } from '../../domain/game/LaunchPhases';
 import { GameState, createInitialState, EmployeeTraining } from '../state';
 import { GameAction } from '../actions';
 import { TRAINING_CONFIGS, completeTraining } from '../../domain';
@@ -75,6 +117,15 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       
       // Process employee training
       newState = processTraining(newState);
+      
+      // Process scheduled features
+      newState = processScheduledFeatures(newState);
+      
+      // Process crowdfunding campaigns
+      newState = processCrowdfunding(newState);
+      
+      // Process monetization implementations
+      newState = processMonetizationImplementations(newState);
       
       // Process monthly expenses (salary, etc.)
       if (newState.currentTick % 30 === 0) {
@@ -464,15 +515,389 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         return new Set();
       };
       
+      // Reconstruct ad configs with Set types
+      const reconstructAdConfigs = (configs: typeof loadedState.gameAdConfigs) => {
+        const result: typeof configs = {};
+        for (const [gameId, config] of Object.entries(configs)) {
+          result[gameId] = {
+            ...config,
+            enabledAdTypes: reconstructSet(config.enabledAdTypes),
+          };
+        }
+        return result;
+      };
+      
+      // Reconstruct monetization setups with Set types
+      const reconstructMonetizationSetups = (setups: typeof loadedState.monetizationSetups) => {
+        const result: typeof setups = {};
+        for (const [gameId, setup] of Object.entries(setups)) {
+          result[gameId] = {
+            ...setup,
+            enabledStrategies: reconstructSet(setup.enabledStrategies),
+          };
+        }
+        return result;
+      };
+      
       return {
         ...loadedState,
         unlockedGenres: reconstructSet<GameGenre>(loadedState.unlockedGenres),
         usedNames: reconstructSet<string>(loadedState.usedNames),
+        officeUpgrades: reconstructSet(loadedState.officeUpgrades),
+        gameAdConfigs: reconstructAdConfigs(loadedState.gameAdConfigs),
+        monetizationSetups: reconstructMonetizationSetups(loadedState.monetizationSetups),
       };
     }
 
     case 'RESET_STATE': {
       return createInitialState();
+    }
+
+    // ========== Feature Roadmap Actions ==========
+    case 'SCHEDULE_FEATURE': {
+      const { gameId, type, name, scheduledStartTick } = action.payload;
+      const feature = createScheduledFeature({ gameId, type, name, scheduledStartTick });
+      return {
+        ...state,
+        scheduledFeatures: [...state.scheduledFeatures, feature],
+      };
+    }
+
+    case 'START_FEATURE_DEVELOPMENT': {
+      if (!state.company) return state;
+      const { featureId } = action.payload;
+      const feature = state.scheduledFeatures.find(f => f.id === featureId);
+      if (!feature || feature.status !== 'planned') return state;
+      
+      const config = FEATURE_TYPE_CONFIGS[feature.type];
+      if (state.company.funds < config.baseCost) return state;
+      
+      const updatedFeatures = state.scheduledFeatures.map(f =>
+        f.id === featureId 
+          ? startFeatureDevelopment(f, state.currentTick)
+          : f
+      );
+      
+      return {
+        ...state,
+        company: updateCompanyFunds(state.company, -config.baseCost),
+        scheduledFeatures: updatedFeatures,
+      };
+    }
+
+    case 'RELEASE_FEATURE': {
+      const { featureId } = action.payload;
+      const feature = state.scheduledFeatures.find(f => f.id === featureId);
+      if (!feature || feature.status !== 'ready') return state;
+      
+      const releasedFeature = releaseFeature(feature, state.currentTick);
+      const boost = createFeatureBoost(releasedFeature, state.currentTick);
+      
+      return {
+        ...state,
+        scheduledFeatures: state.scheduledFeatures.map(f =>
+          f.id === featureId ? releasedFeature : f
+        ),
+        featureBoosts: boost ? [...state.featureBoosts, boost] : state.featureBoosts,
+      };
+    }
+
+    case 'CANCEL_FEATURE': {
+      const { featureId } = action.payload;
+      return {
+        ...state,
+        scheduledFeatures: state.scheduledFeatures.map(f =>
+          f.id === featureId ? cancelFeature(f) : f
+        ),
+      };
+    }
+
+    // ========== Office Upgrade Actions ==========
+    case 'PURCHASE_OFFICE_UPGRADE': {
+      if (!state.company) return state;
+      const { upgradeType } = action.payload;
+      
+      const result = canPurchaseUpgrade(
+        upgradeType,
+        state.company.officeLevel,
+        state.company.funds,
+        state.officeUpgrades
+      );
+      
+      if (!result.canPurchase) return state;
+      
+      const config = OFFICE_UPGRADES[upgradeType];
+      const newUpgrades = new Set(state.officeUpgrades);
+      newUpgrades.add(upgradeType);
+      
+      return {
+        ...state,
+        company: updateCompanyFunds(state.company, -config.cost),
+        officeUpgrades: newUpgrades,
+      };
+    }
+
+    case 'UPGRADE_OFFICE': {
+      if (!state.company) return state;
+      const currentLevel = state.company.officeLevel;
+      if (currentLevel >= 5) return state;
+      
+      const nextLevel = (currentLevel + 1) as OfficeLevel;
+      const tier = OFFICE_TIERS[nextLevel];
+      
+      if (state.company.funds < tier.upgradeCost) return state;
+      
+      return {
+        ...state,
+        company: {
+          ...updateCompanyFunds(state.company, -tier.upgradeCost),
+          officeLevel: nextLevel,
+          monthlyExpenses: tier.monthlyCost,
+        },
+      };
+    }
+
+    // ========== Crowdfunding Actions ==========
+    case 'CREATE_CROWDFUNDING_CAMPAIGN': {
+      const { name, description, genre, fundingGoal, durationDays } = action.payload;
+      const campaign = createCrowdfund({
+        name,
+        description,
+        genre,
+        fundingGoal,
+        campaignDurationDays: durationDays,
+        currentTick: state.currentTick,
+      });
+      return {
+        ...state,
+        crowdfundingCampaigns: [...state.crowdfundingCampaigns, campaign],
+      };
+    }
+
+    case 'LAUNCH_CROWDFUNDING_CAMPAIGN': {
+      const { campaignId } = action.payload;
+      const campaign = state.crowdfundingCampaigns.find(c => c.id === campaignId);
+      if (!campaign) return state;
+      
+      const launchedCampaign = launchCrowdfund(campaign, state.currentTick);
+      
+      return {
+        ...state,
+        crowdfundingCampaigns: state.crowdfundingCampaigns.map(c =>
+          c.id === campaignId ? launchedCampaign : c
+        ),
+      };
+    }
+
+    case 'COMPLETE_CROWDFUNDING_MILESTONE': {
+      const { campaignId, milestoneId } = action.payload;
+      const campaign = state.crowdfundingCampaigns.find(c => c.id === campaignId);
+      if (!campaign || campaign.status !== 'funded') return state;
+      
+      const updatedCampaign = completeMilestone(campaign, milestoneId, state.currentTick);
+      const fundsReleased = updatedCampaign.totalFundsReceived - campaign.totalFundsReceived;
+      
+      return {
+        ...state,
+        crowdfundingCampaigns: state.crowdfundingCampaigns.map(c =>
+          c.id === campaignId ? updatedCampaign : c
+        ),
+        company: state.company 
+          ? updateCompanyFunds(state.company, fundsReleased)
+          : state.company,
+      };
+    }
+
+    // ========== Advertising Actions ==========
+    case 'ENABLE_AD_TYPE': {
+      if (!state.company) return state;
+      const { gameId, adType } = action.payload;
+      const config = AD_TYPE_CONFIGS[adType];
+      
+      if (state.company.funds < config.setupCost) return state;
+      
+      const currentConfig = state.gameAdConfigs[gameId] ?? createGameAdConfig(gameId);
+      const updatedConfig = enableAdType(currentConfig, adType);
+      
+      return {
+        ...state,
+        company: updateCompanyFunds(state.company, -config.setupCost),
+        gameAdConfigs: {
+          ...state.gameAdConfigs,
+          [gameId]: updatedConfig,
+        },
+      };
+    }
+
+    case 'DISABLE_AD_TYPE': {
+      const { gameId, adType } = action.payload;
+      const currentConfig = state.gameAdConfigs[gameId];
+      if (!currentConfig) return state;
+      
+      return {
+        ...state,
+        gameAdConfigs: {
+          ...state.gameAdConfigs,
+          [gameId]: disableAdType(currentConfig, adType),
+        },
+      };
+    }
+
+    case 'SET_AD_FREQUENCY': {
+      const { gameId, frequency } = action.payload;
+      const currentConfig = state.gameAdConfigs[gameId];
+      if (!currentConfig) return state;
+      
+      return {
+        ...state,
+        gameAdConfigs: {
+          ...state.gameAdConfigs,
+          [gameId]: { ...currentConfig, adFrequency: Math.max(0.5, Math.min(2.0, frequency)) },
+        },
+      };
+    }
+
+    case 'ACCEPT_SPONSORSHIP': {
+      const { dealId } = action.payload;
+      const deal = state.sponsorshipDeals.find(d => d.id === dealId);
+      if (!deal || deal.status !== 'offered') return state;
+      
+      const acceptedDeal = acceptSponsorship(deal, state.currentTick);
+      const upfrontPayout = acceptedDeal.payoutSchedule === 'upfront' ? acceptedDeal.totalPayout : 0;
+      
+      return {
+        ...state,
+        sponsorshipDeals: state.sponsorshipDeals.map(d =>
+          d.id === dealId ? acceptedDeal : d
+        ),
+        company: state.company && upfrontPayout > 0
+          ? updateCompanyFunds(state.company, upfrontPayout)
+          : state.company,
+      };
+    }
+
+    case 'REJECT_SPONSORSHIP': {
+      const { dealId } = action.payload;
+      return {
+        ...state,
+        sponsorshipDeals: state.sponsorshipDeals.map(d =>
+          d.id === dealId ? rejectSponsorship(d) : d
+        ),
+      };
+    }
+
+    // ========== Monetization Actions ==========
+    case 'IMPLEMENT_MONETIZATION': {
+      if (!state.company) return state;
+      const { gameId, strategy } = action.payload;
+      const config = MONETIZATION_CONFIGS[strategy];
+      
+      if (state.company.funds < config.implementationCost) return state;
+      
+      const implementation = startMonetizationImplementation(gameId, strategy, state.currentTick);
+      
+      return {
+        ...state,
+        company: updateCompanyFunds(state.company, -config.implementationCost),
+        monetizationImplementations: [...state.monetizationImplementations, implementation],
+      };
+    }
+
+    case 'UPGRADE_MONETIZATION': {
+      if (!state.company) return state;
+      const { gameId, strategy } = action.payload;
+      
+      const currentSetup = state.monetizationSetups[gameId];
+      if (!currentSetup || !currentSetup.enabledStrategies.has(strategy)) return state;
+      
+      const upgradedSetup = upgradeMonetizationLevel(currentSetup, strategy);
+      
+      // Calculate upgrade cost based on level difference
+      const currentLevel = currentSetup.strategyLevels[strategy];
+      if (currentLevel >= 3) return state;
+      
+      const upgradeCost = currentLevel === 1 ? 25000 : 75000;
+      if (state.company.funds < upgradeCost) return state;
+      
+      return {
+        ...state,
+        company: updateCompanyFunds(state.company, -upgradeCost),
+        monetizationSetups: {
+          ...state.monetizationSetups,
+          [gameId]: upgradedSetup,
+        },
+      };
+    }
+
+    // ========== Launch Phase Actions ==========
+    case 'START_PHASED_LAUNCH': {
+      const { gameId } = action.payload;
+      const game = state.games.find(g => g.id === gameId);
+      if (!game || game.developmentProgress < 100) return state;
+      
+      // Create initial launch state for testing phase (alpha)
+      const alphaConfig = LAUNCH_PHASE_CONFIGS.alpha;
+      const newLaunchState = createLaunchState(gameId, state.currentTick);
+      
+      // Calculate initial test users based on playerMultiplier
+      const initialTestUsers = Math.floor(1000 * alphaConfig.playerMultiplier);
+      
+      return {
+        ...state,
+        games: state.games.map(g =>
+          g.id === gameId
+            ? {
+                ...g,
+                status: 'testing' as const,  // Use valid GameStatus
+                // Start with minimal players for alpha testing
+                monetization: {
+                  ...g.monetization,
+                  dailyActiveUsers: initialTestUsers,
+                  totalDownloads: initialTestUsers,
+                },
+              }
+            : g
+        ),
+        launchStates: {
+          ...state.launchStates,
+          [gameId]: newLaunchState,
+        },
+      };
+    }
+
+    case 'ADVANCE_LAUNCH_PHASE': {
+      // Launch phase advancement handled in game development process
+      // This action is for manual advancement if needed
+      return state;
+    }
+
+    case 'EXTEND_LAUNCH_PHASE': {
+      const { gameId, days } = action.payload;
+      const launchState = state.launchStates[gameId];
+      if (!launchState) return state;
+      
+      return {
+        ...state,
+        launchStates: {
+          ...state.launchStates,
+          [gameId]: {
+            ...launchState,
+            extendedDays: launchState.extendedDays + days,
+          },
+        },
+      };
+    }
+
+    case 'RESOLVE_FEEDBACK': {
+      const { feedbackId } = action.payload;
+      return {
+        ...state,
+        playerFeedback: state.playerFeedback.map(f =>
+          f.id === feedbackId 
+            ? { ...f, resolved: true, tickResolved: state.currentTick }
+            : f
+        ),
+      };
     }
 
     default:
@@ -682,6 +1107,46 @@ function processLiveGames(state: GameState): GameState {
     }
 
     totalRevenue += result.dailyRevenue;
+    
+    // Add advertising revenue
+    const adConfig = state.gameAdConfigs[game.id];
+    if (adConfig && adConfig.enabledAdTypes.size > 0) {
+      const adEffects = calculateDailyAdEffects(adConfig, finalGame.monetization.dailyActiveUsers);
+      totalRevenue += adEffects.revenue;
+      
+      // Apply ad satisfaction impact
+      const newSat = Math.max(0, Math.min(100,
+        finalGame.monetization.playerSatisfaction + adEffects.satisfactionChange
+      ));
+      finalGame = {
+        ...finalGame,
+        monetization: { ...finalGame.monetization, playerSatisfaction: newSat },
+      };
+    }
+    
+    // Add monetization revenue (beyond base gacha)
+    const monetizationSetup = state.monetizationSetups[game.id];
+    if (monetizationSetup) {
+      const monetizationResult = calculateDailyMonetizationRevenue(
+        monetizationSetup,
+        finalGame.monetization.dailyActiveUsers,
+        result.newUsers
+      );
+      totalRevenue += monetizationResult.totalRevenue;
+      
+      // Process battle pass tick
+      const updatedSetup = processBattlePassTick(monetizationSetup);
+      if (updatedSetup !== monetizationSetup) {
+        // Would need to update state.monetizationSetups - handled separately
+      }
+    }
+    
+    // Apply feature boost effects
+    const boostEffects = calculateCombinedBoosts(game.id, state.featureBoosts, state.currentTick);
+    if (boostEffects.revenueMultiplier > 1) {
+      totalRevenue *= boostEffects.revenueMultiplier;
+    }
+    
     return finalGame;
   });
 
@@ -807,5 +1272,117 @@ function processTraining(state: GameState): GameState {
     ...state,
     employees: updatedEmployees,
     employeeTraining: ongoingTraining,
+  };
+}
+
+/**
+ * Process scheduled features - development progress, auto-start, release effects
+ */
+function processScheduledFeatures(state: GameState): GameState {
+  if (state.scheduledFeatures.length === 0) return state;
+  
+  const currentTick = state.currentTick;
+  const employeeMap = new Map(state.employees.map(e => [e.id, e]));
+  
+  // Update feature development progress
+  const updatedFeatures = state.scheduledFeatures.map(feature => {
+    // Auto-start features that are scheduled to start now
+    if (feature.status === 'planned' && feature.scheduledStartTick <= currentTick) {
+      return startFeatureDevelopment(feature, currentTick);
+    }
+    
+    // Progress in-development features
+    if (feature.status === 'in_progress') {
+      const game = state.games.find(g => g.id === feature.gameId);
+      if (!game) return feature;
+      
+      // Get team assigned to the game
+      const team = game.assignedEmployees
+        .map(id => employeeMap.get(id))
+        .filter((e): e is Employee => e !== undefined);
+      
+      if (team.length === 0) return feature;
+      
+      // Calculate progress based on team
+      const config = FEATURE_TYPE_CONFIGS[feature.type];
+      const baseProgress = 100 / config.baseDevelopmentDays;
+      const teamSkill = team.reduce((sum, e) => sum + e.skills.programming + e.skills.game_design, 0) / (team.length * 2);
+      const skillMultiplier = 0.7 + (teamSkill / 100) * 0.6;
+      
+      return updateFeatureProgress(feature, baseProgress * skillMultiplier);
+    }
+    
+    return feature;
+  });
+  
+  // Clean up expired feature boosts
+  const activeBoosts = state.featureBoosts.filter(b => b.expiresAtTick > currentTick);
+  
+  return {
+    ...state,
+    scheduledFeatures: updatedFeatures,
+    featureBoosts: activeBoosts,
+  };
+}
+
+/**
+ * Process crowdfunding campaigns - pledges, finalization
+ */
+function processCrowdfunding(state: GameState): GameState {
+  if (state.crowdfundingCampaigns.length === 0) return state;
+  if (!state.company) return state;
+  
+  const currentTick = state.currentTick;
+  let updatedCompany = state.company;
+  
+  const updatedCampaigns = state.crowdfundingCampaigns.map(campaign => {
+    // Process active campaigns
+    if (campaign.status === 'active') {
+      const dayOfCampaign = currentTick - campaign.campaignStartTick;
+      let updated = simulateDailyPledges(campaign, updatedCompany.reputation, dayOfCampaign);
+      
+      // Check if campaign should end
+      if (currentTick >= campaign.campaignEndTick) {
+        updated = finalizeCampaign(updated, currentTick);
+      }
+      
+      return updated;
+    }
+    
+    return campaign;
+  });
+  
+  return {
+    ...state,
+    company: updatedCompany,
+    crowdfundingCampaigns: updatedCampaigns,
+  };
+}
+
+/**
+ * Process monetization implementations - complete and apply
+ */
+function processMonetizationImplementations(state: GameState): GameState {
+  if (state.monetizationImplementations.length === 0) return state;
+  
+  const currentTick = state.currentTick;
+  const completedImpls = state.monetizationImplementations.filter(i => i.endTick <= currentTick);
+  const ongoingImpls = state.monetizationImplementations.filter(i => i.endTick > currentTick);
+  
+  if (completedImpls.length === 0) return state;
+  
+  // Apply completed implementations to monetization setups
+  let updatedSetups = { ...state.monetizationSetups };
+  
+  for (const impl of completedImpls) {
+    const gameId = impl.gameId;
+    const currentSetup = updatedSetups[gameId] ?? createDefaultMonetizationSetup(gameId);
+    updatedSetups[gameId] = completeMonetizationImplementation(currentSetup, impl.strategy);
+  }
+  
+  return {
+    ...state,
+    monetizationSetups: updatedSetups,
+    monetizationImplementations: ongoingImpls,
   };
 }

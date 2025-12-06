@@ -4,6 +4,7 @@ import { GameActions } from '../../../application/actions';
 import { Card, Button, Input, ProgressBar, Icon, IconName } from '../common';
 import { GameGenre, GENRE_CONFIGS, GenreTier } from '../../../domain';
 import { IMPROVEMENT_TASKS, ImprovementFocus } from '../../../domain/game/LiveGameImprovement';
+import { LAUNCH_PHASE_CONFIGS } from '../../../domain/game/LaunchPhases';
 import { 
   PhaseInfoTooltip, 
   ProgressBreakdownPanel, 
@@ -52,6 +53,7 @@ export function GamesView() {
   const { games, employees, company, unlockedGenres } = state;
   const [showNewGame, setShowNewGame] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
+  const [showLaunchModal, setShowLaunchModal] = useState<string | null>(null); // gameId or null
   const [newGameName, setNewGameName] = useState('');
   const [selectedGenre, setSelectedGenre] = useState<GameGenre>('idle'); // Start with an unlocked genre
   const [collapsedGames, setCollapsedGames] = useState<Set<string>>(new Set());
@@ -111,6 +113,12 @@ export function GamesView() {
 
   const handleLaunchGame = (gameId: string) => {
     dispatch(GameActions.launchGame(gameId));
+    setShowLaunchModal(null);
+  };
+
+  const handlePhasedLaunch = (gameId: string) => {
+    dispatch(GameActions.startPhasedLaunch(gameId));
+    setShowLaunchModal(null);
   };
 
   const handleShutdownGame = (gameId: string) => {
@@ -477,12 +485,44 @@ export function GamesView() {
                     <Button
                       fullWidth
                       variant="success"
-                      onClick={() => handleLaunchGame(game.id)}
+                      onClick={() => setShowLaunchModal(game.id)}
                       className="flex items-center justify-center gap-2"
                     >
                       <Icon name="rocket" size="sm" className="text-white" /> Launch Game
                     </Button>
                   )}
+                </div>
+              )}
+
+              {/* Testing Phase Stats */}
+              {game.status === 'testing' && state.launchStates[game.id] && (
+                <div className="space-y-3 pt-3 border-t border-gray-700">
+                  <div className="flex items-center gap-2">
+                    <Icon name="flask" size="sm" className="text-blue-400" />
+                    <span className="text-sm font-semibold text-white">
+                      {state.launchStates[game.id].currentPhase.toUpperCase()} Phase
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <p className="text-xs text-gray-400">Testers</p>
+                      <p className="text-white">{game.monetization.dailyActiveUsers.toLocaleString()}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-400">Feedback Resolved</p>
+                      <p className="text-white">
+                        {state.launchStates[game.id].resolvedFeedbackCount} / {state.launchStates[game.id].totalFeedbackCount}
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    fullWidth
+                    variant="primary"
+                    disabled={state.launchStates[game.id].currentPhase === 'alpha'}
+                    onClick={() => dispatch(GameActions.advanceLaunchPhase(game.id))}
+                  >
+                    Advance to Next Phase
+                  </Button>
                 </div>
               )}
 
@@ -668,6 +708,66 @@ export function GamesView() {
             </Card>
             );
           })}
+        </div>
+      )}
+
+      {/* Launch Type Modal */}
+      {showLaunchModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-md">
+            <h3 className="text-xl font-bold text-white mb-4">Choose Launch Type</h3>
+            <p className="text-sm text-gray-400 mb-4">
+              How would you like to launch your game?
+            </p>
+            
+            <div className="space-y-3">
+              {/* Instant Launch */}
+              <button
+                onClick={() => handleLaunchGame(showLaunchModal)}
+                className="w-full p-4 rounded-lg border-2 border-green-600 bg-green-900/20 hover:bg-green-900/40 text-left transition"
+              >
+                <div className="flex items-center gap-3">
+                  <Icon name="rocket" size="lg" className="text-green-400" />
+                  <div>
+                    <h4 className="font-semibold text-white">Instant Global Launch</h4>
+                    <p className="text-xs text-gray-400">
+                      Launch directly to global audience. Faster to market but no early feedback.
+                    </p>
+                  </div>
+                </div>
+              </button>
+              
+              {/* Phased Launch */}
+              <button
+                onClick={() => handlePhasedLaunch(showLaunchModal)}
+                className="w-full p-4 rounded-lg border-2 border-blue-600 bg-blue-900/20 hover:bg-blue-900/40 text-left transition"
+              >
+                <div className="flex items-center gap-3">
+                  <Icon name="flask" size="lg" className="text-blue-400" />
+                  <div>
+                    <h4 className="font-semibold text-white">Phased Launch</h4>
+                    <p className="text-xs text-gray-400 mb-2">
+                      Alpha → Beta → Soft Launch → Global. Get player feedback and fix issues first.
+                    </p>
+                    <div className="flex gap-2 text-xs">
+                      <span className="px-2 py-0.5 bg-blue-800/50 rounded text-blue-200">
+                        Alpha: {LAUNCH_PHASE_CONFIGS.alpha.recommendedDurationDays}d
+                      </span>
+                      <span className="px-2 py-0.5 bg-blue-800/50 rounded text-blue-200">
+                        Beta: {LAUNCH_PHASE_CONFIGS.beta.recommendedDurationDays}d
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </button>
+            </div>
+            
+            <div className="mt-4 flex justify-end">
+              <Button variant="secondary" onClick={() => setShowLaunchModal(null)}>
+                Cancel
+              </Button>
+            </div>
+          </Card>
         </div>
       )}
     </div>

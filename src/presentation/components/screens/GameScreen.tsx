@@ -9,7 +9,11 @@ import {
   EmployeesView, 
   GachaManagementView,
   MarketingView,
-  FinanceView 
+  FinanceView,
+  OfficeUpgradesView,
+  FeatureRoadmapView,
+  MonetizationView,
+  CrowdfundingView,
 } from '../views';
 
 export function GameScreen() {
@@ -78,6 +82,14 @@ export function GameScreen() {
         return <MarketingView />;
       case 'finance':
         return <FinanceView />;
+      case 'office':
+        return <OfficeUpgradesView />;
+      case 'roadmap':
+        return <FeatureRoadmapView />;
+      case 'monetization':
+        return <MonetizationView />;
+      case 'crowdfunding':
+        return <CrowdfundingView />;
       default:
         return <DashboardView />;
     }

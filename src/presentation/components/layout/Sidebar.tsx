@@ -13,6 +13,10 @@ const tabs: { id: string; label: string; icon: IconName }[] = [
   { id: 'gacha', label: 'Gacha', icon: 'gacha' },
   { id: 'marketing', label: 'Marketing', icon: 'marketing' },
   { id: 'finance', label: 'Finance', icon: 'finance' },
+  { id: 'office', label: 'Office', icon: 'settings' },
+  { id: 'roadmap', label: 'Roadmap', icon: 'calendar' },
+  { id: 'monetization', label: 'Monetize', icon: 'money' },
+  { id: 'crowdfunding', label: 'Funding', icon: 'rocket' },
 ];
 
 export function Sidebar({ activeTab, onTabChange }: SidebarProps) {

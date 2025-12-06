@@ -1,6 +1,10 @@
 import { GameState } from '../state';
 import { CampaignType, EmployeeTier, EmployeeRole, GameGenre, TrainingType } from '../../domain';
 import { ImprovementFocus } from '../../domain/game/LiveGameImprovement';
+import { FeatureType } from '../../domain/game/FeatureRoadmap';
+import { OfficeUpgradeType } from '../../domain/company/OfficeUpgrades';
+import { AdType } from '../../domain/economy/Advertising';
+import { MonetizationStrategy } from '../../domain/economy/Monetization';
 
 /**
  * Action types for state management
@@ -27,7 +31,33 @@ export type GameAction =
   | { type: 'START_CAMPAIGN'; payload: { gameId: string; campaignType: CampaignType } }
   | { type: 'CANCEL_CAMPAIGN'; payload: { campaignId: string } }
   | { type: 'LOAD_STATE'; payload: { state: GameState } }
-  | { type: 'RESET_STATE' };
+  | { type: 'RESET_STATE' }
+  // Feature Roadmap Actions
+  | { type: 'SCHEDULE_FEATURE'; payload: { gameId: string; type: FeatureType; name: string; scheduledStartTick: number } }
+  | { type: 'START_FEATURE_DEVELOPMENT'; payload: { featureId: string } }
+  | { type: 'RELEASE_FEATURE'; payload: { featureId: string } }
+  | { type: 'CANCEL_FEATURE'; payload: { featureId: string } }
+  // Office Upgrade Actions
+  | { type: 'PURCHASE_OFFICE_UPGRADE'; payload: { upgradeType: OfficeUpgradeType } }
+  | { type: 'UPGRADE_OFFICE'; payload: Record<string, never> }
+  // Crowdfunding Actions
+  | { type: 'CREATE_CROWDFUNDING_CAMPAIGN'; payload: { name: string; description: string; genre: GameGenre; fundingGoal: number; durationDays: number } }
+  | { type: 'LAUNCH_CROWDFUNDING_CAMPAIGN'; payload: { campaignId: string } }
+  | { type: 'COMPLETE_CROWDFUNDING_MILESTONE'; payload: { campaignId: string; milestoneId: string } }
+  // Advertising Actions
+  | { type: 'ENABLE_AD_TYPE'; payload: { gameId: string; adType: AdType } }
+  | { type: 'DISABLE_AD_TYPE'; payload: { gameId: string; adType: AdType } }
+  | { type: 'SET_AD_FREQUENCY'; payload: { gameId: string; frequency: number } }
+  | { type: 'ACCEPT_SPONSORSHIP'; payload: { dealId: string } }
+  | { type: 'REJECT_SPONSORSHIP'; payload: { dealId: string } }
+  // Monetization Actions
+  | { type: 'IMPLEMENT_MONETIZATION'; payload: { gameId: string; strategy: MonetizationStrategy } }
+  | { type: 'UPGRADE_MONETIZATION'; payload: { gameId: string; strategy: MonetizationStrategy } }
+  // Launch Phase Actions
+  | { type: 'START_PHASED_LAUNCH'; payload: { gameId: string } }
+  | { type: 'ADVANCE_LAUNCH_PHASE'; payload: { gameId: string } }
+  | { type: 'EXTEND_LAUNCH_PHASE'; payload: { gameId: string; days: number } }
+  | { type: 'RESOLVE_FEEDBACK'; payload: { feedbackId: string } };
 
 /**
  * Action creators - factory functions for type-safe action creation
@@ -134,5 +164,111 @@ export const GameActions = {
 
   resetState: (): GameAction => ({
     type: 'RESET_STATE',
+  }),
+
+  // Feature Roadmap
+  scheduleFeature: (gameId: string, type: FeatureType, name: string, scheduledStartTick: number): GameAction => ({
+    type: 'SCHEDULE_FEATURE',
+    payload: { gameId, type, name, scheduledStartTick },
+  }),
+
+  startFeatureDevelopment: (featureId: string): GameAction => ({
+    type: 'START_FEATURE_DEVELOPMENT',
+    payload: { featureId },
+  }),
+
+  releaseFeature: (featureId: string): GameAction => ({
+    type: 'RELEASE_FEATURE',
+    payload: { featureId },
+  }),
+
+  cancelFeature: (featureId: string): GameAction => ({
+    type: 'CANCEL_FEATURE',
+    payload: { featureId },
+  }),
+
+  // Office Upgrades
+  purchaseOfficeUpgrade: (upgradeType: OfficeUpgradeType): GameAction => ({
+    type: 'PURCHASE_OFFICE_UPGRADE',
+    payload: { upgradeType },
+  }),
+
+  upgradeOffice: (): GameAction => ({
+    type: 'UPGRADE_OFFICE',
+    payload: {},
+  }),
+
+  // Crowdfunding
+  createCrowdfundingCampaign: (name: string, description: string, genre: GameGenre, fundingGoal: number, durationDays: number): GameAction => ({
+    type: 'CREATE_CROWDFUNDING_CAMPAIGN',
+    payload: { name, description, genre, fundingGoal, durationDays },
+  }),
+
+  launchCrowdfundingCampaign: (campaignId: string): GameAction => ({
+    type: 'LAUNCH_CROWDFUNDING_CAMPAIGN',
+    payload: { campaignId },
+  }),
+
+  completeCrowdfundingMilestone: (campaignId: string, milestoneId: string): GameAction => ({
+    type: 'COMPLETE_CROWDFUNDING_MILESTONE',
+    payload: { campaignId, milestoneId },
+  }),
+
+  // Advertising
+  enableAdType: (gameId: string, adType: AdType): GameAction => ({
+    type: 'ENABLE_AD_TYPE',
+    payload: { gameId, adType },
+  }),
+
+  disableAdType: (gameId: string, adType: AdType): GameAction => ({
+    type: 'DISABLE_AD_TYPE',
+    payload: { gameId, adType },
+  }),
+
+  setAdFrequency: (gameId: string, frequency: number): GameAction => ({
+    type: 'SET_AD_FREQUENCY',
+    payload: { gameId, frequency },
+  }),
+
+  acceptSponsorship: (dealId: string): GameAction => ({
+    type: 'ACCEPT_SPONSORSHIP',
+    payload: { dealId },
+  }),
+
+  rejectSponsorship: (dealId: string): GameAction => ({
+    type: 'REJECT_SPONSORSHIP',
+    payload: { dealId },
+  }),
+
+  // Monetization
+  implementMonetization: (gameId: string, strategy: MonetizationStrategy): GameAction => ({
+    type: 'IMPLEMENT_MONETIZATION',
+    payload: { gameId, strategy },
+  }),
+
+  upgradeMonetization: (gameId: string, strategy: MonetizationStrategy): GameAction => ({
+    type: 'UPGRADE_MONETIZATION',
+    payload: { gameId, strategy },
+  }),
+
+  // Launch Phases
+  startPhasedLaunch: (gameId: string): GameAction => ({
+    type: 'START_PHASED_LAUNCH',
+    payload: { gameId },
+  }),
+
+  advanceLaunchPhase: (gameId: string): GameAction => ({
+    type: 'ADVANCE_LAUNCH_PHASE',
+    payload: { gameId },
+  }),
+
+  extendLaunchPhase: (gameId: string, days: number): GameAction => ({
+    type: 'EXTEND_LAUNCH_PHASE',
+    payload: { gameId, days },
+  }),
+
+  resolveFeedback: (feedbackId: string): GameAction => ({
+    type: 'RESOLVE_FEEDBACK',
+    payload: { feedbackId },
   }),
 };

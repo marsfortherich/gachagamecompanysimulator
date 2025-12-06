@@ -5,3 +5,7 @@ export { PlaceholderView } from './PlaceholderView';
 export { GachaManagementView } from './GachaManagementView';
 export { MarketingView } from './MarketingView';
 export { FinanceView } from './FinanceView';
+export { OfficeUpgradesView } from './OfficeUpgradesView';
+export { FeatureRoadmapView } from './FeatureRoadmapView';
+export { MonetizationView } from './MonetizationView';
+export { CrowdfundingView } from './CrowdfundingView';
