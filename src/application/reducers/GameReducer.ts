@@ -20,6 +20,8 @@ import {
   generateTieredEmployee,
   getHiringCost,
   GENRE_CONFIGS,
+  calculateTeamSynergy,
+  createGachaBanner,
 } from '../../domain';
 import { calculateMaintenanceEffect, IMPROVEMENT_TASKS, getImprovementPriority, calculateImprovementSpeed } from '../../domain/game/LiveGameImprovement';
 import { GameState, createInitialState, EmployeeTraining } from '../state';
@@ -379,6 +381,31 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       };
     }
 
+    case 'CREATE_BANNER': {
+      const { gameId, name, duration } = action.payload;
+      
+      // Find the game
+      const game = state.games.find(g => g.id === gameId);
+      if (!game || game.status !== 'live') return state;
+      
+      // Create a new banner with default settings
+      const banner = createGachaBanner({
+        name,
+        gameId,
+        featuredItems: [],  // Player can customize later
+        itemPool: [],
+        startDate: state.currentTick,
+        duration,
+        rates: game.monetization.gachaRates,  // Use game's current rates
+        isLimited: true,  // Banner events are typically limited
+      });
+      
+      return {
+        ...state,
+        gachaBanners: [...state.gachaBanners, banner],
+      };
+    }
+
     case 'START_CAMPAIGN': {
       if (!state.company) return state;
       
@@ -455,6 +482,12 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
 /**
  * Process game development for all games in development
+ * Uses proper team effectiveness formula:
+ * - Skill average: 40% weight
+ * - Team size (capped at 5): 20% weight  
+ * - Average morale: 20% weight
+ * - Role coverage: 20% weight
+ * Plus team synergy bonuses (Producer, balanced team)
  */
 function processGameDevelopment(state: GameState): GameState {
   const employeeMap = new Map(state.employees.map(e => [e.id, e]));
@@ -480,9 +513,39 @@ function processGameDevelopment(state: GameState): GameState {
       return updatedGame;
     }
 
-    // Calculate daily progress - different phases have different speeds
-    let dailyProgress = 0;
-    const qualityGain = { graphics: 0, gameplay: 0, story: 0, sound: 0, polish: 0 };
+    // === Calculate Team Effectiveness using the tooltip formula ===
+    
+    // 1. Average skill score (40% weight)
+    // Calculate average of primary skills per employee, then average across team
+    let totalSkillScore = 0;
+    for (const emp of assignedEmployees) {
+      const progSkill = emp.skills.programming ?? 0;
+      const designSkill = emp.skills.game_design ?? 0;
+      const artSkill = emp.skills.art ?? 0;
+      const avgSkill = (progSkill + designSkill + artSkill) / 3;
+      totalSkillScore += avgSkill;
+    }
+    const avgSkillScore = (totalSkillScore / assignedEmployees.length) / 100; // Normalize to 0-1
+    const skillComponent = avgSkillScore * 0.4;
+    
+    // 2. Team size score (20% weight) - capped at 5 employees
+    const effectiveTeamSize = Math.min(assignedEmployees.length, 5);
+    const sizeComponent = (effectiveTeamSize / 5) * 0.2;
+    
+    // 3. Average morale score (20% weight)
+    const avgMorale = assignedEmployees.reduce((sum, e) => sum + e.morale, 0) / assignedEmployees.length;
+    const moraleComponent = (avgMorale / 100) * 0.2;
+    
+    // 4. Role coverage score (20% weight) - unique roles out of 5 possible
+    const uniqueRoles = new Set(assignedEmployees.map(e => e.role)).size;
+    const coverageComponent = (uniqueRoles / 5) * 0.2;
+    
+    // Team effectiveness (0 to 1)
+    const teamEffectiveness = skillComponent + sizeComponent + moraleComponent + coverageComponent;
+    
+    // Apply team synergy bonus (Producer bonus, balanced team bonus)
+    const synergy = calculateTeamSynergy(assignedEmployees);
+    const synergyMultiplier = 1 + synergy;
     
     // Phase-specific progress multipliers
     const phaseMultipliers: Record<string, number> = {
@@ -496,21 +559,20 @@ function processGameDevelopment(state: GameState): GameState {
     };
     const phaseMultiplier = phaseMultipliers[updatedGame.status] ?? 1.0;
 
+    // Base daily progress: 1-3% based on team effectiveness
+    // teamEffectiveness ranges from 0 to 1, so progress ranges from 0.5 to 3.5
+    const baseProgress = 0.5 + (teamEffectiveness * 3);
+    const dailyProgress = baseProgress * synergyMultiplier * phaseMultiplier;
+
+    // Calculate quality gains based on individual skills
+    const qualityGain = { graphics: 0, gameplay: 0, story: 0, sound: 0, polish: 0 };
     for (const employee of assignedEmployees) {
-      // Each employee contributes based on their skills
-      // Slower development to give time for player feedback and strategic decisions
-      dailyProgress += calculateEffectiveness(employee, 'programming') * 0.03;
-      dailyProgress += calculateEffectiveness(employee, 'game_design') * 0.02;
-      
       qualityGain.graphics += calculateEffectiveness(employee, 'art') * 0.1;
       qualityGain.gameplay += calculateEffectiveness(employee, 'game_design') * 0.1;
       qualityGain.story += calculateEffectiveness(employee, 'writing') * 0.1;
       qualityGain.sound += calculateEffectiveness(employee, 'sound') * 0.1;
       qualityGain.polish += calculateEffectiveness(employee, 'programming') * 0.05;
     }
-    
-    // Apply phase multiplier
-    dailyProgress *= phaseMultiplier;
 
     updatedGame = updateProgress(updatedGame, dailyProgress);
     updatedGame = updateQuality(updatedGame, qualityGain);

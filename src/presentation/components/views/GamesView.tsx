@@ -490,12 +490,30 @@ export function GamesView() {
               {game.status === 'live' && (
                 <div className="space-y-4 pt-3 border-t border-gray-700">
                   {/* Stats */}
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-3 gap-4">
                     <div>
                       <p className="text-xs text-gray-400">DAU</p>
                       <p className="text-lg font-semibold text-white">
                         {game.monetization.dailyActiveUsers.toLocaleString()}
                       </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-400">Est. Daily Churn</p>
+                      {(() => {
+                        // Calculate estimated churn based on satisfaction and genre retention
+                        const genreConfig = GENRE_CONFIGS[game.genre];
+                        const baseRetention = genreConfig?.retentionRate ?? 0.95;
+                        const satisfactionFactor = game.monetization.playerSatisfaction / 100;
+                        const adjustedRetention = baseRetention * (0.8 + satisfactionFactor * 0.2);
+                        const churnRate = 1 - adjustedRetention;
+                        const estimatedChurn = Math.round(game.monetization.dailyActiveUsers * churnRate);
+                        const churnPercent = (churnRate * 100).toFixed(1);
+                        return (
+                          <p className={`text-lg font-semibold ${churnRate > 0.1 ? 'text-red-400' : churnRate > 0.05 ? 'text-yellow-400' : 'text-gray-300'}`}>
+                            -{estimatedChurn.toLocaleString()} <span className="text-xs text-gray-400">({churnPercent}%)</span>
+                          </p>
+                        );
+                      })()}
                     </div>
                     <div>
                       <p className="text-xs text-gray-400">Revenue</p>
