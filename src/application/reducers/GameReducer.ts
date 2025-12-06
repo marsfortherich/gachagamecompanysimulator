@@ -24,6 +24,7 @@ import {
   createGachaBanner,
   OFFICE_TIERS,
   OfficeLevel,
+  getLocationBonuses,
 } from '../../domain';
 import { calculateMaintenanceEffect, IMPROVEMENT_TASKS, getImprovementPriority, calculateImprovementSpeed } from '../../domain/game/LiveGameImprovement';
 import { 
@@ -984,19 +985,24 @@ function processGameDevelopment(state: GameState): GameState {
     };
     const phaseMultiplier = phaseMultipliers[updatedGame.status] ?? 1.0;
 
+    // Get location bonuses for headquarters
+    const locationBonuses = getLocationBonuses(state.company?.headquarters ?? 'Tokyo');
+    const locationSpeedMultiplier = 1 + locationBonuses.developmentSpeedBonus;
+    const locationQualityMultiplier = 1 + locationBonuses.gameQualityBonus + locationBonuses.gamePolishBonus;
+
     // Base daily progress: 1-3% based on team effectiveness
     // teamEffectiveness ranges from 0 to 1, so progress ranges from 0.5 to 3.5
     const baseProgress = 0.5 + (teamEffectiveness * 3);
-    const dailyProgress = baseProgress * synergyMultiplier * phaseMultiplier;
+    const dailyProgress = baseProgress * synergyMultiplier * phaseMultiplier * locationSpeedMultiplier;
 
-    // Calculate quality gains based on individual skills
+    // Calculate quality gains based on individual skills, modified by location bonus
     const qualityGain = { graphics: 0, gameplay: 0, story: 0, sound: 0, polish: 0 };
     for (const employee of assignedEmployees) {
-      qualityGain.graphics += calculateEffectiveness(employee, 'art') * 0.1;
-      qualityGain.gameplay += calculateEffectiveness(employee, 'game_design') * 0.1;
-      qualityGain.story += calculateEffectiveness(employee, 'writing') * 0.1;
-      qualityGain.sound += calculateEffectiveness(employee, 'sound') * 0.1;
-      qualityGain.polish += calculateEffectiveness(employee, 'programming') * 0.05;
+      qualityGain.graphics += calculateEffectiveness(employee, 'art') * 0.1 * locationQualityMultiplier;
+      qualityGain.gameplay += calculateEffectiveness(employee, 'game_design') * 0.1 * locationQualityMultiplier;
+      qualityGain.story += calculateEffectiveness(employee, 'writing') * 0.1 * locationQualityMultiplier;
+      qualityGain.sound += calculateEffectiveness(employee, 'sound') * 0.1 * locationQualityMultiplier;
+      qualityGain.polish += calculateEffectiveness(employee, 'programming') * 0.05 * locationQualityMultiplier;
     }
 
     updatedGame = updateProgress(updatedGame, dailyProgress);
@@ -1058,6 +1064,7 @@ function processLiveGames(state: GameState): GameState {
       companyReputation: state.company!.reputation,
       hasMarketer,
       daysSinceLaunch,
+      headquarters: state.company?.headquarters,
     });
 
     // Apply maintenance effect from assigned staff (other than marketers)
@@ -1210,7 +1217,7 @@ function processCampaigns(state: GameState): GameState {
   for (const game of state.games) {
     if (game.status !== 'live') continue;
     
-    const effects = getCombinedCampaignEffects(game.id, updatedCampaigns);
+    const effects = getCombinedCampaignEffects(game.id, updatedCampaigns, state.company?.headquarters);
     
     // Only apply if there are active effects
     if (effects.dauBoost > 0 || effects.retentionBoost > 0 || effects.revenueBoost > 0) {

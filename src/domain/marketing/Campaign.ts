@@ -1,4 +1,5 @@
 import { Entity, generateId } from '../shared';
+import { getLocationBonuses } from '../company/Location';
 
 /**
  * Types of marketing campaigns
@@ -253,14 +254,20 @@ export function getActiveCampaigns(
 
 /**
  * Calculate combined effects from all active campaigns for a game
+ * Marketing effectiveness is boosted by location bonuses
  */
 export function getCombinedCampaignEffects(
   gameId: string,
-  campaigns: readonly Campaign[]
+  campaigns: readonly Campaign[],
+  headquarters: string = 'Tokyo'
 ): CampaignEffects {
   const activeCampaigns = getActiveCampaigns(gameId, campaigns);
   
-  return activeCampaigns.reduce(
+  // Get location marketing effectiveness bonus
+  const locationBonuses = getLocationBonuses(headquarters);
+  const marketingMultiplier = 1 + locationBonuses.marketingEffectiveness;
+  
+  const baseEffects = activeCampaigns.reduce(
     (combined, campaign) => ({
       dauBoost: combined.dauBoost + campaign.effects.dauBoost,
       retentionBoost: combined.retentionBoost + campaign.effects.retentionBoost,
@@ -268,6 +275,13 @@ export function getCombinedCampaignEffects(
     }),
     { dauBoost: 0, retentionBoost: 0, revenueBoost: 0 }
   );
+  
+  // Apply marketing effectiveness multiplier
+  return {
+    dauBoost: baseEffects.dauBoost * marketingMultiplier,
+    retentionBoost: baseEffects.retentionBoost * marketingMultiplier,
+    revenueBoost: baseEffects.revenueBoost * marketingMultiplier,
+  };
 }
 
 /**

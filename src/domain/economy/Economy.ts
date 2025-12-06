@@ -5,7 +5,7 @@
 
 
 import { Game, GameQuality, calculateOverallQuality } from '../game';
-import { Company, OFFICE_TIERS } from '../company';
+import { Company, OFFICE_TIERS, applyRevenueBonus, applyEmployeeCostModifier } from '../company';
 import { Employee } from '../employee';
 
 // ============================================================================
@@ -212,16 +212,22 @@ export function calculateGameRevenue(
   companyReputation: number,
   marketSaturation: number,
   hasAds: boolean = true,
-  hasLicensingDeal: boolean = false
+  hasLicensingDeal: boolean = false,
+  headquarters: string = 'Tokyo'
 ): GameFinancials {
   const arpu = calculateARPU(game.quality, config, marketSaturation);
   const dau = game.monetization.dailyActiveUsers;
   const mau = dau * 1.5;  // Rough MAU estimate
   
-  const inAppRevenue = calculateInAppRevenue(dau, arpu) * 30;  // Monthly
-  const adRevenue = calculateAdRevenue(dau, arpu, hasAds) * 30;
+  // Calculate base revenues
+  const baseInAppRevenue = calculateInAppRevenue(dau, arpu) * 30;  // Monthly
+  const baseAdRevenue = calculateAdRevenue(dau, arpu, hasAds) * 30;
   const merchRevenue = calculateMerchandiseRevenue(mau, companyReputation, 50);  // Assume 50 popularity
-  const licensingRevenue = calculateLicensingRevenue(inAppRevenue, companyReputation, hasLicensingDeal);
+  const licensingRevenue = calculateLicensingRevenue(baseInAppRevenue, companyReputation, hasLicensingDeal);
+  
+  // Apply location bonuses to revenue
+  const inAppRevenue = applyRevenueBonus(baseInAppRevenue, headquarters, 'gacha');
+  const adRevenue = applyRevenueBonus(baseAdRevenue, headquarters, 'ads');
   
   const serverCost = Math.ceil(dau / 1000) * ECONOMY_CONSTANTS.SERVER_COST_PER_1K_USERS;
   
@@ -247,7 +253,8 @@ export function calculateTotalRevenue(
   games: readonly Game[],
   configs: Map<string, GameEconomyConfig>,
   companyReputation: number,
-  marketSaturations: Map<string, number>
+  marketSaturations: Map<string, number>,
+  headquarters: string = 'Tokyo'
 ): RevenueBreakdown {
   const liveGames = games.filter(g => g.status === 'live');
   
@@ -264,7 +271,7 @@ export function calculateTotalRevenue(
     };
     const saturation = marketSaturations.get(game.genre) ?? 0.3;
     
-    const financials = calculateGameRevenue(game, config, companyReputation, saturation);
+    const financials = calculateGameRevenue(game, config, companyReputation, saturation, true, false, headquarters);
     totalInApp += financials.revenue.inAppPurchases;
     totalAds += financials.revenue.advertisements;
     totalMerch += financials.revenue.merchandise;
@@ -285,10 +292,14 @@ export function calculateTotalRevenue(
 // ============================================================================
 
 /**
- * Calculates total monthly salary costs
+ * Calculates total monthly salary costs with location modifier
  */
-export function calculateSalaryCosts(employees: readonly Employee[]): number {
-  return employees.reduce((sum, emp) => sum + emp.salary, 0);
+export function calculateSalaryCosts(
+  employees: readonly Employee[],
+  headquarters: string = 'Tokyo'
+): number {
+  const baseSalaries = employees.reduce((sum, emp) => sum + emp.salary, 0);
+  return Math.round(applyEmployeeCostModifier(baseSalaries, headquarters));
 }
 
 /**
@@ -354,7 +365,7 @@ export function calculateTotalCosts(
   games: readonly Game[],
   configs: Map<string, GameEconomyConfig>
 ): CostBreakdown {
-  const salaries = calculateSalaryCosts(employees);
+  const salaries = calculateSalaryCosts(employees, company.headquarters);
   const officeRent = calculateOfficeRent(company);
   const serverCosts = calculateServerCosts(games);
   const marketingCosts = calculateMarketingCosts(configs);
@@ -384,7 +395,7 @@ export function generateProfitReport(
   configs: Map<string, GameEconomyConfig>,
   marketSaturations: Map<string, number>
 ): ProfitReport {
-  const revenue = calculateTotalRevenue(games, configs, company.reputation, marketSaturations);
+  const revenue = calculateTotalRevenue(games, configs, company.reputation, marketSaturations, company.headquarters);
   const costs = calculateTotalCosts(company, employees, games, configs);
   
   const grossProfit = revenue.total - costs.total;

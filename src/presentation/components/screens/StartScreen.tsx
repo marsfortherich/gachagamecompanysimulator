@@ -2,90 +2,31 @@ import { useState, useEffect } from 'react';
 import { useGame } from '../../context';
 import { Button, Input, Card, Icon } from '../common';
 import { storageService } from '../../../infrastructure';
+import { LOCATIONS, LocationId } from '../../../domain/company/Location';
 
-// Headquarters location data with bonuses and descriptions
-interface LocationInfo {
-  name: string;
-  region: string;
-  description: string;
-  bonuses: string[];
-  targetAudience: string;
-}
+// Use domain location data for display
+const LOCATION_INFO = Object.fromEntries(
+  Object.entries(LOCATIONS).map(([key, config]) => [
+    key,
+    {
+      name: config.name,
+      region: config.region,
+      description: config.description,
+      bonuses: config.displayBonuses,
+      targetAudience: config.targetAudience,
+    }
+  ])
+) as Record<LocationId, { name: string; region: string; description: string; bonuses: readonly string[]; targetAudience: string }>;
 
-const LOCATION_INFO: Record<string, LocationInfo> = {
-  'Tokyo': {
-    name: 'Tokyo',
-    region: 'Asia',
-    description: 'The heart of the gacha gaming industry',
-    bonuses: ['+15% gacha revenue', 'Access to top anime artists', 'Strong mobile gaming market'],
-    targetAudience: 'Core mobile gamers, anime/JRPG enthusiasts',
-  },
-  'Seoul': {
-    name: 'Seoul',
-    region: 'Asia',
-    description: 'Competitive gaming capital with strong esports culture',
-    bonuses: ['+10% player engagement', 'Skilled developers', 'Esports integration'],
-    targetAudience: 'Competitive players, MMO fans',
-  },
-  'Shanghai': {
-    name: 'Shanghai',
-    region: 'Asia',
-    description: 'Gateway to the massive Chinese gaming market',
-    bonuses: ['+20% potential player base', 'Lower development costs', 'Growing talent pool'],
-    targetAudience: 'Casual to mid-core players, large market',
-  },
-  'Los Angeles': {
-    name: 'Los Angeles',
-    region: 'North America',
-    description: 'Entertainment capital with strong marketing reach',
-    bonuses: ['+15% marketing effectiveness', 'Celebrity partnerships', 'Media connections'],
-    targetAudience: 'Western casual gamers, mainstream audience',
-  },
-  'San Francisco': {
-    name: 'San Francisco',
-    region: 'North America',
-    description: 'Tech hub with innovative development culture',
-    bonuses: ['+10% development speed', 'Access to tech talent', 'Investor connections'],
-    targetAudience: 'Tech-savvy players, early adopters',
-  },
-  'Seattle': {
-    name: 'Seattle',
-    region: 'North America',
-    description: 'Home to major gaming studios',
-    bonuses: ['+10% game quality', 'Experienced developers', 'Strong gaming culture'],
-    targetAudience: 'Core gamers, AAA-quality seekers',
-  },
-  'Montreal': {
-    name: 'Montreal',
-    region: 'North America',
-    description: 'Creative hub with government incentives',
-    bonuses: ['-15% employee costs', 'Art/design talent', 'Bilingual market access'],
-    targetAudience: 'Story-focused players, artistic games',
-  },
-  'London': {
-    name: 'London',
-    region: 'Europe',
-    description: 'European gateway with diverse talent',
-    bonuses: ['+10% EU market reach', 'Cultural diversity', 'Strong IP protection'],
-    targetAudience: 'European market, strategy gamers',
-  },
-  'Stockholm': {
-    name: 'Stockholm',
-    region: 'Europe',
-    description: 'Nordic game dev excellence',
-    bonuses: ['+15% game polish', 'Work-life balance = happy devs', 'Indie success stories'],
-    targetAudience: 'Quality-focused players, indie fans',
-  },
-};
 
 export function StartScreen() {
   const { startGame, loadGame } = useGame();
   const [companyName, setCompanyName] = useState('');
-  const [headquarters, setHeadquarters] = useState('Tokyo');
+  const [headquarters, setHeadquarters] = useState<LocationId>('Tokyo');
   const [hasSave, setHasSave] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  const locations = Object.keys(LOCATION_INFO);
+  const locations = Object.keys(LOCATION_INFO) as LocationId[];
 
   useEffect(() => {
     const checkSave = async () => {
@@ -162,7 +103,7 @@ export function StartScreen() {
                 <select
                   id="headquarters-select"
                   value={headquarters}
-                  onChange={(e) => setHeadquarters(e.target.value)}
+                  onChange={(e) => setHeadquarters(e.target.value as LocationId)}
                   className="w-full px-4 py-2 bg-gray-700 text-white border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-gacha-purple"
                   aria-label="Select headquarters location"
                 >

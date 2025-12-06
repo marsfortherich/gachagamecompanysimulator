@@ -6,6 +6,7 @@
 import { Game, GameStatus, GameQuality, updateProgress, updateGameStatus, updateQuality } from './Game';
 import { Employee, calculateEffectiveness, SkillType, calculateTeamSynergy } from '../employee';
 import { Result, ok, err, IRNGProvider, defaultRNG } from '../shared';
+import { getLocationBonuses } from '../company/Location';
 
 /**
  * Development phase configuration
@@ -136,7 +137,8 @@ export function transitionPhase(
 export function calculateTickProgress(
   game: Game,
   employees: readonly Employee[],
-  rng: IRNGProvider = defaultRNG
+  rng: IRNGProvider = defaultRNG,
+  headquarters: string = 'Tokyo'
 ): number {
   if (employees.length === 0) return 0;
   
@@ -164,7 +166,11 @@ export function calculateTickProgress(
   // Add some variance
   const variance = 0.8 + rng.random() * 0.4;  // 0.8 to 1.2
   
-  return baseProgress * synergyMultiplier * variance;
+  // Apply location development speed bonus
+  const locationBonuses = getLocationBonuses(headquarters);
+  const locationMultiplier = 1 + locationBonuses.developmentSpeedBonus;
+  
+  return baseProgress * synergyMultiplier * variance * locationMultiplier;
 }
 
 /**
@@ -173,12 +179,17 @@ export function calculateTickProgress(
 export function calculateQualityImprovement(
   game: Game,
   employees: readonly Employee[],
-  rng: IRNGProvider = defaultRNG
+  rng: IRNGProvider = defaultRNG,
+  headquarters: string = 'Tokyo'
 ): Partial<Record<keyof GameQuality, number>> {
   const phase = DEVELOPMENT_PHASES[game.status];
   const improvements: Record<string, number> = {};
   
   if (phase.qualityImpact.length === 0) return improvements;
+  
+  // Get location quality bonuses
+  const locationBonuses = getLocationBonuses(headquarters);
+  const qualityMultiplier = 1 + locationBonuses.gameQualityBonus + locationBonuses.gamePolishBonus;
   
   for (const qualityAttr of phase.qualityImpact) {
     // Find relevant skill for this quality attribute
@@ -198,11 +209,11 @@ export function calculateQualityImprovement(
     const currentQuality = game.quality[qualityAttr];
     const diminishingFactor = 1 - (currentQuality / 100) * 0.5;
     
-    // Quality improvement: 0.1-0.5 per tick
+    // Quality improvement: 0.1-0.5 per tick, modified by location bonuses
     const improvement = (avgContribution / 100) * 0.4 * diminishingFactor;
     const variance = 0.8 + rng.random() * 0.4;
     
-    improvements[qualityAttr] = improvement * variance;
+    improvements[qualityAttr] = improvement * variance * qualityMultiplier;
   }
   
   return improvements;
@@ -229,7 +240,8 @@ export function processDevelopmentTick(
   game: Game,
   employees: readonly Employee[],
   currentTick: number,
-  rng: IRNGProvider = defaultRNG
+  rng: IRNGProvider = defaultRNG,
+  headquarters: string = 'Tokyo'
 ): Result<DevelopmentTickResult, DevelopmentError> {
   if (game.status === 'shutdown') {
     return err({ type: 'GAME_SHUTDOWN' });
@@ -238,11 +250,11 @@ export function processDevelopmentTick(
   const phase = DEVELOPMENT_PHASES[game.status];
   
   // Calculate progress
-  const progressMade = calculateTickProgress(game, employees, rng);
+  const progressMade = calculateTickProgress(game, employees, rng, headquarters);
   let updatedGame = updateProgress(game, progressMade);
   
   // Calculate quality improvements
-  const qualityGained = calculateQualityImprovement(game, employees, rng);
+  const qualityGained = calculateQualityImprovement(game, employees, rng, headquarters);
   for (const [attr, value] of Object.entries(qualityGained)) {
     if (value !== undefined) {
       updatedGame = updateQuality(updatedGame, { [attr]: game.quality[attr as keyof GameQuality] + value });
@@ -275,7 +287,8 @@ export function processDevelopmentTick(
 export function estimatePhaseCompletion(
   game: Game,
   employees: readonly Employee[],
-  ticksPerDay: number = 24
+  ticksPerDay: number = 24,
+  headquarters: string = 'Tokyo'
 ): number | null {
   const phase = DEVELOPMENT_PHASES[game.status];
   if (phase.requiredProgress === 0) return null;
@@ -283,8 +296,8 @@ export function estimatePhaseCompletion(
   const remainingProgress = phase.requiredProgress - game.developmentProgress;
   if (remainingProgress <= 0) return 0;
   
-  // Estimate average progress per tick
-  const avgProgress = calculateTickProgress(game, employees);
+  // Estimate average progress per tick (use undefined for rng to use default)
+  const avgProgress = calculateTickProgress(game, employees, undefined, headquarters);
   if (avgProgress <= 0) return null;
   
   const ticksNeeded = remainingProgress / avgProgress;

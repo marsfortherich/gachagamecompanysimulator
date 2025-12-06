@@ -1,5 +1,6 @@
 import { Entity, EntityId, generateId } from '../shared';
 import { GENRE_CONFIGS } from './GenreTiers';
+import { getLocationBonuses } from '../company/Location';
 
 /**
  * Game genre types
@@ -286,6 +287,7 @@ export interface LiveGameConfig {
   hasMarketer: boolean;       // Is there a marketer assigned?
   daysSinceLaunch: number;    // Days since the game went live
   marketingBudget?: number;   // Optional daily marketing spend
+  headquarters?: string;      // Company headquarters for location bonuses
 }
 
 /**
@@ -328,6 +330,11 @@ export function simulateLiveGameTick(
   const reputationFactor = config.companyReputation / 100; // 0-1
   const satisfactionFactor = game.monetization.playerSatisfaction / 100; // 0-1
 
+  // Get location bonuses
+  const locationBonuses = getLocationBonuses(config.headquarters ?? 'Tokyo');
+  const engagementMultiplier = 1 + locationBonuses.playerEngagementBonus;
+  const gachaRevenueMultiplier = 1 + locationBonuses.gachaRevenueBonus;
+
   // === Calculate new user acquisition ===
   // Base new users depends on genre and quality
   let baseNewUsers = genreMod.baseDAU * 0.1; // 10% of base DAU per day initially
@@ -343,6 +350,9 @@ export function simulateLiveGameTick(
     ? 2.0 - (config.daysSinceLaunch / 30) 
     : 1.0;
   baseNewUsers *= launchBoost;
+  
+  // Apply location engagement bonus (more engaged audience = more user acquisition)
+  baseNewUsers *= engagementMultiplier;
   
   // Marketer boost
   if (config.hasMarketer) {
@@ -393,7 +403,8 @@ export function simulateLiveGameTick(
   const gachaGenerosity = game.monetization.gachaRates.legendary * 50; // 0.01 * 50 = 0.5
   arpdau *= (0.8 + (1 - gachaGenerosity) * 0.4);
   
-  const dailyRevenue = Math.round(newDAU * arpdau * 100) / 100;
+  // Apply location gacha revenue bonus
+  const dailyRevenue = Math.round(newDAU * arpdau * gachaRevenueMultiplier * 100) / 100;
 
   // === Update player satisfaction ===
   // Satisfaction naturally decays without content updates
