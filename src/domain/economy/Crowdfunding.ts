@@ -109,7 +109,7 @@ export interface StretchGoal {
 /**
  * Parameters for creating a new crowdfunding campaign
  */
-export interface CreateCampaignParams {
+export interface CreateCrowdfundingParams {
   name: string;
   description: string;
   genre: GameGenre;
@@ -230,7 +230,7 @@ export function createDefaultMilestones(
 /**
  * Create a new crowdfunding campaign
  */
-export function createCrowdfundingCampaign(params: CreateCampaignParams): CrowdfundingCampaign {
+export function createCrowdfundingCampaign(params: CreateCrowdfundingParams): CrowdfundingCampaign {
   const campaignEndTick = params.currentTick + params.campaignDurationDays;
   const estimatedDevTime = 120; // ~4 months development
   

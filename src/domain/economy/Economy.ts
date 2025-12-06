@@ -57,11 +57,11 @@ export const ECONOMY_CONSTANTS = {
 // TYPES
 // ============================================================================
 
-export type MonetizationStrategy = 'generous' | 'balanced' | 'aggressive' | 'predatory';
+export type EconomyMonetizationStrategy = 'generous' | 'balanced' | 'aggressive' | 'predatory';
 export type UpdateFrequency = 'weekly' | 'biweekly' | 'monthly' | 'sporadic' | 'none';
 
 export interface GameEconomyConfig {
-  readonly monetizationStrategy: MonetizationStrategy;
+  readonly monetizationStrategy: EconomyMonetizationStrategy;
   readonly updateFrequency: UpdateFrequency;
   readonly marketingBudget: number;  // Monthly marketing spend
 }
@@ -133,7 +133,7 @@ export function calculateARPU(
 /**
  * Calculates retention multiplier based on monetization strategy
  */
-export function calculateRetentionMultiplier(strategy: MonetizationStrategy): number {
+export function calculateRetentionMultiplier(strategy: EconomyMonetizationStrategy): number {
   return ECONOMY_CONSTANTS.MONETIZATION_MULTIPLIERS[strategy].retention;
 }
 
@@ -258,7 +258,7 @@ export function calculateTotalRevenue(
   
   for (const game of liveGames) {
     const config = configs.get(game.id) ?? {
-      monetizationStrategy: 'balanced' as MonetizationStrategy,
+      monetizationStrategy: 'balanced' as EconomyMonetizationStrategy,
       updateFrequency: 'monthly' as UpdateFrequency,
       marketingBudget: 0,
     };
