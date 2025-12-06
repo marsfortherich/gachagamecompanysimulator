@@ -690,9 +690,11 @@ function processCampaigns(state: GameState): GameState {
       updatedGames = updatedGames.map(g => {
         if (g.id !== game.id) return g;
         
-        // Apply DAU boost
+        // Apply DAU boost, but cap at genre's maxDAU
         const dauMultiplier = 1 + effects.dauBoost;
-        const newDau = Math.round(g.monetization.dailyActiveUsers * dauMultiplier);
+        const genreConfig = GENRE_CONFIGS[g.genre];
+        const maxDAU = genreConfig?.maxDAU ?? 1000000;
+        const newDau = Math.min(maxDAU, Math.round(g.monetization.dailyActiveUsers * dauMultiplier));
         
         return {
           ...g,

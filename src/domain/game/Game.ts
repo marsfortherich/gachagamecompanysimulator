@@ -1,4 +1,5 @@
 import { Entity, EntityId, generateId } from '../shared';
+import { GENRE_CONFIGS } from './GenreTiers';
 
 /**
  * Game genre types
@@ -372,7 +373,10 @@ export function simulateLiveGameTick(
   const churnedUsers = Math.round(currentDAU * churnRate);
 
   // === Calculate new DAU ===
-  const newDAU = Math.max(0, currentDAU + newUsers - churnedUsers);
+  // Cap DAU at genre's maximum
+  const genreConfig = GENRE_CONFIGS[game.genre];
+  const maxDAU = genreConfig?.maxDAU ?? 1000000;
+  const newDAU = Math.min(maxDAU, Math.max(0, currentDAU + newUsers - churnedUsers));
 
   // === Calculate daily revenue ===
   // Base ARPDAU from genre
