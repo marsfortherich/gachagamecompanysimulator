@@ -47,7 +47,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       return {
         ...state,
         company,
-        isPaused: false,
+        // Game starts paused - player must click play to begin
       };
     }
 
@@ -498,9 +498,9 @@ function processGameDevelopment(state: GameState): GameState {
 
     for (const employee of assignedEmployees) {
       // Each employee contributes based on their skills
-      // Increased base multipliers for faster progress (0.05 -> 0.15, 0.03 -> 0.10)
-      dailyProgress += calculateEffectiveness(employee, 'programming') * 0.15;
-      dailyProgress += calculateEffectiveness(employee, 'game_design') * 0.10;
+      // Slower development to give time for player feedback and strategic decisions
+      dailyProgress += calculateEffectiveness(employee, 'programming') * 0.03;
+      dailyProgress += calculateEffectiveness(employee, 'game_design') * 0.02;
       
       qualityGain.graphics += calculateEffectiveness(employee, 'art') * 0.1;
       qualityGain.gameplay += calculateEffectiveness(employee, 'game_design') * 0.1;
