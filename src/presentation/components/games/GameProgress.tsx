@@ -275,7 +275,7 @@ export const MonetizationSummary: React.FC<MonetizationSummaryProps> = ({ moneti
         <div className="text-lg font-bold text-green-600">
           {monetization.revenueFormatted}
         </div>
-        <div className="text-xs text-green-600/70">Monthly Revenue</div>
+        <div className="text-xs text-green-600/70">{t.phaseInfo.monthlyRevenue}</div>
       </div>
       <div>
         <div className="text-lg font-bold text-blue-600">
@@ -504,14 +504,14 @@ export const GameDetailPanel: React.FC<GameDetailPanelProps> = ({
       {/* Timeline */}
       {game.isDevelopment && (
         <div className="px-6 py-4 border-b border-gray-100">
-          <h3 className="text-sm font-medium text-gray-500 mb-3">Development Progress</h3>
+          <h3 className="text-sm font-medium text-gray-500 mb-3">{t.phaseInfo.developmentProgress}</h3>
           <PhaseTimeline currentPhase={game.phase} />
         </div>
       )}
 
       {/* Quality */}
       <div className="px-6 py-4 border-b border-gray-100">
-        <h3 className="text-sm font-medium text-gray-500 mb-3">Quality Metrics</h3>
+        <h3 className="text-sm font-medium text-gray-500 mb-3">{t.phaseInfo.qualityMetrics}</h3>
         <div className="flex justify-center gap-8">
           <ProgressRing progress={game.quality.overall} size={100}>
             <div className="text-center">
@@ -568,7 +568,7 @@ export const GameDetailPanel: React.FC<GameDetailPanelProps> = ({
               <div className="text-xl font-bold text-green-600">
                 {game.monetization.revenueFormatted}
               </div>
-              <div className="text-xs text-green-600/70">Monthly Revenue</div>
+              <div className="text-xs text-green-600/70">{t.phaseInfo.monthlyRevenue}</div>
             </div>
             <div className="text-center p-3 bg-blue-50 rounded-lg">
               <div className="text-xl font-bold text-blue-600">

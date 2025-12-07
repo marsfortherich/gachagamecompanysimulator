@@ -13,6 +13,7 @@ import { useEmployees, EmployeeFilters, TeamStats } from '@presentation/hooks/us
 import { EmployeeViewModel, SkillDisplay, MoraleDisplay } from '@presentation/viewmodels/EmployeeViewModel';
 import { EmployeeRole } from '@domain/employee';
 import { Icon, IconName } from '@presentation/components/common/Icon';
+import { useI18n } from '@infrastructure/i18n';
 
 // =============================================================================
 // Filter Bar Component
@@ -133,6 +134,7 @@ export const EmployeeCard: React.FC<EmployeeCardProps> = ({
   isSelected = false,
   showActions = true,
 }) => {
+  const { t } = useI18n();
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -233,7 +235,7 @@ export const EmployeeCard: React.FC<EmployeeCardProps> = ({
               setExpanded(!expanded);
             }}
           >
-            {expanded ? 'Hide Details' : 'Show Details'}
+            {expanded ? t.employeeManagement.hideDetails : t.employeeManagement.showDetails}
           </button>
           {onFire && (
             <button
@@ -346,29 +348,30 @@ export interface TeamStatsSummaryProps {
 }
 
 export const TeamStatsSummary: React.FC<TeamStatsSummaryProps> = ({ stats }) => {
+  const { t } = useI18n();
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-white rounded-lg border border-gray-200">
       <div className="text-center">
         <div className="text-2xl font-bold text-gray-900">{stats.totalEmployees}</div>
-        <div className="text-sm text-gray-500">Employees</div>
+        <div className="text-sm text-gray-500">{t.employeeManagement.employees}</div>
       </div>
       <div className="text-center">
         <div className="text-2xl font-bold text-gray-900">
           ${(stats.totalSalary / 1000).toFixed(0)}K
         </div>
-        <div className="text-sm text-gray-500">Monthly Payroll</div>
+        <div className="text-sm text-gray-500">{t.employeeManagement.monthlyPayroll}</div>
       </div>
       <div className="text-center">
         <div className="text-2xl font-bold text-gray-900">
           {stats.averageMorale.toFixed(0)}%
         </div>
-        <div className="text-sm text-gray-500">Avg Morale</div>
+        <div className="text-sm text-gray-500">{t.employeeManagement.avgMorale}</div>
       </div>
       <div className="text-center">
         <div className="text-2xl font-bold text-gray-900">
           Lv {stats.averageLevel.toFixed(1)}
         </div>
-        <div className="text-sm text-gray-500">Avg Level</div>
+        <div className="text-sm text-gray-500">{t.employeeManagement.avgLevel}</div>
       </div>
       
       {/* Role breakdown */}

@@ -10,6 +10,7 @@
 
 import { useMemo, useCallback } from 'react';
 import { useGame } from '@presentation/context';
+import { GameActions } from '@application/actions';
 import {
   CompanyViewModel,
   toCompanyViewModel,
@@ -40,7 +41,7 @@ export interface UseCompanyReturn {
  * Hook for managing company data and actions
  */
 export function useCompany(): UseCompanyReturn {
-  const { state } = useGame();
+  const { state, dispatch } = useGame();
 
   // Transform company to ViewModel
   const company = useMemo((): CompanyViewModel | null => {
@@ -85,11 +86,12 @@ export function useCompany(): UseCompanyReturn {
     return company.office.canUpgrade && funds >= (company.office.upgradeCost ?? 0);
   }, [company, funds]);
 
-  // Upgrade office (placeholder)
+  // Upgrade office
   const upgradeOffice = useCallback(() => {
-    // TODO: Implement office upgrade action
-    console.log('Office upgrade requested');
-  }, []);
+    if (canUpgradeOffice) {
+      dispatch(GameActions.upgradeOffice());
+    }
+  }, [canUpgradeOffice, dispatch]);
 
   return {
     company,
