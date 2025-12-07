@@ -50,7 +50,7 @@ function formatCurrency(value: number): string {
 
 export function GamesView() {
   const { state, dispatch } = useGame();
-  const { games, employees, company, unlockedGenres } = state;
+  const { games, employees, company, unlockedGenres, founder } = state;
   const [showNewGame, setShowNewGame] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [showLaunchModal, setShowLaunchModal] = useState<string | null>(null); // gameId or null
@@ -109,6 +109,27 @@ export function GamesView() {
 
   const handleUnassignEmployee = (gameId: string, employeeId: string) => {
     dispatch(GameActions.unassignFromProject(employeeId, gameId));
+  };
+
+  const handleAssignFounder = (gameId: string) => {
+    dispatch(GameActions.assignFounderToProject(gameId));
+  };
+
+  const handleUnassignFounder = (gameId: string) => {
+    dispatch(GameActions.unassignFounderFromProject(gameId));
+  };
+
+  // Check if founder is assigned to a game
+  const isFounderAssignedTo = (gameId: string) => {
+    if (!founder) return false;
+    const game = games.find(g => g.id === gameId);
+    return game?.assignedEmployees.includes(founder.id) ?? false;
+  };
+
+  // Check if founder is available (not assigned to any game)
+  const isFounderAvailable = () => {
+    if (!founder) return false;
+    return !games.some(g => g.assignedEmployees.includes(founder.id));
   };
 
   const handleLaunchGame = (gameId: string) => {
@@ -433,26 +454,40 @@ export function GamesView() {
                 ))}
               </div>
 
-              {/* Assigned Employees */}
+              {/* Assigned Team (including Founder) */}
               <div className="mb-4">
                 <p className="text-sm text-gray-400 mb-2">
-                  Team ({game.assignedEmployees.length} members)
+                  Team ({game.assignedEmployees.length} members{isFounderAssignedTo(game.id) ? ' + You' : ''})
                 </p>
-                {game.assignedEmployees.length === 0 && game.status !== 'live' && game.status !== 'shutdown' && (
+                {game.assignedEmployees.length === 0 && !isFounderAssignedTo(game.id) && game.status !== 'live' && game.status !== 'shutdown' && (
                   <div className="text-sm text-yellow-400 bg-yellow-900/30 rounded-lg p-2 mb-2 flex items-center gap-2">
-                    <Icon name="warning" size="sm" className="text-yellow-400" /> No employees assigned! Assign team members to make progress.
+                    <Icon name="warning" size="sm" className="text-yellow-400" /> No one assigned! Assign yourself or hire employees to make progress.
                   </div>
                 )}
                 <div className="flex flex-wrap gap-1">
+                  {/* Show founder first if assigned */}
+                  {isFounderAssignedTo(game.id) && founder && (
+                    <button
+                      onClick={() => handleUnassignFounder(game.id)}
+                      className="text-xs px-2 py-1 bg-gacha-purple/30 border border-gacha-purple rounded-full text-gacha-purple hover:bg-gacha-purple/50 transition-colors flex items-center gap-1"
+                      title="Click to unassign yourself"
+                    >
+                      <Icon name="star" size="xs" /> You ({founder.name.split(' ')[0]})
+                    </button>
+                  )}
                   {game.assignedEmployees.map((empId) => {
+                    // Skip founder ID, we show them separately
+                    if (founder && empId === founder.id) return null;
                     const emp = employees.find(e => e.id === empId);
                     return emp ? (
-                      <span
+                      <button
                         key={empId}
-                        className="text-xs px-2 py-1 bg-gray-700 rounded-full text-gray-300"
+                        onClick={() => handleUnassignEmployee(game.id, empId)}
+                        className="text-xs px-2 py-1 bg-gray-700 rounded-full text-gray-300 hover:bg-red-900/30 hover:text-red-300 transition-colors"
+                        title="Click to unassign"
                       >
                         {emp.name.split(' ')[0]}
-                      </span>
+                      </button>
                     ) : null;
                   })}
                 </div>
@@ -461,6 +496,18 @@ export function GamesView() {
               {/* Actions */}
               {game.status !== 'live' && game.status !== 'shutdown' && (
                 <div className="space-y-2">
+                  {/* Assign Founder Button */}
+                  {founder && isFounderAvailable() && (
+                    <Button
+                      fullWidth
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => handleAssignFounder(game.id)}
+                      className="flex items-center justify-center gap-2"
+                    >
+                      <Icon name="star" size="sm" /> Assign Yourself
+                    </Button>
+                  )}
                   {availableEmployees.length > 0 && (
                     <select
                       aria-label="Assign employee to game"
