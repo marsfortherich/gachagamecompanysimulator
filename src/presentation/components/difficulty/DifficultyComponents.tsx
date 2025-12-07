@@ -4,6 +4,7 @@
 
 import { useState } from 'react';
 import { Icon } from '../common/Icon';
+import { useI18n } from '../../../infrastructure/i18n';
 import {
   DifficultyMode,
   DifficultyConfig,
@@ -23,6 +24,7 @@ interface DifficultySelectProps {
 export function DifficultySelect({ onSelect, currentMode = 'standard' }: DifficultySelectProps) {
   const [selected, setSelected] = useState<DifficultyMode>(currentMode);
   const [showDetails, setShowDetails] = useState<DifficultyMode | null>(null);
+  const { t } = useI18n();
 
   const modes: DifficultyMode[] = ['casual', 'standard', 'hardcore', 'sandbox'];
 
@@ -34,7 +36,7 @@ export function DifficultySelect({ onSelect, currentMode = 'standard' }: Difficu
 
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <h2 className="text-2xl font-bold text-white text-center mb-2">Select Difficulty</h2>
+      <h2 className="text-2xl font-bold text-white text-center mb-2">{t.difficulty.selectDifficulty}</h2>
       <p className="text-gray-400 text-center mb-8">
         Choose how challenging you want your experience to be
       </p>
@@ -86,6 +88,7 @@ interface DifficultyCardProps {
 }
 
 function DifficultyCard({ config, isSelected, onSelect, onShowDetails }: DifficultyCardProps) {
+  const { t } = useI18n();
   const colorClasses: Record<string, string> = {
     green: 'border-green-500 bg-green-900/20',
     blue: 'border-blue-500 bg-blue-900/20',
@@ -125,13 +128,13 @@ function DifficultyCard({ config, isSelected, onSelect, onShowDetails }: Difficu
       {/* Quick Stats */}
       <div className="flex flex-wrap gap-2 mb-3">
         {!config.features.canFail && (
-          <span className="px-2 py-1 bg-green-900/50 text-green-300 text-xs rounded">No Failure</span>
+          <span className="px-2 py-1 bg-green-900/50 text-green-300 text-xs rounded">{t.difficulty.noFailure}</span>
         )}
         {!config.features.achievementsEnabled && (
-          <span className="px-2 py-1 bg-yellow-900/50 text-yellow-300 text-xs rounded">No Achievements</span>
+          <span className="px-2 py-1 bg-yellow-900/50 text-yellow-300 text-xs rounded">{t.difficulty.noAchievements}</span>
         )}
         {config.features.leaderboardEnabled && (
-          <span className="px-2 py-1 bg-blue-900/50 text-blue-300 text-xs rounded">Leaderboard</span>
+          <span className="px-2 py-1 bg-blue-900/50 text-blue-300 text-xs rounded">{t.difficulty.leaderboard}</span>
         )}
       </div>
 
@@ -143,7 +146,7 @@ function DifficultyCard({ config, isSelected, onSelect, onShowDetails }: Difficu
         }}
         className="text-sm text-blue-400 hover:text-blue-300"
       >
-        View Details →
+        {t.games.viewDetails} →
       </button>
     </div>
   );
@@ -160,6 +163,7 @@ interface DifficultyDetailsModalProps {
 
 function DifficultyDetailsModal({ config, onClose }: DifficultyDetailsModalProps) {
   const { modifiers } = config;
+  const { t } = useI18n();
 
   const formatModifier = (value: number, isMultiplier = true): string => {
     if (isMultiplier) {
@@ -196,60 +200,60 @@ function DifficultyDetailsModal({ config, onClose }: DifficultyDetailsModalProps
 
         {/* Modifiers */}
         <div className="p-6 overflow-y-auto max-h-[60vh]">
-          <h4 className="text-lg font-bold text-white mb-4">Modifiers</h4>
+          <h4 className="text-lg font-bold text-white mb-4">{t.difficulty.modifiers}</h4>
           
           <div className="grid grid-cols-2 gap-4">
             {/* Economy */}
-            <ModifierSection title="Economy">
-              <ModifierRow label="Starting Money" value={formatModifier(modifiers.startingMoney)} color={getModifierColor(modifiers.startingMoney)} />
-              <ModifierRow label="Revenue" value={formatModifier(modifiers.revenuMultiplier)} color={getModifierColor(modifiers.revenuMultiplier)} />
-              <ModifierRow label="Costs" value={formatModifier(modifiers.costMultiplier)} color={getModifierColor(modifiers.costMultiplier, false)} />
-              <ModifierRow label="Salary Growth" value={formatModifier(modifiers.salaryGrowthRate)} color={getModifierColor(modifiers.salaryGrowthRate, false)} />
+            <ModifierSection title={t.difficulty.economy}>
+              <ModifierRow label={t.difficulty.startingMoney} value={formatModifier(modifiers.startingMoney)} color={getModifierColor(modifiers.startingMoney)} />
+              <ModifierRow label={t.difficulty.revenue} value={formatModifier(modifiers.revenuMultiplier)} color={getModifierColor(modifiers.revenuMultiplier)} />
+              <ModifierRow label={t.difficulty.costs} value={formatModifier(modifiers.costMultiplier)} color={getModifierColor(modifiers.costMultiplier, false)} />
+              <ModifierRow label={t.difficulty.salaryGrowth} value={formatModifier(modifiers.salaryGrowthRate)} color={getModifierColor(modifiers.salaryGrowthRate, false)} />
             </ModifierSection>
 
             {/* Reputation */}
-            <ModifierSection title="Reputation">
-              <ModifierRow label="Starting Rep" value={formatModifier(modifiers.startingReputation)} color={getModifierColor(modifiers.startingReputation)} />
-              <ModifierRow label="Rep Gains" value={formatModifier(modifiers.reputationGainMultiplier)} color={getModifierColor(modifiers.reputationGainMultiplier)} />
-              <ModifierRow label="Rep Losses" value={formatModifier(modifiers.reputationLossMultiplier)} color={getModifierColor(modifiers.reputationLossMultiplier, false)} />
-              <ModifierRow label="Volatility" value={formatModifier(modifiers.reputationVolatility)} color={getModifierColor(modifiers.reputationVolatility, false)} />
+            <ModifierSection title={t.difficulty.reputation}>
+              <ModifierRow label={t.difficulty.startingRep} value={formatModifier(modifiers.startingReputation)} color={getModifierColor(modifiers.startingReputation)} />
+              <ModifierRow label={t.difficulty.repGains} value={formatModifier(modifiers.reputationGainMultiplier)} color={getModifierColor(modifiers.reputationGainMultiplier)} />
+              <ModifierRow label={t.difficulty.repLosses} value={formatModifier(modifiers.reputationLossMultiplier)} color={getModifierColor(modifiers.reputationLossMultiplier, false)} />
+              <ModifierRow label={t.difficulty.volatility} value={formatModifier(modifiers.reputationVolatility)} color={getModifierColor(modifiers.reputationVolatility, false)} />
             </ModifierSection>
 
             {/* Development */}
-            <ModifierSection title="Development">
-              <ModifierRow label="Dev Speed" value={formatModifier(modifiers.developmentSpeed)} color={getModifierColor(modifiers.developmentSpeed)} />
-              <ModifierRow label="Bug Chance" value={formatModifier(modifiers.bugChance)} color={getModifierColor(modifiers.bugChance, false)} />
-              <ModifierRow label="Quality Variance" value={formatModifier(modifiers.qualityVariance)} color={getModifierColor(modifiers.qualityVariance, false)} />
+            <ModifierSection title={t.difficulty.development}>
+              <ModifierRow label={t.difficulty.devSpeed} value={formatModifier(modifiers.developmentSpeed)} color={getModifierColor(modifiers.developmentSpeed)} />
+              <ModifierRow label={t.difficulty.bugChance} value={formatModifier(modifiers.bugChance)} color={getModifierColor(modifiers.bugChance, false)} />
+              <ModifierRow label={t.difficulty.qualityVariance} value={formatModifier(modifiers.qualityVariance)} color={getModifierColor(modifiers.qualityVariance, false)} />
             </ModifierSection>
 
             {/* Employees */}
-            <ModifierSection title="Employees">
-              <ModifierRow label="Skill Growth" value={formatModifier(modifiers.skillGrowthRate)} color={getModifierColor(modifiers.skillGrowthRate)} />
-              <ModifierRow label="Morale Decay" value={formatModifier(modifiers.employeeMoraleDecay)} color={getModifierColor(modifiers.employeeMoraleDecay, false)} />
-              <ModifierRow label="Quit Chance" value={formatModifier(modifiers.employeeQuitChance)} color={getModifierColor(modifiers.employeeQuitChance, false)} />
+            <ModifierSection title={t.difficulty.employees}>
+              <ModifierRow label={t.difficulty.skillGrowth} value={formatModifier(modifiers.skillGrowthRate)} color={getModifierColor(modifiers.skillGrowthRate)} />
+              <ModifierRow label={t.difficulty.moraleDecay} value={formatModifier(modifiers.employeeMoraleDecay)} color={getModifierColor(modifiers.employeeMoraleDecay, false)} />
+              <ModifierRow label={t.difficulty.quitChance} value={formatModifier(modifiers.employeeQuitChance)} color={getModifierColor(modifiers.employeeQuitChance, false)} />
             </ModifierSection>
 
             {/* Gacha */}
-            <ModifierSection title="Gacha">
-              <ModifierRow label="Rate Bonus" value={formatModifier(modifiers.gachaRateBonus, false)} color={getModifierColor(modifiers.gachaRateBonus)} />
-              <ModifierRow label="Pity Reduction" value={formatModifier(modifiers.pityReduction, false)} color={getModifierColor(modifiers.pityReduction)} />
+            <ModifierSection title={t.difficulty.gacha}>
+              <ModifierRow label={t.difficulty.rateBonus} value={formatModifier(modifiers.gachaRateBonus, false)} color={getModifierColor(modifiers.gachaRateBonus)} />
+              <ModifierRow label={t.difficulty.pityReduction} value={formatModifier(modifiers.pityReduction, false)} color={getModifierColor(modifiers.pityReduction)} />
             </ModifierSection>
 
             {/* Risk */}
-            <ModifierSection title="Risk & Recovery">
-              <ModifierRow label="Bankruptcy Time" value={formatModifier(modifiers.bankruptcyTolerance)} color={getModifierColor(modifiers.bankruptcyTolerance)} />
-              <ModifierRow label="Debt Interest" value={formatModifier(modifiers.debtInterestRate)} color={getModifierColor(modifiers.debtInterestRate, false)} />
-              <ModifierRow label="Recovery Speed" value={formatModifier(modifiers.recoverySpeed)} color={getModifierColor(modifiers.recoverySpeed)} />
+            <ModifierSection title={t.difficulty.riskRecovery}>
+              <ModifierRow label={t.difficulty.bankruptcyTime} value={formatModifier(modifiers.bankruptcyTolerance)} color={getModifierColor(modifiers.bankruptcyTolerance)} />
+              <ModifierRow label={t.difficulty.debtInterest} value={formatModifier(modifiers.debtInterestRate)} color={getModifierColor(modifiers.debtInterestRate, false)} />
+              <ModifierRow label={t.difficulty.recoverySpeed} value={formatModifier(modifiers.recoverySpeed)} color={getModifierColor(modifiers.recoverySpeed)} />
             </ModifierSection>
           </div>
 
           {/* Features */}
-          <h4 className="text-lg font-bold text-white mt-6 mb-4">Features</h4>
+          <h4 className="text-lg font-bold text-white mt-6 mb-4">{t.difficulty.features}</h4>
           <div className="grid grid-cols-2 gap-2">
-            <FeatureRow label="Can Fail" enabled={config.features.canFail} />
-            <FeatureRow label="Achievements" enabled={config.features.achievementsEnabled} />
-            <FeatureRow label="Leaderboards" enabled={config.features.leaderboardEnabled} />
-            <FeatureRow label="Forced Tutorial" enabled={config.features.tutorialForced} />
+            <FeatureRow label={t.difficulty.canFail} enabled={config.features.canFail} />
+            <FeatureRow label={t.difficulty.achievements} enabled={config.features.achievementsEnabled} />
+            <FeatureRow label={t.difficulty.leaderboards} enabled={config.features.leaderboardEnabled} />
+            <FeatureRow label={t.difficulty.forcedTutorial} enabled={config.features.tutorialForced} />
           </div>
         </div>
       </div>

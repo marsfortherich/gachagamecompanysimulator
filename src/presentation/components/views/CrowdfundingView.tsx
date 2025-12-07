@@ -305,7 +305,7 @@ export function CrowdfundingView() {
                 <input
                   type="text"
                   className="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white"
-                  placeholder="My Awesome Game"
+                  placeholder={t.crowdfunding.gameNamePlaceholder}
                   value={campaignConfig.name}
                   onChange={(e) => setCampaignConfig({ ...campaignConfig, name: e.target.value })}
                 />
@@ -318,7 +318,7 @@ export function CrowdfundingView() {
                 </label>
                 <textarea
                   className="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white"
-                  placeholder="A revolutionary gacha game..."
+                  placeholder={t.crowdfunding.descriptionPlaceholder}
                   rows={3}
                   value={campaignConfig.description}
                   onChange={(e) => setCampaignConfig({ ...campaignConfig, description: e.target.value })}
@@ -335,13 +335,13 @@ export function CrowdfundingView() {
                   value={campaignConfig.genre}
                   onChange={(e) => setCampaignConfig({ ...campaignConfig, genre: e.target.value as GameGenre })}
                 >
-                  <option value="idle">Idle</option>
-                  <option value="puzzle">Puzzle</option>
-                  <option value="rhythm">Rhythm</option>
-                  <option value="card">Card</option>
-                  <option value="strategy">Strategy</option>
-                  <option value="action">Action</option>
-                  <option value="rpg">RPG</option>
+                  <option value="idle">{t.genres.idle}</option>
+                  <option value="puzzle">{t.genres.puzzle}</option>
+                  <option value="rhythm">{t.genres.rhythm}</option>
+                  <option value="card">{t.genres.card}</option>
+                  <option value="strategy">{t.genres.strategy}</option>
+                  <option value="action">{t.genres.action}</option>
+                  <option value="rpg">{t.genres.rpg}</option>
                 </select>
               </div>
               

@@ -580,6 +580,9 @@ export const en = {
     fundingGoal: 'Funding Goal',
     campaignDuration: 'Campaign Duration',
     createCampaign: 'Create Campaign',
+    gameNamePlaceholder: 'My Awesome Game',
+    descriptionPlaceholder: 'A revolutionary gacha game...',
+    of: 'of',
   },
 
   // Roadmap
@@ -670,6 +673,7 @@ export const en = {
     idle: 'Idle',
     strategy: 'Strategy',
     rhythm: 'Rhythm',
+    card: 'Card',
   },
 
   // Tiers
@@ -807,11 +811,23 @@ export const en = {
     selectDifficulty: 'Select Difficulty',
     noFailure: 'No Failure',
     noAchievements: 'No Achievements',
+    leaderboard: 'Leaderboard',
+    modifiers: 'Modifiers',
+    features: 'Features',
+    economy: 'Economy',
+    development: 'Development',
+    riskRecovery: 'Risk & Recovery',
+    employees: 'Employees',
+    gacha: 'Gacha',
+    reputation: 'Reputation',
     startingMoney: 'Starting Money',
+    revenue: 'Revenue',
+    costs: 'Costs',
     salaryGrowth: 'Salary Growth',
     startingRep: 'Starting Rep',
     repGains: 'Rep Gains',
     repLosses: 'Rep Losses',
+    volatility: 'Volatility',
     devSpeed: 'Dev Speed',
     bugChance: 'Bug Chance',
     qualityVariance: 'Quality Variance',
@@ -825,12 +841,18 @@ export const en = {
     recoverySpeed: 'Recovery Speed',
     canFail: 'Can Fail',
     forcedTutorial: 'Forced Tutorial',
+    leaderboards: 'Leaderboards',
+    achievements: 'Achievements',
   },
 
   // Sandbox
   sandbox: {
     sandboxMode: 'Sandbox Mode',
+    sandboxModeActive: 'Sandbox Mode Active',
+    sandbox: 'Sandbox',
     quickCheats: 'Quick Cheats',
+    noCommandsYet: 'No commands yet...',
+    enterCommand: 'Enter command...',
     enableSandbox: 'Enable Sandbox',
     disableSandbox: 'Disable Sandbox',
     infiniteMoney: 'Infinite Money',
@@ -862,6 +884,19 @@ export const en = {
     assignEmployeesTip: 'Assign employees to your game project to make progress',
     hideDetails: 'Hide Details',
     showDetails: 'Show Details',
+    requirements: 'Requirements',
+    tips: 'Tips',
+    howDevelopmentWorks: 'How Development Works',
+    progress: 'Progress',
+    team: 'Team',
+    skillsWeight: 'Skills (40%)',
+    skillsDesc: 'Average skill level of assigned employees',
+    sizeWeight: 'Size (20%)',
+    sizeDesc: 'Team size, optimal at 5+ employees',
+    moraleWeight: 'Morale (20%)',
+    moraleDesc: 'Average morale of the team',
+    coverageWeight: 'Coverage (20%)',
+    coverageDesc: 'Diversity of roles (Programmer, Artist, Designer, etc.)',
   },
 
   // Employee Management
@@ -896,6 +931,60 @@ export const en = {
   // Achievements
   achievements: {
     hiddenAchievement: 'Hidden achievement',
+    searchAchievements: 'Search achievements...',
+  },
+
+  // Header
+  header: {
+    funds: 'Funds',
+    reputation: 'Reputation',
+    date: 'Date',
+  },
+
+  // Statistics Dashboard (additional)
+  stats: {
+    title: 'Statistics',
+    lastUpdated: 'Last updated',
+    released: 'released',
+    legendary: 'legendary',
+    weeklyFinancialOverview: 'Weekly Financial Overview',
+    teamComposition: 'Team Composition',
+    noEmployeesHiredYet: 'No employees hired yet',
+    gamePortfolioStatus: 'Game Portfolio Status',
+    noGamesInDevelopment: 'No games in development',
+    avgPullsPerLegendary: 'Avg. Pulls/Legendary',
+  },
+
+  // Prestige (additional labels)
+  prestigeLabels: {
+    legacyPointsEarned: 'Legacy Points Earned',
+    milestonesReached: 'Milestones Reached',
+    spendLegacyPoints: 'Spend Legacy Points on permanent upgrades',
+    available: 'Available',
+    activeLegacyBonuses: 'Active Legacy Bonuses',
+    milestones: 'Milestones',
+    total: 'Total',
+  },
+
+  // Research (additional labels)
+  researchLabels: {
+    cost: 'Cost',
+    effects: 'Effects',
+    prerequisites: 'Prerequisites',
+  },
+
+  // Game Progress
+  gameProgressLabels: {
+    team: 'Team',
+    overall: 'Overall',
+    performance: 'Performance',
+    arpu: 'ARPU',
+    satisfaction: 'Satisfaction',
+  },
+
+  // Placeholder
+  placeholder: {
+    comingSoon: 'This feature is coming soon!',
   },
 } as const;
 

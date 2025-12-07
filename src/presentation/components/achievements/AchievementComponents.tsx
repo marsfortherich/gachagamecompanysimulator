@@ -6,6 +6,7 @@
 
 import { useState, useEffect, useCallback, createContext, useContext, useReducer, type ReactNode } from 'react';
 import { Icon } from '../common/Icon';
+import { useI18n } from '../../../infrastructure/i18n';
 import type { Achievement, AchievementCategory, AchievementRarity, AchievementProgress } from '../../../domain/achievements/Achievement';
 import {
   ACHIEVEMENTS,
@@ -334,6 +335,7 @@ export function AchievementPanel({ isOpen, onClose }: AchievementPanelProps) {
   const [sort, setSort] = useState<SortOption>('name');
   const [searchQuery, setSearchQuery] = useState('');
   const [showHidden, setShowHidden] = useState(false);
+  const { t } = useI18n();
 
   const stats = state.manager.getStats();
 
@@ -456,7 +458,7 @@ export function AchievementPanel({ isOpen, onClose }: AchievementPanelProps) {
           {/* Search */}
           <input
             type="text"
-            placeholder="Search achievements..."
+            placeholder={t.achievements.searchAchievements}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="flex-1 min-w-[200px] px-3 py-2 bg-gray-800 border border-gray-700 rounded text-white placeholder-gray-500"

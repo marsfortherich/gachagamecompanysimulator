@@ -46,13 +46,15 @@ export const EmployeeFilterBar: React.FC<EmployeeFilterBarProps> = ({
   onFilterChange,
   onClear,
 }) => {
+  const { t } = useI18n();
+  
   return (
     <div className="flex flex-wrap gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
       {/* Search */}
       <div className="flex-1 min-w-[200px]">
         <input
           type="text"
-          placeholder="Search employees..."
+          placeholder={t.employeeManagement.searchEmployees}
           value={filters.searchTerm || ''}
           onChange={(e) => onFilterChange({ ...filters, searchTerm: e.target.value })}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 

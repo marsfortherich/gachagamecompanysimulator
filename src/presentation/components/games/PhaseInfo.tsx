@@ -209,6 +209,7 @@ export interface PhaseInfoTooltipProps {
 export const PhaseInfoTooltip: React.FC<PhaseInfoTooltipProps> = ({ phaseId, children }) => {
   const [isVisible, setIsVisible] = useState(false);
   const info = PHASE_INFO[phaseId];
+  const { t } = useI18n();
 
   if (!info) {
     return <>{children}</>;
@@ -236,7 +237,7 @@ export const PhaseInfoTooltip: React.FC<PhaseInfoTooltipProps> = ({ phaseId, chi
           <p className="text-sm text-slate-300 mb-3">{info.description}</p>
           
           <div className="mb-3">
-            <h5 className="text-xs font-semibold text-slate-400 uppercase mb-1">Requirements</h5>
+            <h5 className="text-xs font-semibold text-slate-400 uppercase mb-1">{t.phaseInfo.requirements}</h5>
             <ul className="text-sm text-slate-300 space-y-1">
               {info.requirements.map((req, i) => (
                 <li key={i} className="flex items-start gap-2">
@@ -248,7 +249,7 @@ export const PhaseInfoTooltip: React.FC<PhaseInfoTooltipProps> = ({ phaseId, chi
           </div>
           
           <div>
-            <h5 className="text-xs font-semibold text-slate-400 uppercase mb-1">Tips</h5>
+            <h5 className="text-xs font-semibold text-slate-400 uppercase mb-1">{t.phaseInfo.tips}</h5>
             <ul className="text-sm text-green-300 space-y-1">
               {info.tips.map((tip, i) => (
                 <li key={i} className="flex items-start gap-2">
@@ -430,6 +431,8 @@ export interface PhaseHelpModalProps {
  * Full help modal explaining all development phases
  */
 export const PhaseHelpModal: React.FC<PhaseHelpModalProps> = ({ isOpen, onClose }) => {
+  const { t } = useI18n();
+  
   if (!isOpen) return null;
 
   return (
@@ -446,7 +449,7 @@ export const PhaseHelpModal: React.FC<PhaseHelpModalProps> = ({ isOpen, onClose 
       >
         <div className="sticky top-0 bg-slate-800 p-4 border-b border-slate-700 flex justify-between items-center">
           <h2 id="phase-help-title" className="text-xl font-bold text-white">
-            <Icon name="book" size="md" className="text-blue-400" /> Game Development Guide
+            <Icon name="book" size="md" className="text-blue-400" /> {t.phaseInfo.howDevelopmentWorks}
           </h2>
           <button 
             onClick={onClose}
@@ -460,36 +463,34 @@ export const PhaseHelpModal: React.FC<PhaseHelpModalProps> = ({ isOpen, onClose 
         <div className="p-4 space-y-6">
           {/* Overview */}
           <section>
-            <h3 className="text-lg font-semibold text-white mb-2">How Development Works</h3>
+            <h3 className="text-lg font-semibold text-white mb-2">{t.phaseInfo.howDevelopmentWorks}</h3>
             <p className="text-slate-300 text-sm">
-              Each game goes through several phases before launch. To complete a phase, 
-              you need to reach <strong className="text-white">100% progress</strong>. 
-              Progress speed depends on your team&apos;s effectiveness.
+              {t.phaseInfo.progress}
             </p>
           </section>
           
           {/* Team Effectiveness */}
           <section className="bg-slate-700/50 rounded-lg p-4">
             <h3 className="text-lg font-semibold text-white mb-2">
-              <Icon name="chart-up" size="sm" className="text-purple-400 inline" /> Team Effectiveness Formula
+              <Icon name="chart-up" size="sm" className="text-purple-400 inline" /> {t.phaseInfo.team}
             </h3>
             <div className="text-sm text-slate-300 space-y-2">
-              <p>Your team&apos;s effectiveness determines how fast you progress:</p>
+              <p>{t.phaseInfo.progress}</p>
               <code className="block bg-slate-900 p-3 rounded text-green-400 text-xs">
                 Effectiveness = (Skills × 0.4) + (Size × 0.2) + (Morale × 0.2) + (Coverage × 0.2)
               </code>
               <ul className="space-y-1 mt-2">
-                <li><strong className="text-blue-400">Skills (40%):</strong> Average skill level of assigned employees</li>
-                <li><strong className="text-green-400">Size (20%):</strong> Team size, optimal at 5+ employees</li>
-                <li><strong className="text-yellow-400">Morale (20%):</strong> Average morale of the team</li>
-                <li><strong className="text-purple-400">Coverage (20%):</strong> Diversity of roles (Programmer, Artist, Designer, etc.)</li>
+                <li><strong className="text-blue-400">{t.phaseInfo.skillsWeight}:</strong> {t.phaseInfo.skillsDesc}</li>
+                <li><strong className="text-green-400">{t.phaseInfo.sizeWeight}:</strong> {t.phaseInfo.sizeDesc}</li>
+                <li><strong className="text-yellow-400">{t.phaseInfo.moraleWeight}:</strong> {t.phaseInfo.moraleDesc}</li>
+                <li><strong className="text-purple-400">{t.phaseInfo.coverageWeight}:</strong> {t.phaseInfo.coverageDesc}</li>
               </ul>
             </div>
           </section>
           
           {/* Phase Details */}
           <section>
-            <h3 className="text-lg font-semibold text-white mb-3">Development Phases</h3>
+            <h3 className="text-lg font-semibold text-white mb-3">{t.phaseInfo.developmentPhases}</h3>
             <div className="space-y-4">
               {Object.values(PHASE_INFO).map(phase => (
                 <PhaseCard key={phase.id} phase={phase} />
@@ -499,13 +500,9 @@ export const PhaseHelpModal: React.FC<PhaseHelpModalProps> = ({ isOpen, onClose 
           
           {/* Quick Tips */}
           <section className="bg-green-900/30 border border-green-700 rounded-lg p-4">
-            <h3 className="text-lg font-semibold text-green-400 mb-2 flex items-center gap-2"><Icon name="lightbulb" size="sm" /> Quick Tips</h3>
+            <h3 className="text-lg font-semibold text-green-400 mb-2 flex items-center gap-2"><Icon name="lightbulb" size="sm" /> {t.phaseInfo.quickTips}</h3>
             <ul className="text-sm text-slate-300 space-y-2">
-              <li>• <strong>Assign employees</strong> to your game project to make progress</li>
-              <li>• <strong>Balance your team</strong> - mix different roles for the coverage bonus</li>
-              <li>• <strong>Keep morale high</strong> - happy employees work faster</li>
-              <li>• <strong>Don&apos;t rush</strong> - quality improvements happen during development</li>
-              <li>• <strong>Check the breakdown</strong> - see exactly what&apos;s affecting your speed</li>
+              <li>• {t.phaseInfo.assignEmployeesTip}</li>
             </ul>
           </section>
         </div>

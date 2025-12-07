@@ -6,6 +6,7 @@
 
 import { useState, useEffect, createContext, useContext, useReducer, type ReactNode } from 'react';
 import { Icon } from '../common/Icon';
+import { useI18n } from '../../../infrastructure/i18n';
 import {
   ResearchNode,
   ResearchState,
@@ -315,6 +316,7 @@ function ResearchDetailModal({
 }: ResearchDetailModalProps) {
   const isCompleted = isResearchCompleted(state, node.id as string);
   const { canStart, reason } = canStartResearch(state, node, currentMoney);
+  const { t } = useI18n();
 
   return (
     <div className="absolute inset-0 bg-black/80 flex items-center justify-center p-4">
@@ -341,17 +343,17 @@ function ResearchDetailModal({
 
         {/* Cost */}
         <div className="bg-gray-900 rounded-lg p-3 mb-4">
-          <h4 className="text-sm font-bold text-gray-400 mb-2">Cost</h4>
+          <h4 className="text-sm font-bold text-gray-400 mb-2">{t.researchLabels.cost}</h4>
           <div className="flex gap-4">
             <span className="text-white">${node.cost.money.toLocaleString()}</span>
             <span className="text-blue-300">{node.cost.researchPoints} RP</span>
-            <span className="text-gray-400">{node.researchTime} days</span>
+            <span className="text-gray-400">{node.researchTime} {t.common.days}</span>
           </div>
         </div>
 
         {/* Effects */}
         <div className="bg-gray-900 rounded-lg p-3 mb-4">
-          <h4 className="text-sm font-bold text-gray-400 mb-2">Effects</h4>
+          <h4 className="text-sm font-bold text-gray-400 mb-2">{t.researchLabels.effects}</h4>
           <ul className="space-y-1">
             {node.effects.map((effect, i) => (
               <li key={i} className="text-green-400 text-sm">
@@ -364,7 +366,7 @@ function ResearchDetailModal({
         {/* Prerequisites */}
         {node.prerequisites.length > 0 && (
           <div className="bg-gray-900 rounded-lg p-3 mb-4">
-            <h4 className="text-sm font-bold text-gray-400 mb-2">Prerequisites</h4>
+            <h4 className="text-sm font-bold text-gray-400 mb-2">{t.researchLabels.prerequisites}</h4>
             <ul className="space-y-1">
               {node.prerequisites.map(prereqId => {
                 const prereq = getResearchById(prereqId as string);

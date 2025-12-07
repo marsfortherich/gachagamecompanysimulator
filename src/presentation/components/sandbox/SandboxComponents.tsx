@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useReducer, useCallback, ReactNode } from 'react';
 import { Icon } from '../common/Icon';
+import { useI18n } from '../../../infrastructure/i18n';
 import {
   SandboxFlags,
   SandboxManager,
@@ -385,6 +386,7 @@ interface SandboxPanelProps {
 
 export function SandboxPanel({ className = '' }: SandboxPanelProps) {
   const { state, toggleFlag, enableSandbox, disableSandbox } = useSandbox();
+  const { t } = useI18n();
 
   const cheatsByCategory = CHEAT_INFO.reduce((acc, cheat) => {
     if (!acc[cheat.category]) {
@@ -400,10 +402,10 @@ export function SandboxPanel({ className = '' }: SandboxPanelProps) {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-            <Icon name="games" size="md" className="text-purple-400" /> Sandbox Mode
+            <Icon name="games" size="md" className="text-purple-400" /> {t.sandbox.sandboxMode}
           </h2>
           <p className="text-gray-400 mt-1">
-            Enable cheats and debug tools. Achievements are disabled in sandbox mode.
+            {t.difficulty.noAchievements}
           </p>
         </div>
         <button
@@ -416,7 +418,7 @@ export function SandboxPanel({ className = '' }: SandboxPanelProps) {
           `}
           onClick={() => state.isActive ? disableSandbox() : enableSandbox()}
         >
-          {state.isActive ? <><Icon name="lock" size="sm" className="inline mr-1" /> Disable Sandbox</> : <><Icon name="unlock" size="sm" className="inline mr-1" /> Enable Sandbox</>}
+          {state.isActive ? <><Icon name="lock" size="sm" className="inline mr-1" /> {t.sandbox.disableSandbox}</> : <><Icon name="unlock" size="sm" className="inline mr-1" /> {t.sandbox.enableSandbox}</>}
         </button>
       </div>
 
@@ -425,11 +427,10 @@ export function SandboxPanel({ className = '' }: SandboxPanelProps) {
         <div className="bg-yellow-900/30 border border-yellow-600 rounded-lg p-4 mb-6">
           <div className="flex items-center gap-2 text-yellow-500">
             <Icon name="warning" size="md" className="text-yellow-500" />
-            <span className="font-semibold">Sandbox Mode Active</span>
+            <span className="font-semibold">{t.sandbox.sandboxModeActive}</span>
           </div>
           <p className="text-yellow-200/80 text-sm mt-1">
-            Achievements are disabled and saves will be marked as modified.
-            This cannot be undone for the current save file.
+            {t.difficulty.noAchievements}
           </p>
         </div>
       )}
@@ -463,11 +464,10 @@ export function SandboxPanel({ className = '' }: SandboxPanelProps) {
         <div className="text-center py-12">
           <Icon name="lock" size="lg" className="text-gray-500 mb-4" />
           <h3 className="text-xl font-semibold text-gray-300 mb-2">
-            Sandbox Mode is Disabled
+            {t.sandbox.sandboxMode}
           </h3>
           <p className="text-gray-500 max-w-md mx-auto">
-            Enable sandbox mode to access cheats and debug tools.
-            Note that this will permanently mark your save file and disable achievements.
+            {t.sandbox.enableSandbox}
           </p>
         </div>
       )}
@@ -481,6 +481,7 @@ export function SandboxPanel({ className = '' }: SandboxPanelProps) {
 
 export function SandboxIndicator() {
   const { state } = useSandbox();
+  const { t } = useI18n();
 
   if (!state.isActive) return null;
 
@@ -493,7 +494,7 @@ export function SandboxIndicator() {
       <div className="bg-purple-600/90 backdrop-blur-sm rounded-lg px-4 py-2 shadow-lg">
         <div className="flex items-center gap-2 text-white">
           <Icon name="games" size="sm" className="text-white" />
-          <span className="font-semibold">Sandbox</span>
+          <span className="font-semibold">{t.sandbox.sandbox}</span>
           {activeCount > 0 && (
             <span className="bg-white/20 rounded-full px-2 py-0.5 text-xs">
               {activeCount} active
@@ -515,6 +516,7 @@ interface QuickCheatsProps {
 
 export function QuickCheats({ className = '' }: QuickCheatsProps) {
   const { state, toggleFlag, enableSandbox } = useSandbox();
+  const { t } = useI18n();
 
   const quickCheats: BooleanSandboxFlags[] = [
     'infiniteMoney',
@@ -527,12 +529,12 @@ export function QuickCheats({ className = '' }: QuickCheatsProps) {
     return (
       <div className={`bg-gray-800 rounded-lg p-4 ${className}`}>
         <div className="flex items-center justify-between">
-          <span className="text-gray-400 flex items-center gap-2"><Icon name="games" size="sm" /> Sandbox Mode</span>
+          <span className="text-gray-400 flex items-center gap-2"><Icon name="games" size="sm" /> {t.sandbox.sandboxMode}</span>
           <button
             className="text-purple-400 hover:text-purple-300 text-sm"
             onClick={enableSandbox}
           >
-            Enable
+            {t.sandbox.enableSandbox}
           </button>
         </div>
       </div>
@@ -541,7 +543,7 @@ export function QuickCheats({ className = '' }: QuickCheatsProps) {
 
   return (
     <div className={`bg-gray-800 rounded-lg p-4 ${className}`}>
-      <h4 className="text-sm font-semibold text-gray-300 mb-3">Quick Cheats</h4>
+      <h4 className="text-sm font-semibold text-gray-300 mb-3">{t.sandbox.quickCheats}</h4>
       <div className="space-y-2">
         {quickCheats.map((key) => {
           const cheat = CHEAT_INFO.find((c) => c.key === key);
@@ -586,6 +588,7 @@ interface DebugConsoleProps {
 export function DebugConsole({ className = '' }: DebugConsoleProps) {
   const { state, executeCheat } = useSandbox();
   const [input, setInput] = React.useState('');
+  const { t } = useI18n();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -606,7 +609,7 @@ export function DebugConsole({ className = '' }: DebugConsoleProps) {
       {/* Command History */}
       <div className="bg-black rounded-lg p-3 mb-3 h-32 overflow-y-auto font-mono text-xs">
         {state.commandHistory.length === 0 ? (
-          <div className="text-gray-600">No commands yet...</div>
+          <div className="text-gray-600">{t.sandbox.noCommandsYet}</div>
         ) : (
           state.commandHistory.map((cmd, i) => (
             <div key={i} className="text-green-400">
@@ -623,7 +626,7 @@ export function DebugConsole({ className = '' }: DebugConsoleProps) {
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Enter command..."
+            placeholder={t.sandbox.enterCommand}
             className="flex-1 bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-purple-500"
           />
           <button

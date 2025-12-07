@@ -6,6 +6,7 @@
 
 import React, { useMemo } from 'react';
 import { useGame } from '@presentation/context/GameContext';
+import { useI18n } from '@infrastructure/i18n';
 import type { Game, Employee } from '@domain/index';
 import type { StatisticsDTO, DailyStatsDTO } from '@domain/shared/DTOs';
 import { Icon } from '../common/Icon';
@@ -323,6 +324,7 @@ function useStatistics(): StatisticsDTO {
 export const StatisticsDashboard: React.FC = () => {
   const statistics = useStatistics();
   const { state } = useGame();
+  const { t } = useI18n();
 
   // Transform daily stats for chart
   const chartData: ChartDataPoint[] = useMemo(() => {
@@ -392,35 +394,35 @@ export const StatisticsDashboard: React.FC = () => {
     <div className="p-4 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white">Statistics</h1>
+        <h1 className="text-2xl font-bold text-white">{t.stats.title}</h1>
         <span className="text-slate-400 text-sm">
-          Last updated: {new Date().toLocaleTimeString()}
+          {t.stats.lastUpdated}: {new Date().toLocaleTimeString()}
         </span>
       </div>
 
       {/* Overview Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatCard
-          title="Total Playtime"
+          title={t.statistics.totalPlaytime}
           value={formatPlaytime(statistics.totalPlaytime)}
           icon={<Icon name="clock" size="md" />}
         />
         <StatCard
-          title="Games Created"
+          title={t.statistics.gamesCreated}
           value={statistics.gamesCreated}
-          subtitle={`${statistics.gamesReleased} released`}
+          subtitle={`${statistics.gamesReleased} ${t.stats.released}`}
           icon={<Icon name="games" size="md" />}
         />
         <StatCard
-          title="Total Revenue"
+          title={t.statistics.totalRevenue}
           value={`$${statistics.totalRevenue.toLocaleString()}`}
           trend={{ value: 12.5, isPositive: true }}
           icon={<Icon name="money" size="md" />}
         />
         <StatCard
-          title="Total Employees"
+          title={t.statistics.totalEmployees}
           value={statistics.employeesHired}
-          subtitle={`${statistics.ssrObtained} legendary`}
+          subtitle={`${statistics.ssrObtained} ${t.stats.legendary}`}
           icon={<Icon name="users" size="md" />}
         />
       </div>
@@ -428,17 +430,17 @@ export const StatisticsDashboard: React.FC = () => {
       {/* Financial Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <StatCard
-          title="Highest Funds"
+          title={t.statistics.highestFunds}
           value={`$${statistics.highestFunds.toLocaleString()}`}
           icon={<Icon name="chart-up" size="md" />}
         />
         <StatCard
-          title="Total Expenses"
+          title={t.statistics.totalExpenses}
           value={`$${statistics.totalExpenses.toLocaleString()}`}
           icon={<Icon name="chart-down" size="md" />}
         />
         <StatCard
-          title="Net Profit"
+          title={t.statistics.netProfit}
           value={`$${(statistics.totalRevenue - statistics.totalExpenses).toLocaleString()}`}
           trend={{
             value: ((statistics.totalRevenue - statistics.totalExpenses) / Math.max(statistics.totalExpenses, 1)) * 100,
@@ -453,7 +455,7 @@ export const StatisticsDashboard: React.FC = () => {
         {/* Revenue Chart */}
         <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
           <h2 className="text-lg font-semibold text-white mb-4">
-            Weekly Financial Overview
+            {t.stats.weeklyFinancialOverview}
           </h2>
           <FinancialChart data={chartData} height={300} />
         </div>
@@ -461,13 +463,13 @@ export const StatisticsDashboard: React.FC = () => {
         {/* Distribution Charts */}
         <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
           <h2 className="text-lg font-semibold text-white mb-4">
-            Team Composition
+            {t.stats.teamComposition}
           </h2>
           {employeeDistribution.length > 0 ? (
             <DistributionPieChart data={employeeDistribution} height={250} />
           ) : (
             <div className="text-slate-400 text-center py-8">
-              No employees hired yet
+              {t.stats.noEmployeesHiredYet}
             </div>
           )}
         </div>
@@ -476,32 +478,32 @@ export const StatisticsDashboard: React.FC = () => {
       {/* Game Distribution */}
       <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
         <h2 className="text-lg font-semibold text-white mb-4">
-          Game Portfolio Status
+          {t.stats.gamePortfolioStatus}
         </h2>
         {gameDistribution.length > 0 ? (
           <DistributionPieChart data={gameDistribution} height={250} />
         ) : (
           <div className="text-slate-400 text-center py-8">
-            No games in development
+            {t.stats.noGamesInDevelopment}
           </div>
         )}
       </div>
 
       {/* Gacha Stats */}
       <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
-        <h2 className="text-lg font-semibold text-white mb-4">Gacha Statistics</h2>
+        <h2 className="text-lg font-semibold text-white mb-4">{t.statistics.gachaStatistics}</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="text-center">
             <div className="text-3xl font-bold text-indigo-400">
               {statistics.gachaPulls}
             </div>
-            <div className="text-slate-400 text-sm">Total Pulls</div>
+            <div className="text-slate-400 text-sm">{t.statistics.totalPulls}</div>
           </div>
           <div className="text-center">
             <div className="text-3xl font-bold text-yellow-400">
               {statistics.ssrObtained}
             </div>
-            <div className="text-slate-400 text-sm">Legendary Obtained</div>
+            <div className="text-slate-400 text-sm">{t.statistics.legendaryObtained}</div>
           </div>
           <div className="text-center">
             <div className="text-3xl font-bold text-purple-400">
@@ -509,7 +511,7 @@ export const StatisticsDashboard: React.FC = () => {
                 ? ((statistics.ssrObtained / statistics.gachaPulls) * 100).toFixed(1) 
                 : '0.0'}%
             </div>
-            <div className="text-slate-400 text-sm">Legendary Rate</div>
+            <div className="text-slate-400 text-sm">{t.statistics.legendaryRate}</div>
           </div>
           <div className="text-center">
             <div className="text-3xl font-bold text-green-400">
@@ -517,7 +519,7 @@ export const StatisticsDashboard: React.FC = () => {
                 ? Math.floor(statistics.gachaPulls / Math.max(statistics.ssrObtained, 1))
                 : 0}
             </div>
-            <div className="text-slate-400 text-sm">Avg. Pulls/Legendary</div>
+            <div className="text-slate-400 text-sm">{t.stats.avgPullsPerLegendary}</div>
           </div>
         </div>
       </div>

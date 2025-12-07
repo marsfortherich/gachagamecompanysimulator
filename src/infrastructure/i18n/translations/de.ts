@@ -580,6 +580,9 @@ export const de = {
     fundingGoal: 'Finanzierungsziel',
     campaignDuration: 'Kampagnendauer',
     createCampaign: 'Kampagne erstellen',
+    gameNamePlaceholder: 'Mein tolles Spiel',
+    descriptionPlaceholder: 'Ein revolutionäres Gacha-Spiel...',
+    of: 'von',
   },
 
   // Roadmap
@@ -670,6 +673,7 @@ export const de = {
     idle: 'Idle',
     strategy: 'Strategie',
     rhythm: 'Rhythmus',
+    card: 'Kartenspiel',
   },
 
   // Tiers
@@ -807,11 +811,23 @@ export const de = {
     selectDifficulty: 'Schwierigkeit wählen',
     noFailure: 'Kein Scheitern',
     noAchievements: 'Keine Erfolge',
+    leaderboard: 'Bestenliste',
+    modifiers: 'Modifikatoren',
+    features: 'Funktionen',
+    economy: 'Wirtschaft',
+    development: 'Entwicklung',
+    riskRecovery: 'Risiko & Erholung',
+    employees: 'Mitarbeiter',
+    gacha: 'Gacha',
+    reputation: 'Ruf',
     startingMoney: 'Startgeld',
+    revenue: 'Einnahmen',
+    costs: 'Kosten',
     salaryGrowth: 'Gehaltswachstum',
     startingRep: 'Start-Rep.',
     repGains: 'Rep.-Gewinne',
     repLosses: 'Rep.-Verluste',
+    volatility: 'Volatilität',
     devSpeed: 'Entw.-Geschw.',
     bugChance: 'Bug-Chance',
     qualityVariance: 'Qualitäts-Varianz',
@@ -825,12 +841,18 @@ export const de = {
     recoverySpeed: 'Erholungsgeschw.',
     canFail: 'Kann scheitern',
     forcedTutorial: 'Erzwungenes Tutorial',
+    leaderboards: 'Bestenlisten',
+    achievements: 'Erfolge',
   },
 
   // Sandbox
   sandbox: {
     sandboxMode: 'Sandbox-Modus',
+    sandboxModeActive: 'Sandbox-Modus aktiv',
+    sandbox: 'Sandbox',
     quickCheats: 'Schnelle Cheats',
+    noCommandsYet: 'Noch keine Befehle...',
+    enterCommand: 'Befehl eingeben...',
     enableSandbox: 'Sandbox aktivieren',
     disableSandbox: 'Sandbox deaktivieren',
     infiniteMoney: 'Unendlich Geld',
@@ -862,6 +884,19 @@ export const de = {
     assignEmployeesTip: 'Weise Mitarbeiter deinem Spielprojekt zu, um Fortschritt zu machen',
     hideDetails: 'Details ausblenden',
     showDetails: 'Details anzeigen',
+    requirements: 'Anforderungen',
+    tips: 'Tipps',
+    howDevelopmentWorks: 'Wie Entwicklung funktioniert',
+    progress: 'Fortschritt',
+    team: 'Team',
+    skillsWeight: 'Skills (40%)',
+    skillsDesc: 'Durchschnittliches Skill-Level der zugewiesenen Mitarbeiter',
+    sizeWeight: 'Größe (20%)',
+    sizeDesc: 'Teamgröße, optimal bei 5+ Mitarbeitern',
+    moraleWeight: 'Moral (20%)',
+    moraleDesc: 'Durchschnittliche Moral des Teams',
+    coverageWeight: 'Abdeckung (20%)',
+    coverageDesc: 'Vielfalt der Rollen (Programmierer, Künstler, Designer, etc.)',
   },
 
   // Employee Management
@@ -896,5 +931,59 @@ export const de = {
   // Achievements
   achievements: {
     hiddenAchievement: 'Versteckter Erfolg',
+    searchAchievements: 'Erfolge suchen...',
+  },
+
+  // Header
+  header: {
+    funds: 'Kapital',
+    reputation: 'Ruf',
+    date: 'Datum',
+  },
+
+  // Statistics Dashboard (additional)
+  stats: {
+    title: 'Statistiken',
+    lastUpdated: 'Zuletzt aktualisiert',
+    released: 'veröffentlicht',
+    legendary: 'legendär',
+    weeklyFinancialOverview: 'Wöchentliche Finanzübersicht',
+    teamComposition: 'Teamzusammensetzung',
+    noEmployeesHiredYet: 'Noch keine Mitarbeiter eingestellt',
+    gamePortfolioStatus: 'Spieleportfolio-Status',
+    noGamesInDevelopment: 'Keine Spiele in Entwicklung',
+    avgPullsPerLegendary: 'Durchschn. Züge/Legendär',
+  },
+
+  // Prestige (additional labels)
+  prestigeLabels: {
+    legacyPointsEarned: 'Verdiente Vermächtnispunkte',
+    milestonesReached: 'Erreichte Meilensteine',
+    spendLegacyPoints: 'Vermächtnispunkte für permanente Upgrades ausgeben',
+    available: 'Verfügbar',
+    activeLegacyBonuses: 'Aktive Vermächtnis-Boni',
+    milestones: 'Meilensteine',
+    total: 'Gesamt',
+  },
+
+  // Research (additional labels)
+  researchLabels: {
+    cost: 'Kosten',
+    effects: 'Effekte',
+    prerequisites: 'Voraussetzungen',
+  },
+
+  // Game Progress
+  gameProgressLabels: {
+    team: 'Team',
+    overall: 'Gesamt',
+    performance: 'Leistung',
+    arpu: 'ARPU',
+    satisfaction: 'Zufriedenheit',
+  },
+
+  // Placeholder
+  placeholder: {
+    comingSoon: 'Diese Funktion kommt bald!',
   },
 } as const;

@@ -2,9 +2,11 @@ import { useGame } from '../../context';
 import { GameActions } from '../../../application/actions';
 import { GameSpeed } from '../../../application/state';
 import { Icon, LanguageSelector } from '../common';
+import { useI18n } from '../../../infrastructure/i18n';
 
 export function Header() {
   const { state, dispatch, saveGame } = useGame();
+  const { t } = useI18n();
   const { company, currentTick, gameSpeed, isPaused } = state;
 
   const formatDate = (tick: number): string => {
@@ -53,13 +55,13 @@ export function Header() {
           </div>
           <div className="hidden sm:block h-8 w-px bg-gray-600" />
           <div className="hidden sm:block">
-            <p className="text-sm text-gray-400">Funds</p>
+            <p className="text-sm text-gray-400">{t.header.funds}</p>
             <p className="text-lg font-semibold text-gacha-gold">
               {formatCurrency(company.funds)}
             </p>
           </div>
           <div className="hidden sm:block">
-            <p className="text-sm text-gray-400">Reputation</p>
+            <p className="text-sm text-gray-400">{t.header.reputation}</p>
             <p className="text-lg font-semibold text-gacha-purple">
               {company.reputation}/100
             </p>
@@ -69,7 +71,7 @@ export function Header() {
         {/* Date and Controls */}
         <div className="flex items-center gap-4">
           <div className="text-right">
-            <p className="text-sm text-gray-400">Date</p>
+            <p className="text-sm text-gray-400">{t.header.date}</p>
             <p className="text-lg font-semibold text-white">
               {formatDate(currentTick)}
             </p>
@@ -121,13 +123,13 @@ export function Header() {
       {/* Mobile: Company stats */}
       <div className="flex sm:hidden gap-4 mt-3 pt-3 border-t border-gray-700">
         <div>
-          <p className="text-xs text-gray-400">Funds</p>
+          <p className="text-xs text-gray-400">{t.header.funds}</p>
           <p className="text-base font-semibold text-gacha-gold">
             {formatCurrency(company.funds)}
           </p>
         </div>
         <div>
-          <p className="text-xs text-gray-400">Reputation</p>
+          <p className="text-xs text-gray-400">{t.header.reputation}</p>
           <p className="text-base font-semibold text-gacha-purple">
             {company.reputation}/100
           </p>

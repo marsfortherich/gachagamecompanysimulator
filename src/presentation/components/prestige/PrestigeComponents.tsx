@@ -6,6 +6,7 @@
 
 import { useState, createContext, useContext, useReducer, useEffect, type ReactNode } from 'react';
 import { Icon } from '../common/Icon';
+import { useI18n } from '../../../infrastructure/i18n';
 import {
   PrestigeState,
   PrestigeUpgrade,
@@ -111,6 +112,7 @@ interface PrestigeSummaryProps {
 export function PrestigeSummary({ runSummary, onConfirm, onCancel }: PrestigeSummaryProps) {
   const [isConfirming, setIsConfirming] = useState(false);
   const breakdown = calculateLegacyPoints(runSummary);
+  const { t } = useI18n();
 
   const handleConfirm = () => {
     if (!isConfirming) {
@@ -134,39 +136,39 @@ export function PrestigeSummary({ runSummary, onConfirm, onCancel }: PrestigeSum
         <div className="relative p-6 text-center border-b border-purple-700">
           <h2 className="text-3xl font-bold text-purple-200 flex items-center justify-center gap-2"><Icon name="sparkles" size="md" className="text-purple-300" /> Prestige <Icon name="sparkles" size="md" className="text-purple-300" /></h2>
           <p className="text-purple-400 mt-2">
-            Reset your progress to gain permanent Legacy Points
+            {t.prestigeLabels.legacyPointsEarned}
           </p>
         </div>
 
         {/* Run Summary */}
         <div className="p-6 grid grid-cols-2 gap-4">
-          <StatBox label="Days Played" value={runSummary.daysPlayed} icon={<Icon name="calendar" size="md" />} />
-          <StatBox label="Total Revenue" value={`$${formatNumber(runSummary.totalRevenue)}`} icon={<Icon name="money" size="md" />} />
-          <StatBox label="Max Reputation" value={runSummary.maxReputation} icon={<Icon name="star" size="md" />} />
-          <StatBox label="Games Launched" value={runSummary.gamesLaunched} icon={<Icon name="games" size="md" />} />
-          <StatBox label="Peak Employees" value={runSummary.peakEmployees} icon={<Icon name="users" size="md" />} />
-          <StatBox label="Achievements" value={runSummary.achievementsUnlocked} icon={<Icon name="trophy" size="md" />} />
+          <StatBox label={t.prestige.daysPlayed} value={runSummary.daysPlayed} icon={<Icon name="calendar" size="md" />} />
+          <StatBox label={t.prestige.totalRevenue} value={`$${formatNumber(runSummary.totalRevenue)}`} icon={<Icon name="money" size="md" />} />
+          <StatBox label={t.prestige.maxReputation} value={runSummary.maxReputation} icon={<Icon name="star" size="md" />} />
+          <StatBox label={t.prestige.gamesLaunched} value={runSummary.gamesLaunched} icon={<Icon name="games" size="md" />} />
+          <StatBox label={t.prestige.peakEmployees} value={runSummary.peakEmployees} icon={<Icon name="users" size="md" />} />
+          <StatBox label={t.difficulty.achievements} value={runSummary.achievementsUnlocked} icon={<Icon name="trophy" size="md" />} />
         </div>
 
         {/* Legacy Points Breakdown */}
         <div className="p-6 bg-black/30">
-          <h3 className="text-lg font-bold text-purple-200 mb-4">Legacy Points Earned</h3>
+          <h3 className="text-lg font-bold text-purple-200 mb-4">{t.prestigeLabels.legacyPointsEarned}</h3>
           
           <div className="space-y-2 text-sm">
-            <BreakdownRow label="Base Points" value={breakdown.basePoints} />
-            <BreakdownRow label="Revenue Bonus" value={breakdown.revenuePoints} />
-            <BreakdownRow label="Reputation Bonus" value={breakdown.reputationPoints} />
-            <BreakdownRow label="Games Bonus" value={breakdown.gamesPoints} />
-            <BreakdownRow label="Employees Bonus" value={breakdown.employeesPoints} />
-            <BreakdownRow label="Achievements Bonus" value={breakdown.achievementsPoints} />
+            <BreakdownRow label={t.prestige.basePoints} value={breakdown.basePoints} />
+            <BreakdownRow label={t.prestige.revenueBonus} value={breakdown.revenuePoints} />
+            <BreakdownRow label={t.prestige.reputationBonus} value={breakdown.reputationPoints} />
+            <BreakdownRow label={t.prestige.gamesBonus} value={breakdown.gamesPoints} />
+            <BreakdownRow label={t.prestige.employeesBonus} value={breakdown.employeesPoints} />
+            <BreakdownRow label={t.prestige.achievementsBonus} value={breakdown.achievementsPoints} />
             {breakdown.milestonePoints > 0 && (
-              <BreakdownRow label="Milestones" value={breakdown.milestonePoints} highlight />
+              <BreakdownRow label={t.prestigeLabels.milestonesReached} value={breakdown.milestonePoints} highlight />
             )}
             {breakdown.speedBonus > 0 && (
-              <BreakdownRow label="Speed Bonus" value={breakdown.speedBonus} highlight />
+              <BreakdownRow label={t.prestige.speedBonus} value={breakdown.speedBonus} highlight />
             )}
             <div className="border-t border-purple-700 pt-2 mt-2">
-              <BreakdownRow label="Total" value={breakdown.totalPoints} isTotal />
+              <BreakdownRow label={t.prestigeLabels.total} value={breakdown.totalPoints} isTotal />
             </div>
           </div>
         </div>
@@ -174,7 +176,7 @@ export function PrestigeSummary({ runSummary, onConfirm, onCancel }: PrestigeSum
         {/* Milestones */}
         {breakdown.milestones.length > 0 && (
           <div className="p-6 border-t border-purple-700">
-            <h3 className="text-lg font-bold text-purple-200 mb-3">Milestones Reached</h3>
+            <h3 className="text-lg font-bold text-purple-200 mb-3">{t.prestigeLabels.milestonesReached}</h3>
             <div className="flex flex-wrap gap-2">
               {breakdown.milestones.map((m: { id: string; name: string }) => (
                 <span 
@@ -194,7 +196,7 @@ export function PrestigeSummary({ runSummary, onConfirm, onCancel }: PrestigeSum
             onClick={onCancel}
             className="flex-1 px-4 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg text-white font-bold transition-colors"
           >
-            Cancel
+            {t.common.cancel}
           </button>
           <button
             onClick={handleConfirm}
@@ -271,15 +273,16 @@ export function UpgradeShop({ isOpen, onClose }: UpgradeShopProps) {
   const { state: contextState } = usePrestige();
   const [selectedCategory, setSelectedCategory] = useState<PrestigeUpgradeCategory>('starting');
   const { calculator, state } = contextState;
+  const { t } = useI18n();
 
   const categories: { id: PrestigeUpgradeCategory; label: string; iconName: 'gift' | 'settings' | 'money' | 'users' | 'casino' | 'research' | 'star' }[] = [
-    { id: 'starting', label: 'Starting', iconName: 'gift' },
-    { id: 'production', label: 'Production', iconName: 'settings' },
-    { id: 'financial', label: 'Financial', iconName: 'money' },
-    { id: 'employees', label: 'Employees', iconName: 'users' },
-    { id: 'gacha', label: 'Gacha', iconName: 'casino' },
-    { id: 'research', label: 'Research', iconName: 'research' },
-    { id: 'reputation', label: 'Reputation', iconName: 'star' },
+    { id: 'starting', label: t.prestige.startingMoney.split(' ')[0], iconName: 'gift' },
+    { id: 'production', label: t.difficulty.development, iconName: 'settings' },
+    { id: 'financial', label: t.nav.finance, iconName: 'money' },
+    { id: 'employees', label: t.difficulty.employees, iconName: 'users' },
+    { id: 'gacha', label: t.difficulty.gacha, iconName: 'casino' },
+    { id: 'research', label: t.research.noResearch.split(' ')[1] || 'Research', iconName: 'research' },
+    { id: 'reputation', label: t.difficulty.reputation, iconName: 'star' },
   ];
 
   const upgrades = getUpgradesByCategory(selectedCategory);
@@ -306,15 +309,15 @@ export function UpgradeShop({ isOpen, onClose }: UpgradeShopProps) {
         {/* Header */}
         <div className="p-4 bg-gradient-to-r from-purple-900 to-gray-900 border-b border-purple-700 flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold text-white flex items-center gap-2"><Icon name="shop" size="md" /> Upgrade Shop</h2>
-            <p className="text-sm text-gray-400">Spend Legacy Points on permanent upgrades</p>
+            <h2 className="text-xl font-bold text-white flex items-center gap-2"><Icon name="shop" size="md" /> {t.prestige.upgradeShop}</h2>
+            <p className="text-sm text-gray-400">{t.prestigeLabels.spendLegacyPoints}</p>
           </div>
           <div className="flex items-center gap-4">
             <div className="text-right">
               <div className="text-purple-300 font-bold text-lg">
                 {state.availableLegacyPoints} LP
               </div>
-              <div className="text-xs text-gray-500">Available</div>
+              <div className="text-xs text-gray-500">{t.prestigeLabels.available}</div>
             </div>
             <button
               onClick={onClose}
@@ -538,6 +541,7 @@ export function LegacyWidget({ onClick }: LegacyWidgetProps) {
 export function ActiveEffectsDisplay() {
   const { state: contextState } = usePrestige();
   const effects = getAllEffects(contextState.state);
+  const { t } = useI18n();
   
   const activeEffects = Object.entries(effects)
     .filter(([_, value]) => value > 0)
@@ -548,27 +552,27 @@ export function ActiveEffectsDisplay() {
   }
 
   const effectLabels: Record<PrestigeEffectType, { label: string; iconName: 'money' | 'star' | 'bolt' | 'sparkles' | 'chart-up' | 'expense' | 'book' | 'happy' | 'handshake' | 'clover' | 'casino' | 'research' | 'document' | 'megaphone' | 'trophy' | 'target' }> = {
-    startingMoney: { label: 'Starting $', iconName: 'money' },
-    startingReputation: { label: 'Starting Rep', iconName: 'star' },
-    devSpeedBonus: { label: 'Dev Speed', iconName: 'bolt' },
-    gameQualityBonus: { label: 'Quality', iconName: 'sparkles' },
-    revenueMultiplier: { label: 'Revenue', iconName: 'chart-up' },
-    costReduction: { label: 'Cost -', iconName: 'expense' },
-    employeeSkillBonus: { label: 'Skill', iconName: 'book' },
-    employeeMoraleBonus: { label: 'Morale', iconName: 'happy' },
-    hiringCostReduction: { label: 'Hire -', iconName: 'handshake' },
-    gachaRateBonus: { label: 'Gacha', iconName: 'clover' },
-    pityReduction: { label: 'Pity -', iconName: 'casino' },
-    researchSpeedBonus: { label: 'Research', iconName: 'research' },
-    researchCostReduction: { label: 'R&D -', iconName: 'document' },
-    reputationGainBonus: { label: 'Rep +', iconName: 'megaphone' },
-    marketShareBonus: { label: 'Market', iconName: 'trophy' },
-    criticalSuccessChance: { label: 'Crit', iconName: 'target' },
+    startingMoney: { label: t.prestige.startingMoney, iconName: 'money' },
+    startingReputation: { label: t.prestige.startingRep, iconName: 'star' },
+    devSpeedBonus: { label: t.prestige.devSpeed, iconName: 'bolt' },
+    gameQualityBonus: { label: t.prestige.gameQuality, iconName: 'sparkles' },
+    revenueMultiplier: { label: t.difficulty.revenue, iconName: 'chart-up' },
+    costReduction: { label: t.prestige.costReduction, iconName: 'expense' },
+    employeeSkillBonus: { label: t.prestige.employeeSkill, iconName: 'book' },
+    employeeMoraleBonus: { label: t.prestige.employeeMorale, iconName: 'happy' },
+    hiringCostReduction: { label: t.prestige.hiringCost, iconName: 'handshake' },
+    gachaRateBonus: { label: t.prestige.gachaRates, iconName: 'clover' },
+    pityReduction: { label: t.prestige.pityReduction, iconName: 'casino' },
+    researchSpeedBonus: { label: t.prestige.researchSpeed, iconName: 'research' },
+    researchCostReduction: { label: t.prestige.researchCost, iconName: 'document' },
+    reputationGainBonus: { label: t.prestige.reputationGain, iconName: 'megaphone' },
+    marketShareBonus: { label: t.prestige.marketShare, iconName: 'trophy' },
+    criticalSuccessChance: { label: t.prestige.critChance, iconName: 'target' },
   };
 
   return (
     <div className="bg-purple-900/20 border border-purple-800 rounded-lg p-3">
-      <h4 className="text-xs text-purple-400 font-bold uppercase mb-2">Active Legacy Bonuses</h4>
+      <h4 className="text-xs text-purple-400 font-bold uppercase mb-2">{t.prestigeLabels.activeLegacyBonuses}</h4>
       <div className="flex flex-wrap gap-2">
         {activeEffects.map(({ type, value }) => {
           const config = effectLabels[type];

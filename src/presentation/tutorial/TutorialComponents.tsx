@@ -7,6 +7,7 @@
 import { useEffect, useState, useRef, ReactNode } from 'react';
 import { useTutorial, TutorialStep } from './TutorialContext';
 import { Icon } from '../components/common/Icon';
+import { useI18n } from '../../infrastructure/i18n';
 
 // =============================================================================
 // Types
@@ -416,18 +417,19 @@ interface TutorialReplayPanelProps {
 
 export function TutorialReplayPanel({ onReplay }: TutorialReplayPanelProps) {
   const { state, jumpToStep } = useTutorial();
+  const { t } = useI18n();
   
   const sections = [
-    { id: 'welcome', label: 'Welcome & Overview' },
-    { id: 'first_employee_intro', label: 'Hiring Employees' },
-    { id: 'first_project_intro', label: 'Game Development' },
-    { id: 'research_intro', label: 'Research System' },
-    { id: 'market_awareness', label: 'Market & Ethics' },
+    { id: 'welcome', label: t.tutorial.hiringEmployees },
+    { id: 'first_employee_intro', label: t.tutorial.hiringEmployees },
+    { id: 'first_project_intro', label: t.tutorial.gameDevelopment },
+    { id: 'research_intro', label: t.tutorial.researchSystem },
+    { id: 'market_awareness', label: t.tutorial.ethicalChoices },
   ] as const;
 
   return (
     <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
-      <h3 className="text-lg font-semibold text-white mb-4">Tutorial Sections</h3>
+      <h3 className="text-lg font-semibold text-white mb-4">{t.tutorial.tutorialSections}</h3>
       
       <div className="space-y-2">
         {sections.map((section) => {
