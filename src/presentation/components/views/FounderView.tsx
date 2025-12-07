@@ -265,6 +265,15 @@ export function FounderView() {
               <p className="text-sm text-gray-400">
                 +{FOUNDER_TRAINING_CONFIGS[founder.currentTraining!].skillGainPerDay * founder.learningMultiplier}{t.common.perDay}
               </p>
+              <Button
+                variant="danger"
+                size="sm"
+                className="mt-2"
+                onClick={() => dispatch(GameActions.cancelFounderTraining())}
+              >
+                <Icon name="blocked" size="sm" className="mr-1" />
+                {t.founder.cancelTraining}
+              </Button>
             </div>
           </div>
         </Card>

@@ -118,6 +118,7 @@ export const de = {
     skills: 'Fähigkeiten',
     startTraining: 'Training starten',
     trainingInProgress: 'Training läuft...',
+    cancelTraining: 'Training abbrechen',
     primary: 'Primär',
     secondary: 'Sekundär',
     specialization: 'Spezialisierung',

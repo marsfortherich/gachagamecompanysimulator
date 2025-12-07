@@ -118,6 +118,7 @@ export const en = {
     skills: 'Skills',
     startTraining: 'Start Training',
     trainingInProgress: 'Training in Progress...',
+    cancelTraining: 'Cancel Training',
     primary: 'Primary',
     secondary: 'Secondary',
     specialization: 'Specialization',
