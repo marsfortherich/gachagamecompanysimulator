@@ -173,8 +173,8 @@ export function FinanceView() {
                     color="green"
                   />
                   <div className="flex justify-between text-xs text-gray-500 mt-1">
-                    <span>DAU: {game.dau.toLocaleString()}</span>
-                    <span>ARPDAU: ${game.arpdau.toFixed(3)}</span>
+                    <span>{t.metrics.dau}: {game.dau.toLocaleString()}</span>
+                    <span>{t.metrics.arpdau}: ${game.arpdau.toFixed(3)}</span>
                   </div>
                 </div>
               ))}

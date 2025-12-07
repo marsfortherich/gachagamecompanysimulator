@@ -9,6 +9,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { Icon } from '../common/Icon';
+import { useI18n } from '@infrastructure/i18n';
 
 // =============================================================================
 // Phase Configuration Data
@@ -290,65 +291,68 @@ export const ProgressBreakdownPanel: React.FC<ProgressBreakdownPanelProps> = ({
   breakdown, 
   currentPhase 
 }) => {
+  const { t } = useI18n();
   const phaseInfo = PHASE_INFO[currentPhase];
   const baseProgress = phaseInfo?.baseProgressPerTick ?? 1;
   const actualProgress = baseProgress * breakdown.total;
+
+  const pb = t.games.progressBreakdown;
 
   return (
     <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
       <h4 className="font-semibold text-white mb-3 flex items-center gap-2">
         <Icon name="chart-up" size="sm" className="text-blue-400" />
-        Progress Speed Breakdown
+        {pb.title}
       </h4>
       
       <div className="space-y-2">
         <BreakdownBar 
-          label="Team Skills" 
+          label={pb.teamSkills}
           value={breakdown.skillScore} 
           maxValue={0.4}
           color="blue"
-          description="Average skill level (40% weight)"
+          description={pb.teamSkillsDesc}
         />
         <BreakdownBar 
-          label="Team Size" 
+          label={pb.teamSize}
           value={breakdown.sizeScore} 
           maxValue={0.2}
           color="green"
-          description="Optimal at 5+ employees (20% weight)"
+          description={pb.teamSizeDesc}
         />
         <BreakdownBar 
-          label="Morale" 
+          label={pb.morale}
           value={breakdown.moraleScore} 
           maxValue={0.2}
           color="yellow"
-          description="Average team morale (20% weight)"
+          description={pb.moraleDesc}
         />
         <BreakdownBar 
-          label="Role Coverage" 
+          label={pb.roleCoverage}
           value={breakdown.coverageScore} 
           maxValue={0.2}
           color="purple"
-          description="Unique roles in team (20% weight)"
+          description={pb.roleCoverageDesc}
         />
       </div>
       
       <div className="mt-4 pt-3 border-t border-slate-600">
         <div className="flex justify-between text-sm">
-          <span className="text-slate-400">Team Effectiveness:</span>
+          <span className="text-slate-400">{pb.teamEffectiveness}:</span>
           <span className={`font-bold ${getEffectivenessColor(breakdown.total)}`}>
             {(breakdown.total * 100).toFixed(0)}%
           </span>
         </div>
         <div className="flex justify-between text-sm mt-1">
-          <span className="text-slate-400">Base Progress/Day:</span>
+          <span className="text-slate-400">{pb.baseProgressPerDay}:</span>
           <span className="text-white">{baseProgress.toFixed(1)}</span>
         </div>
         <div className="flex justify-between text-sm mt-1">
-          <span className="text-slate-400">Actual Progress/Day:</span>
+          <span className="text-slate-400">{pb.actualProgressPerDay}:</span>
           <span className="text-green-400 font-bold">{actualProgress.toFixed(2)}</span>
         </div>
         <div className="flex justify-between text-sm mt-1">
-          <span className="text-slate-400">Days to Complete:</span>
+          <span className="text-slate-400">{pb.daysToComplete}:</span>
           <span className="text-white">
             {actualProgress > 0 ? Math.ceil(100 / actualProgress) : '∞'}
           </span>

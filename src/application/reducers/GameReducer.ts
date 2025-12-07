@@ -33,6 +33,8 @@ import {
   completeFounderTraining,
   processFounderDailyTraining,
   workFounder,
+  restFounder,
+  recordGameCompleted,
   FOUNDER_TRAINING_CONFIGS,
 } from '../../domain';
 import { calculateMaintenanceEffect, IMPROVEMENT_TASKS, getImprovementPriority, calculateImprovementSpeed } from '../../domain/game/LiveGameImprovement';
@@ -419,16 +421,26 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     case 'LAUNCH_GAME': {
       const { gameId } = action.payload;
       
-      const updatedGames = state.games.map(game => {
-        if (game.id === gameId && game.developmentProgress >= 100) {
-          return updateGameStatus(game, 'live', state.currentTick);
+      const game = state.games.find(g => g.id === gameId);
+      if (!game || game.developmentProgress < 100) return state;
+      
+      const updatedGames = state.games.map(g => {
+        if (g.id === gameId) {
+          return updateGameStatus(g, 'live', state.currentTick);
         }
-        return game;
+        return g;
       });
+
+      // Check if founder was assigned to this game and increment their games completed
+      let updatedFounder = state.founder;
+      if (updatedFounder && game.assignedEmployees.includes(updatedFounder.id)) {
+        updatedFounder = recordGameCompleted(updatedFounder);
+      }
 
       return {
         ...state,
         games: updatedGames,
+        founder: updatedFounder,
       };
     }
 
@@ -1191,6 +1203,9 @@ function processGameDevelopment(state: GameState): GameState {
     if (updatedFounder.currentTraining === 'hands_on_practice') {
       updatedFounder = processFounderDailyTraining(updatedFounder, true);
     }
+  } else if (updatedFounder && !founderIsWorking && !updatedFounder.currentTraining) {
+    // Founder is idle (not working, not training) - recover energy
+    updatedFounder = restFounder(updatedFounder);
   }
   
   // Process founder training completion for non-hands-on training

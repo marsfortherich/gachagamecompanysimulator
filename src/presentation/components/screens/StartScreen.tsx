@@ -11,19 +11,18 @@ import {
   EXPERIENCE_CONFIGS 
 } from '../../../domain/company/Founder';
 
-// Use domain location data for display
-const LOCATION_INFO = Object.fromEntries(
-  Object.entries(LOCATIONS).map(([key, config]) => [
-    key,
-    {
-      name: config.name,
-      region: config.region,
-      description: config.description,
-      bonuses: config.displayBonuses,
-      targetAudience: config.targetAudience,
-    }
-  ])
-) as Record<LocationId, { name: string; region: string; description: string; bonuses: readonly string[]; targetAudience: string }>;
+// Location key mapping for i18n
+const LOCATION_KEYS: Record<LocationId, string> = {
+  'Tokyo': 'tokyo',
+  'Seoul': 'seoul',
+  'Shanghai': 'shanghai',
+  'Los Angeles': 'losAngeles',
+  'San Francisco': 'sanFrancisco',
+  'Seattle': 'seattle',
+  'Montreal': 'montreal',
+  'London': 'london',
+  'Stockholm': 'stockholm',
+};
 
 
 export function StartScreen() {
@@ -37,9 +36,87 @@ export function StartScreen() {
   const [hasSave, setHasSave] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  const locations = Object.keys(LOCATION_INFO) as LocationId[];
+  const locations = Object.keys(LOCATIONS) as LocationId[];
   const specializations = Object.keys(SPECIALIZATION_CONFIGS) as FounderSpecialization[];
   const experienceLevels = Object.keys(EXPERIENCE_CONFIGS) as FounderExperience[];
+
+  // Helper functions to get translated texts
+  const getSpecName = (spec: FounderSpecialization) => {
+    const nameMap: Record<FounderSpecialization, string> = {
+      programmer: t.specializations.programmer,
+      artist: t.specializations.artist,
+      designer: t.specializations.designer,
+      generalist: t.specializations.generalist,
+    };
+    return nameMap[spec];
+  };
+
+  const getSpecDesc = (spec: FounderSpecialization) => {
+    const descMap: Record<FounderSpecialization, string> = {
+      programmer: t.specializations.programmerDesc,
+      artist: t.specializations.artistDesc,
+      designer: t.specializations.designerDesc,
+      generalist: t.specializations.generalistDesc,
+    };
+    return descMap[spec];
+  };
+
+  const getExpName = (exp: FounderExperience) => {
+    const nameMap: Record<FounderExperience, string> = {
+      student: t.experienceLevels.student,
+      junior: t.experienceLevels.junior,
+      experienced: t.experienceLevels.experienced,
+      veteran: t.experienceLevels.veteran,
+    };
+    return nameMap[exp];
+  };
+
+  const getExpDesc = (exp: FounderExperience) => {
+    const descMap: Record<FounderExperience, string> = {
+      student: t.experienceLevels.studentDesc,
+      junior: t.experienceLevels.juniorDesc,
+      experienced: t.experienceLevels.experiencedDesc,
+      veteran: t.experienceLevels.veteranDesc,
+    };
+    return descMap[exp];
+  };
+
+  const getSkillName = (skill: string) => {
+    const skillMap: Record<string, string> = {
+      programming: t.skills.programming,
+      art: t.skills.art,
+      game_design: t.skills.gameDesign,
+      marketing: t.skills.marketing,
+      management: t.skills.management,
+      sound: t.skills.sound,
+      writing: t.skills.writing,
+    };
+    return skillMap[skill] || skill.replace('_', ' ');
+  };
+
+  const getLocationName = (loc: LocationId) => {
+    const key = LOCATION_KEYS[loc] as keyof typeof t.locations;
+    return t.locations[key] || LOCATIONS[loc].name;
+  };
+
+  const getLocationDesc = (loc: LocationId) => {
+    const key = LOCATION_KEYS[loc];
+    const descKey = `${key}Desc` as keyof typeof t.locations;
+    return (t.locations[descKey] as string) || LOCATIONS[loc].description;
+  };
+
+  const getLocationBonuses = (loc: LocationId): readonly string[] => {
+    const key = LOCATION_KEYS[loc];
+    const bonusKey = `${key}Bonuses` as keyof typeof t.locations;
+    const bonuses = t.locations[bonusKey];
+    return Array.isArray(bonuses) ? bonuses : LOCATIONS[loc].displayBonuses;
+  };
+
+  const getLocationAudience = (loc: LocationId) => {
+    const key = LOCATION_KEYS[loc];
+    const audienceKey = `${key}Audience` as keyof typeof t.locations;
+    return (t.locations[audienceKey] as string) || LOCATIONS[loc].targetAudience;
+  };
 
   useEffect(() => {
     const checkSave = async () => {
@@ -146,7 +223,7 @@ export function StartScreen() {
                     >
                       {specializations.map((spec) => (
                         <option key={spec} value={spec}>
-                          {SPECIALIZATION_CONFIGS[spec].name}
+                          {getSpecName(spec)}
                         </option>
                       ))}
                     </select>
@@ -163,7 +240,7 @@ export function StartScreen() {
                     >
                       {experienceLevels.map((exp) => (
                         <option key={exp} value={exp}>
-                          {EXPERIENCE_CONFIGS[exp].name}
+                          {getExpName(exp)}
                         </option>
                       ))}
                     </select>
@@ -175,10 +252,10 @@ export function StartScreen() {
                   <div className="flex items-start justify-between mb-2">
                     <div>
                       <span className="font-medium text-white">
-                        {SPECIALIZATION_CONFIGS[specialization].name}
+                        {getSpecName(specialization)}
                       </span>
                       <span className="text-xs text-gray-400 ml-2">
-                        ({EXPERIENCE_CONFIGS[experience].name})
+                        ({getExpName(experience)})
                       </span>
                     </div>
                     <span className="text-sm font-medium text-gacha-gold">
@@ -186,17 +263,17 @@ export function StartScreen() {
                     </span>
                   </div>
                   <p className="text-xs text-gray-400 mb-2">
-                    {SPECIALIZATION_CONFIGS[specialization].description}
+                    {getSpecDesc(specialization)}
                   </p>
                   <p className="text-xs text-gray-400">
-                    {EXPERIENCE_CONFIGS[experience].description}
+                    {getExpDesc(experience)}
                   </p>
                   <div className="mt-2 flex flex-wrap gap-2">
                     <span className="text-xs px-2 py-0.5 bg-blue-500/20 text-blue-300 rounded">
-                      +{SPECIALIZATION_CONFIGS[specialization].primaryBonus} {SPECIALIZATION_CONFIGS[specialization].primarySkill.replace('_', ' ')}
+                      +{SPECIALIZATION_CONFIGS[specialization].primaryBonus} {getSkillName(SPECIALIZATION_CONFIGS[specialization].primarySkill)}
                     </span>
                     <span className="text-xs px-2 py-0.5 bg-green-500/20 text-green-300 rounded">
-                      +{SPECIALIZATION_CONFIGS[specialization].secondaryBonus} {SPECIALIZATION_CONFIGS[specialization].secondarySkill.replace('_', ' ')}
+                      +{SPECIALIZATION_CONFIGS[specialization].secondaryBonus} {getSkillName(SPECIALIZATION_CONFIGS[specialization].secondarySkill)}
                     </span>
                     <span className="text-xs px-2 py-0.5 bg-yellow-500/20 text-yellow-300 rounded">
                       ×{EXPERIENCE_CONFIGS[experience].learningSpeedMultiplier} {t.startScreen.learning}
@@ -219,38 +296,36 @@ export function StartScreen() {
                 >
                   {locations.map((loc) => (
                     <option key={loc} value={loc}>
-                      {loc} ({LOCATION_INFO[loc].region})
+                      {getLocationName(loc)} ({LOCATIONS[loc].region})
                     </option>
                   ))}
                 </select>
                 
                 {/* Location info panel */}
-                {LOCATION_INFO[headquarters] && (
-                  <div className="mt-3 p-3 bg-gray-700/50 rounded-lg border border-gray-600">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Icon name="settings" size="sm" className="text-gacha-purple" />
-                      <span className="font-medium text-white">{LOCATION_INFO[headquarters].name}</span>
-                      <span className="text-xs text-gray-400">({LOCATION_INFO[headquarters].region})</span>
-                    </div>
-                    <p className="text-sm text-gray-300 mb-2">{LOCATION_INFO[headquarters].description}</p>
-                    
-                    <div className="mb-2">
-                      <span className="text-xs text-gray-400 uppercase">{t.startScreen.bonuses}:</span>
-                      <ul className="mt-1 space-y-0.5">
-                        {LOCATION_INFO[headquarters].bonuses.map((bonus, i) => (
-                          <li key={i} className="text-xs text-green-400 flex items-center gap-1">
-                            <Icon name="check" size="sm" /> {bonus}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                    
-                    <div>
-                      <span className="text-xs text-gray-400 uppercase">{t.startScreen.targetAudience}:</span>
-                      <p className="text-xs text-blue-300 mt-0.5">{LOCATION_INFO[headquarters].targetAudience}</p>
-                    </div>
+                <div className="mt-3 p-3 bg-gray-700/50 rounded-lg border border-gray-600">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Icon name="settings" size="sm" className="text-gacha-purple" />
+                    <span className="font-medium text-white">{getLocationName(headquarters)}</span>
+                    <span className="text-xs text-gray-400">({LOCATIONS[headquarters].region})</span>
                   </div>
-                )}
+                  <p className="text-sm text-gray-300 mb-2">{getLocationDesc(headquarters)}</p>
+                  
+                  <div className="mb-2">
+                    <span className="text-xs text-gray-400 uppercase">{t.startScreen.bonuses}:</span>
+                    <ul className="mt-1 space-y-0.5">
+                      {getLocationBonuses(headquarters).map((bonus, i) => (
+                        <li key={i} className="text-xs text-green-400 flex items-center gap-1">
+                          <Icon name="check" size="sm" /> {bonus}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  
+                  <div>
+                    <span className="text-xs text-gray-400 uppercase">{t.startScreen.targetAudience}:</span>
+                    <p className="text-xs text-blue-300 mt-0.5">{getLocationAudience(headquarters)}</p>
+                  </div>
+                </div>
               </div>
 
               <Button

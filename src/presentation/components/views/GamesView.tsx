@@ -256,7 +256,7 @@ export function GamesView() {
                                 </span>
                                 <span className="text-gacha-gold">
                                   <Icon name="money" size="xs" className="inline mr-1" />
-                                  ${config.baseARPDAU.toFixed(2)}/DAU
+                                  ${config.baseARPDAU.toFixed(2)}/{t.metrics.dau}
                                 </span>
                               </div>
                             )}
@@ -355,15 +355,33 @@ export function GamesView() {
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
           {games.map((game) => {
-            // Calculate team data for breakdown
-            const teamMembers: TeamMemberForCalculation[] = game.assignedEmployees
+            // Calculate team data for breakdown - include founder if assigned
+            const teamMembers: TeamMemberForCalculation[] = [];
+            
+            // Add founder if assigned to this game
+            if (founder && game.assignedEmployees.includes(founder.id)) {
+              teamMembers.push({
+                skills: founder.skills,
+                morale: Math.round(founder.energy * 0.8 + 20), // Energy affects morale-like behavior
+                role: founder.specialization === 'programmer' ? 'Programmer' :
+                      founder.specialization === 'artist' ? 'Artist' :
+                      founder.specialization === 'designer' ? 'Designer' : 'Designer',
+              });
+            }
+            
+            // Add employees (excluding founder ID)
+            game.assignedEmployees
+              .filter(empId => !founder || empId !== founder.id)
               .map(empId => employees.find(e => e.id === empId))
               .filter((e): e is NonNullable<typeof e> => e != null)
-              .map(emp => ({
-                skills: emp.skills,
-                morale: emp.morale,
-                role: emp.role,
-              }));
+              .forEach(emp => {
+                teamMembers.push({
+                  skills: emp.skills,
+                  morale: emp.morale,
+                  role: emp.role,
+                });
+              });
+            
             const teamBreakdown = calculateTeamEffectivenessBreakdown(teamMembers);
             
             const isCollapsed = collapsedGames.has(game.id);
@@ -402,7 +420,7 @@ export function GamesView() {
                     {isCollapsed && game.status === 'live' && (
                       <>
                         <span className="text-xs text-gray-400">
-                          DAU: {game.monetization.dailyActiveUsers.toLocaleString()}
+                          {t.metrics.dau}: {game.monetization.dailyActiveUsers.toLocaleString()}
                         </span>
                         <span className="text-xs text-gacha-gold">
                           ${game.monetization.monthlyRevenue.toLocaleString()}/mo

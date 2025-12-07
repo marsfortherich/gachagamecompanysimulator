@@ -146,7 +146,7 @@ export function GachaManagementView() {
                     <div className="font-semibold">{game.name}</div>
                     <div className="text-sm opacity-75 capitalize">{game.genre}</div>
                     <div className="text-xs mt-1">
-                      DAU: {game.monetization.dailyActiveUsers.toLocaleString()}
+                      {t.metrics.dau}: {game.monetization.dailyActiveUsers.toLocaleString()}
                     </div>
                   </button>
                 ))}

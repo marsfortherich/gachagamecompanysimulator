@@ -28,6 +28,31 @@ export function MarketingView() {
   const { t } = useI18n();
   const { games, employees, company, campaigns, currentTick } = state;
 
+  // Helper to get translated campaign name
+  const getCampaignName = (type: CampaignType): string => {
+    const nameMap: Record<CampaignType, string> = {
+      social_media: t.marketing.campaignTypes.socialMedia,
+      collaboration: t.marketing.campaignTypes.collaboration,
+      livestream: t.marketing.campaignTypes.livestream,
+      ad_campaign: t.marketing.campaignTypes.adCampaign,
+      influencer_short: t.marketing.campaignTypes.influencerShort,
+      influencer_long: t.marketing.campaignTypes.influencerLong,
+    };
+    return nameMap[type] || type;
+  };
+
+  const getCampaignDesc = (type: CampaignType): string => {
+    const descMap: Record<CampaignType, string> = {
+      social_media: t.marketing.campaignTypes.socialMediaDesc,
+      collaboration: t.marketing.campaignTypes.collaborationDesc,
+      livestream: t.marketing.campaignTypes.livestreamDesc,
+      ad_campaign: t.marketing.campaignTypes.adCampaignDesc,
+      influencer_short: t.marketing.campaignTypes.influencerShortDesc,
+      influencer_long: t.marketing.campaignTypes.influencerLongDesc,
+    };
+    return descMap[type] || '';
+  };
+
   // Get live games and marketers
   const liveGames = games.filter(g => g.status === 'live');
   const marketers = employees.filter(e => e.role === 'Marketer');
@@ -155,7 +180,7 @@ export function MarketingView() {
                     >
                       <div className="font-semibold">{game.name}</div>
                       <div className="text-sm opacity-75">
-                        DAU: {game.monetization.dailyActiveUsers.toLocaleString()}
+                        {t.metrics.dau}: {game.monetization.dailyActiveUsers.toLocaleString()}
                       </div>
                       <div className="flex items-center gap-2 mt-1">
                         <span className="text-xs flex items-center gap-1">
@@ -163,7 +188,7 @@ export function MarketingView() {
                         </span>
                         {marketingBonus > 0 && (
                           <span className="text-xs text-green-400">
-                            +{(marketingBonus * 100).toFixed(0)}% DAU
+                            +{(marketingBonus * 100).toFixed(0)}% {t.metrics.dau}
                           </span>
                         )}
                       </div>
@@ -272,7 +297,7 @@ export function MarketingView() {
                             <div className="flex items-center justify-between mb-2">
                               <div className="flex items-center gap-2">
                                 <Icon name="target" />
-                                <span className="text-white font-medium">{definition.name}</span>
+                                <span className="text-white font-medium">{getCampaignName(campaign.type)}</span>
                               </div>
                               <span className="text-green-400 text-sm">
                                 {remainingDays} {t.marketing.daysLeft}
@@ -281,7 +306,7 @@ export function MarketingView() {
                             <ProgressBar value={progress} max={100} color="green" />
                             <div className="flex gap-4 mt-2 text-xs text-gray-400">
                               <span className="flex items-center gap-1">
-                                <Icon name="chart-up" size="xs" /> +{(campaign.effects.dauBoost * 100).toFixed(0)}% DAU
+                                <Icon name="chart-up" size="xs" /> +{(campaign.effects.dauBoost * 100).toFixed(0)}% {t.metrics.dau}
                               </span>
                               {campaign.effects.retentionBoost > 0 && (
                                 <span className="flex items-center gap-1">
@@ -321,11 +346,11 @@ export function MarketingView() {
                             <div className="flex items-start gap-3">
                               <Icon name="target" size="lg" />
                               <div>
-                                <p className="text-white font-medium">{campaignDef.name}</p>
-                                <p className="text-sm text-gray-400">{campaignDef.description}</p>
+                                <p className="text-white font-medium">{getCampaignName(campaignDef.type)}</p>
+                                <p className="text-sm text-gray-400">{getCampaignDesc(campaignDef.type)}</p>
                                 <div className="flex flex-wrap gap-3 mt-2 text-xs text-gray-500">
                                   <span className="flex items-center gap-1">
-                                    <Icon name="chart-up" size="xs" /> +{(campaignDef.dauBoost * 100).toFixed(0)}% DAU
+                                    <Icon name="chart-up" size="xs" /> +{(campaignDef.dauBoost * 100).toFixed(0)}% {t.metrics.dau}
                                   </span>
                                   {campaignDef.retentionBoost > 0 && (
                                     <span className="flex items-center gap-1">

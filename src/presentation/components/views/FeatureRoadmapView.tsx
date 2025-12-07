@@ -38,6 +38,35 @@ export function FeatureRoadmapView() {
   const [featureName, setFeatureName] = useState('');
   const [scheduledDays, setScheduledDays] = useState(7);
 
+  // Helper to get translated feature type name and description
+  const getFeatureTypeName = (type: FeatureType): string => {
+    const nameMap: Record<FeatureType, string> = {
+      content_update: t.roadmap.featureTypes.contentUpdate,
+      seasonal_event: t.roadmap.featureTypes.seasonalEvent,
+      dlc_expansion: t.roadmap.featureTypes.dlcExpansion,
+      quality_of_life: t.roadmap.featureTypes.qualityOfLife,
+      monetization_update: t.roadmap.featureTypes.monetizationUpdate,
+      collaboration: t.roadmap.featureTypes.collaboration,
+      anniversary: t.roadmap.featureTypes.anniversary,
+      balance_patch: t.roadmap.featureTypes.balancePatch,
+    };
+    return nameMap[type] || type;
+  };
+
+  const getFeatureTypeDesc = (type: FeatureType): string => {
+    const descMap: Record<FeatureType, string> = {
+      content_update: t.roadmap.featureTypes.contentUpdateDesc,
+      seasonal_event: t.roadmap.featureTypes.seasonalEventDesc,
+      dlc_expansion: t.roadmap.featureTypes.dlcExpansionDesc,
+      quality_of_life: t.roadmap.featureTypes.qualityOfLifeDesc,
+      monetization_update: t.roadmap.featureTypes.monetizationUpdateDesc,
+      collaboration: t.roadmap.featureTypes.collaborationDesc,
+      anniversary: t.roadmap.featureTypes.anniversaryDesc,
+      balance_patch: t.roadmap.featureTypes.balancePatchDesc,
+    };
+    return descMap[type] || '';
+  };
+
   if (!company) {
     return (
       <div className="p-6">
@@ -146,7 +175,7 @@ export function FeatureRoadmapView() {
                     >
                       <div className="flex items-center gap-2">
                         <Icon name={FEATURE_ICONS[type]} size="sm" className="text-gacha-gold" />
-                        <span className="text-sm text-white">{config.name}</span>
+                        <span className="text-sm text-white">{getFeatureTypeName(type)}</span>
                       </div>
                       <div className="text-xs text-gray-400 mt-1">
                         {config.baseDevelopmentDays}d • {formatCurrency(config.baseCost)}
@@ -251,7 +280,7 @@ export function FeatureRoadmapView() {
                 <Icon name="games" size="md" className="text-gacha-purple" />
                 <h3 className="text-lg font-bold text-white">{game.name}</h3>
                 <span className="text-xs px-2 py-0.5 bg-green-900/50 rounded text-green-300">
-                  {game.monetization.dailyActiveUsers.toLocaleString()} DAU
+                  {game.monetization.dailyActiveUsers.toLocaleString()} {t.metrics.dau}
                 </span>
               </div>
 
@@ -280,7 +309,7 @@ export function FeatureRoadmapView() {
                                   {feature.status.replace('_', ' ')}
                                 </span>
                               </div>
-                              <p className="text-xs text-gray-400">{config.name}</p>
+                              <p className="text-xs text-gray-400">{getFeatureTypeName(feature.type)}</p>
                               
                               {feature.status === 'in_progress' && (
                                 <div className="mt-2 w-48">

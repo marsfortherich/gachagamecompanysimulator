@@ -33,12 +33,27 @@ const TIER_STYLES: Record<EmployeeTier, { bg: string; border: string; text: stri
 
 export function EmployeesView() {
   const { state, dispatch } = useGame();
+  const { t } = useI18n();
   const { employees, games, company, employeeTraining } = state;
   const [showHireModal, setShowHireModal] = useState(false);
   const [selectedTier, setSelectedTier] = useState<EmployeeTier>('junior');
   const [selectedRole, setSelectedRole] = useState<EmployeeRole>('Programmer');
   const [trainingEmployeeId, setTrainingEmployeeId] = useState<string | null>(null);
   const [collapsedEmployees, setCollapsedEmployees] = useState<Set<string>>(new Set());
+
+  // Helper function for skill name translation
+  const getSkillName = (skill: string) => {
+    const skillMap: Record<string, string> = {
+      programming: t.skills.programming,
+      art: t.skills.art,
+      game_design: t.skills.gameDesign,
+      marketing: t.skills.marketing,
+      management: t.skills.management,
+      sound: t.skills.sound,
+      writing: t.skills.writing,
+    };
+    return skillMap[skill] || skill.replace('_', ' ');
+  };
 
   const toggleEmployeeCollapse = (employeeId: string) => {
     setCollapsedEmployees(prev => {
@@ -98,7 +113,6 @@ export function EmployeesView() {
   const currentOffice = company ? OFFICE_TIERS[company.officeLevel] : OFFICE_TIERS[0];
   const canHireEmployees = currentOffice.maxEmployees > 0;
   const isAtMaxEmployees = employees.length >= currentOffice.maxEmployees;
-  const { t } = useI18n();
 
   return (
     <div className="p-4 md:p-6 space-y-6">
@@ -303,7 +317,7 @@ export function EmployeesView() {
                       <div className="mt-2 flex flex-wrap gap-2">
                         {Object.entries(config.skillBoosts).map(([skill, boost]) => (
                           <span key={skill} className="text-xs px-2 py-1 bg-gacha-purple/30 rounded text-gacha-purple">
-                            +{boost} {skill.replace(/_/g, ' ')}
+                            +{boost} {getSkillName(skill)}
                           </span>
                         ))}
                         {config.moraleBoost > 0 && (
@@ -415,7 +429,7 @@ export function EmployeesView() {
                         value={value}
                         color={SKILL_COLORS[skill] as 'blue' | 'green' | 'purple' | 'gold' | 'red'}
                         size="sm"
-                        label={skill.replace('_', ' ')}
+                        label={getSkillName(skill)}
                         showLabel
                       />
                     ))}

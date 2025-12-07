@@ -13,6 +13,7 @@ import { useGameDetails, useGamesByStatus } from '@presentation/hooks/useGames';
 import { GameViewModel, PhaseInfo, MonetizationDisplay, TeamMember } from '@presentation/viewmodels/GameViewModel';
 import { GameStatus } from '@domain/game';
 import { Icon, IconName } from '@presentation/components/common/Icon';
+import { useI18n } from '@infrastructure/i18n';
 
 // =============================================================================
 // Phase Timeline Component
@@ -267,6 +268,7 @@ interface MonetizationSummaryProps {
 }
 
 export const MonetizationSummary: React.FC<MonetizationSummaryProps> = ({ monetization }) => {
+  const { t } = useI18n();
   return (
     <div className="grid grid-cols-2 gap-2 p-3 bg-green-50 rounded-lg">
       <div>
@@ -279,7 +281,7 @@ export const MonetizationSummary: React.FC<MonetizationSummaryProps> = ({ moneti
         <div className="text-lg font-bold text-blue-600">
           {monetization.dauFormatted}
         </div>
-        <div className="text-xs text-blue-600/70">DAU</div>
+        <div className="text-xs text-blue-600/70">{t.metrics.dau}</div>
       </div>
     </div>
   );
@@ -462,6 +464,7 @@ export const GameDetailPanel: React.FC<GameDetailPanelProps> = ({
   onClose,
   onLaunch,
 }) => {
+  const { t } = useI18n();
   const game = useGameDetails(gameId);
 
   if (!game) {
@@ -571,7 +574,7 @@ export const GameDetailPanel: React.FC<GameDetailPanelProps> = ({
               <div className="text-xl font-bold text-blue-600">
                 {game.monetization.dauFormatted}
               </div>
-              <div className="text-xs text-blue-600/70">DAU</div>
+              <div className="text-xs text-blue-600/70">{t.metrics.dau}</div>
             </div>
             <div className="text-center p-3 bg-purple-50 rounded-lg">
               <div className="text-xl font-bold text-purple-600">

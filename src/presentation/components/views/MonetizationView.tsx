@@ -132,7 +132,7 @@ export function MonetizationView() {
           <div className="flex-1">
             <h3 className="text-lg font-bold text-white">{selectedGame.name}</h3>
             <div className="flex gap-4 text-sm text-gray-400">
-              <span>{selectedGame.monetization.dailyActiveUsers.toLocaleString()} DAU</span>
+              <span>{selectedGame.monetization.dailyActiveUsers.toLocaleString()} {t.metrics.dau}</span>
               <span className="text-gacha-gold">{formatCurrency(selectedGame.monetization.monthlyRevenue)}/mo revenue</span>
             </div>
           </div>
@@ -301,7 +301,7 @@ export function MonetizationView() {
                         
                         <div className="flex flex-wrap gap-1 mt-2 text-xs">
                           <span className="px-1.5 py-0.5 bg-gacha-gold/20 rounded text-gacha-gold">
-                            ${(config.revenuePerView * config.viewsPerDauPerDay).toFixed(3)}/DAU/day
+                            ${(config.revenuePerView * config.viewsPerDauPerDay).toFixed(3)}/{t.metrics.dau}/{t.common.day}
                           </span>
                           <span className={`px-1.5 py-0.5 rounded ${
                             config.satisfactionImpact >= 0 
