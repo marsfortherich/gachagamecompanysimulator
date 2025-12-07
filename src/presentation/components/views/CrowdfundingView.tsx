@@ -258,7 +258,7 @@ export function CrowdfundingView() {
         </div>
       )}
 
-      {/* Failed Campaigns */}}
+      {/* Failed Campaigns */}
       {failedCampaigns.length > 0 && (
         <div className="space-y-4">
           <h3 className="text-lg font-semibold text-white">{t.crowdfunding.pastCampaigns}</h3>
@@ -277,7 +277,7 @@ export function CrowdfundingView() {
                 </div>
                 <div className="mt-3 flex justify-between text-sm">
                   <span className="text-white">{formatCurrency(campaign.currentPledges)} {t.crowdfunding.raised}</span>
-                  <span className="text-gray-400">{campaign.backerCount} {t.crowdfunding.backers}</span></span>
+                  <span className="text-gray-400">{campaign.backerCount} {t.crowdfunding.backers}</span>
                 </div>
               </Card>
             ))}
