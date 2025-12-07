@@ -25,6 +25,15 @@ import {
   OFFICE_TIERS,
   OfficeLevel,
   getLocationBonuses,
+  // Founder imports
+  createFounder,
+  getFounderStartingFunds,
+  founderAsEmployee,
+  startFounderTraining,
+  completeFounderTraining,
+  processFounderDailyTraining,
+  workFounder,
+  FOUNDER_TRAINING_CONFIGS,
 } from '../../domain';
 import { calculateMaintenanceEffect, IMPROVEMENT_TASKS, getImprovementPriority, calculateImprovementSpeed } from '../../domain/game/LiveGameImprovement';
 import { 
@@ -83,15 +92,26 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
   switch (action.type) {
     case 'INITIALIZE_COMPANY': {
+      // Create founder first to get starting funds based on experience
+      const founder = createFounder({
+        name: action.payload.founderName,
+        specialization: action.payload.specialization,
+        experience: action.payload.experience,
+      });
+      
+      const startingFunds = getFounderStartingFunds(action.payload.experience);
+      
       const company = createCompany({
         name: action.payload.name,
         headquarters: action.payload.headquarters,
         foundedDate: state.currentTick,
-        startingFunds: 200000,  // Increased from 100k to give more runway
+        startingFunds,  // Based on founder's experience level
       });
+      
       return {
         ...state,
         company,
+        founder,
         // Game starts paused - player must click play to begin
       };
     }
@@ -197,6 +217,82 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         employees: state.employees.filter(e => e.id !== employeeId),
         games: updatedGames,
         employeeTraining: state.employeeTraining.filter(t => t.employeeId !== employeeId),
+      };
+    }
+
+    // Founder Actions
+    case 'START_FOUNDER_TRAINING': {
+      if (!state.company || !state.founder) return state;
+      
+      const { trainingType, targetSkill } = action.payload;
+      const config = FOUNDER_TRAINING_CONFIGS[trainingType];
+      
+      // Check if training requires payment
+      const totalCost = config.costPerDay * config.durationDays;
+      if (state.company.funds < totalCost) {
+        return state;
+      }
+      
+      // Deduct cost and start training
+      const updatedCompany = updateCompanyFunds(state.company, -totalCost);
+      const updatedFounder = startFounderTraining(
+        state.founder, 
+        trainingType, 
+        targetSkill, 
+        state.currentTick
+      );
+      
+      return {
+        ...state,
+        company: updatedCompany,
+        founder: updatedFounder,
+      };
+    }
+
+    case 'CANCEL_FOUNDER_TRAINING': {
+      if (!state.founder) return state;
+      
+      return {
+        ...state,
+        founder: {
+          ...state.founder,
+          currentTraining: null,
+          trainingTargetSkill: null,
+          trainingStartTick: null,
+          trainingEndTick: null,
+        },
+      };
+    }
+
+    case 'ASSIGN_FOUNDER_TO_PROJECT': {
+      if (!state.founder) return state;
+      
+      const { gameId } = action.payload;
+      const game = state.games.find(g => g.id === gameId);
+      if (!game) return state;
+      
+      // Add founder ID to game's assigned employees
+      const updatedGame = assignEmployees(game, [state.founder.id]);
+      
+      return {
+        ...state,
+        games: state.games.map(g => g.id === gameId ? updatedGame : g),
+      };
+    }
+
+    case 'UNASSIGN_FOUNDER_FROM_PROJECT': {
+      if (!state.founder) return state;
+      
+      const { gameId } = action.payload;
+      const game = state.games.find(g => g.id === gameId);
+      if (!game) return state;
+      
+      // Remove founder ID from game's assigned employees
+      const updatedGame = removeEmployees(game, [state.founder.id]);
+      
+      return {
+        ...state,
+        games: state.games.map(g => g.id === gameId ? updatedGame : g),
       };
     }
 
@@ -918,6 +1014,15 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 function processGameDevelopment(state: GameState): GameState {
   const employeeMap = new Map(state.employees.map(e => [e.id, e]));
   
+  // Convert founder to employee-like object if they exist
+  const founderEmployee = state.founder ? founderAsEmployee(state.founder) : null;
+  if (founderEmployee) {
+    employeeMap.set(founderEmployee.id, founderEmployee as Employee);
+  }
+  
+  // Track if founder is working on any project (for training purposes)
+  let founderIsWorking = false;
+  
   const updatedGames = state.games.map(game => {
     // Skip live, maintenance, and shutdown games
     if (game.status === 'live' || game.status === 'maintenance' || game.status === 'shutdown') {
@@ -930,10 +1035,15 @@ function processGameDevelopment(state: GameState): GameState {
       updatedGame = updateGameStatus(game, 'development');
     }
 
-    // Calculate development progress based on assigned employees
+    // Calculate development progress based on assigned employees (including founder)
     const assignedEmployees = game.assignedEmployees
       .map(id => employeeMap.get(id))
       .filter((e): e is Employee => e !== undefined);
+    
+    // Check if founder is assigned to this game
+    if (state.founder && game.assignedEmployees.includes(state.founder.id)) {
+      founderIsWorking = true;
+    }
 
     if (assignedEmployees.length === 0) {
       return updatedGame;
@@ -1025,7 +1135,28 @@ function processGameDevelopment(state: GameState): GameState {
     return updatedGame;
   });
 
-  return { ...state, games: updatedGames };
+  // Process founder work - reduce energy if working, apply hands-on training
+  let updatedFounder = state.founder;
+  if (updatedFounder && founderIsWorking) {
+    // Founder loses energy from working
+    updatedFounder = workFounder(updatedFounder);
+    
+    // If founder is doing hands-on training while working, apply skill gain
+    if (updatedFounder.currentTraining === 'hands_on_practice') {
+      updatedFounder = processFounderDailyTraining(updatedFounder, true);
+    }
+  }
+  
+  // Process founder training completion for non-hands-on training
+  if (updatedFounder && updatedFounder.trainingEndTick && state.currentTick >= updatedFounder.trainingEndTick) {
+    updatedFounder = completeFounderTraining(updatedFounder);
+  }
+
+  return { 
+    ...state, 
+    games: updatedGames,
+    founder: updatedFounder,
+  };
 }
 
 /**

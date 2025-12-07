@@ -3,6 +3,12 @@ import { useGame } from '../../context';
 import { Button, Input, Card, Icon } from '../common';
 import { storageService } from '../../../infrastructure';
 import { LOCATIONS, LocationId } from '../../../domain/company/Location';
+import { 
+  FounderSpecialization, 
+  FounderExperience, 
+  SPECIALIZATION_CONFIGS, 
+  EXPERIENCE_CONFIGS 
+} from '../../../domain/company/Founder';
 
 // Use domain location data for display
 const LOCATION_INFO = Object.fromEntries(
@@ -22,11 +28,16 @@ const LOCATION_INFO = Object.fromEntries(
 export function StartScreen() {
   const { startGame, loadGame } = useGame();
   const [companyName, setCompanyName] = useState('');
+  const [founderName, setFounderName] = useState('');
+  const [specialization, setSpecialization] = useState<FounderSpecialization>('programmer');
+  const [experience, setExperience] = useState<FounderExperience>('junior');
   const [headquarters, setHeadquarters] = useState<LocationId>('Tokyo');
   const [hasSave, setHasSave] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   const locations = Object.keys(LOCATION_INFO) as LocationId[];
+  const specializations = Object.keys(SPECIALIZATION_CONFIGS) as FounderSpecialization[];
+  const experienceLevels = Object.keys(EXPERIENCE_CONFIGS) as FounderExperience[];
 
   useEffect(() => {
     const checkSave = async () => {
@@ -38,8 +49,8 @@ export function StartScreen() {
   }, []);
 
   const handleStart = () => {
-    if (companyName.trim()) {
-      startGame(companyName.trim(), headquarters);
+    if (companyName.trim() && founderName.trim()) {
+      startGame(companyName.trim(), founderName.trim(), specialization, experience, headquarters);
     }
   };
 
@@ -48,6 +59,11 @@ export function StartScreen() {
     if (!success) {
       alert('Failed to load save file');
     }
+  };
+
+  // Format currency for display
+  const formatMoney = (amount: number) => {
+    return amount >= 1000 ? `$${(amount / 1000).toFixed(0)}k` : `$${amount}`;
   };
 
   if (isLoading) {
@@ -88,6 +104,7 @@ export function StartScreen() {
                 {hasSave ? 'Or Start New Game' : 'New Game'}
               </h2>
               
+              {/* Company Info */}
               <Input
                 label="Company Name"
                 placeholder="Enter your company name..."
@@ -96,7 +113,93 @@ export function StartScreen() {
                 onKeyDown={(e) => e.key === 'Enter' && handleStart()}
               />
 
-              <div>
+              {/* Founder Info */}
+              <div className="pt-2 border-t border-gray-700">
+                <h3 className="text-sm font-medium text-gray-300 mb-3 flex items-center gap-2">
+                  <Icon name="users" size="sm" className="text-gacha-purple" />
+                  Your Character (Founder)
+                </h3>
+                
+                <Input
+                  label="Your Name"
+                  placeholder="Enter your name..."
+                  value={founderName}
+                  onChange={(e) => setFounderName(e.target.value)}
+                />
+
+                <div className="grid grid-cols-2 gap-3 mt-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">
+                      Specialization
+                    </label>
+                    <select
+                      value={specialization}
+                      onChange={(e) => setSpecialization(e.target.value as FounderSpecialization)}
+                      className="w-full px-3 py-2 bg-gray-700 text-white border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-gacha-purple text-sm"
+                    >
+                      {specializations.map((spec) => (
+                        <option key={spec} value={spec}>
+                          {SPECIALIZATION_CONFIGS[spec].name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">
+                      Experience
+                    </label>
+                    <select
+                      value={experience}
+                      onChange={(e) => setExperience(e.target.value as FounderExperience)}
+                      className="w-full px-3 py-2 bg-gray-700 text-white border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-gacha-purple text-sm"
+                    >
+                      {experienceLevels.map((exp) => (
+                        <option key={exp} value={exp}>
+                          {EXPERIENCE_CONFIGS[exp].name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Founder Preview */}
+                <div className="mt-3 p-3 bg-gray-700/50 rounded-lg border border-gray-600">
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <span className="font-medium text-white">
+                        {SPECIALIZATION_CONFIGS[specialization].name}
+                      </span>
+                      <span className="text-xs text-gray-400 ml-2">
+                        ({EXPERIENCE_CONFIGS[experience].name})
+                      </span>
+                    </div>
+                    <span className="text-sm font-medium text-gacha-gold">
+                      {formatMoney(EXPERIENCE_CONFIGS[experience].startingFunds)}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-400 mb-2">
+                    {SPECIALIZATION_CONFIGS[specialization].description}
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    {EXPERIENCE_CONFIGS[experience].description}
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    <span className="text-xs px-2 py-0.5 bg-blue-500/20 text-blue-300 rounded">
+                      +{SPECIALIZATION_CONFIGS[specialization].primaryBonus} {SPECIALIZATION_CONFIGS[specialization].primarySkill.replace('_', ' ')}
+                    </span>
+                    <span className="text-xs px-2 py-0.5 bg-green-500/20 text-green-300 rounded">
+                      +{SPECIALIZATION_CONFIGS[specialization].secondaryBonus} {SPECIALIZATION_CONFIGS[specialization].secondarySkill.replace('_', ' ')}
+                    </span>
+                    <span className="text-xs px-2 py-0.5 bg-yellow-500/20 text-yellow-300 rounded">
+                      ×{EXPERIENCE_CONFIGS[experience].learningSpeedMultiplier} learning
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Headquarters */}
+              <div className="pt-2 border-t border-gray-700">
                 <label htmlFor="headquarters-select" className="block text-sm font-medium text-gray-300 mb-2">
                   Headquarters
                 </label>
@@ -148,7 +251,7 @@ export function StartScreen() {
                 size="lg"
                 variant={hasSave ? 'secondary' : 'primary'}
                 onClick={handleStart}
-                disabled={!companyName.trim()}
+                disabled={!companyName.trim() || !founderName.trim()}
               >
                 Start New Company
               </Button>
@@ -158,8 +261,8 @@ export function StartScreen() {
 
         {/* Footer */}
         <p className="text-center text-gray-500 text-sm mt-6">
-          Manage developers, create games, design gacha systems,
-          and build your gaming empire!
+          Start as a solo indie developer, create games, train your skills,
+          and grow into a gacha gaming empire!
         </p>
       </div>
     </div>

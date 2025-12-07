@@ -3,11 +3,12 @@ import { GameState, createInitialState } from '../../application/state';
 import { GameAction, GameActions } from '../../application/actions';
 import { gameReducer } from '../../application/reducers';
 import { gameLoop, storageService } from '../../infrastructure';
+import { FounderSpecialization, FounderExperience } from '../../domain';
 
 interface GameContextValue {
   state: GameState;
   dispatch: React.Dispatch<GameAction>;
-  startGame: (companyName: string, headquarters?: string) => void;
+  startGame: (companyName: string, founderName: string, specialization: FounderSpecialization, experience: FounderExperience, headquarters?: string) => void;
   saveGame: () => Promise<void>;
   loadGame: () => Promise<boolean>;
   resetGame: () => void;
@@ -60,8 +61,8 @@ export function GameProvider({ children }: GameProviderProps) {
   }, [state.gameSpeed]);
 
   // Start a new game
-  const startGame = useCallback((companyName: string, headquarters?: string) => {
-    dispatch(GameActions.initializeCompany(companyName, headquarters));
+  const startGame = useCallback((companyName: string, founderName: string, specialization: FounderSpecialization, experience: FounderExperience, headquarters?: string) => {
+    dispatch(GameActions.initializeCompany(companyName, founderName, specialization, experience, headquarters));
   }, []);
 
   // Save game

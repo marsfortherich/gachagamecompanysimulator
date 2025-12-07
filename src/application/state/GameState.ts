@@ -1,4 +1,4 @@
-import { Company, Game, Employee, GachaBanner, GachaItem, Campaign, GameGenre, TrainingType } from '../../domain';
+import { Company, Game, Employee, GachaBanner, GachaItem, Campaign, GameGenre, TrainingType, Founder } from '../../domain';
 import { GameImprovementWork } from '../../domain/game/LiveGameImprovement';
 import { ScheduledFeature, FeatureBoost } from '../../domain/game/FeatureRoadmap';
 import { LaunchState, PlayerFeedback } from '../../domain/game/LaunchPhases';
@@ -22,6 +22,7 @@ export interface EmployeeTraining {
  */
 export interface GameState {
   readonly company: Company | null;
+  readonly founder: Founder | null;    // The player character
   readonly employees: Employee[];
   readonly games: Game[];
   readonly gachaItems: GachaItem[];
@@ -82,6 +83,7 @@ export const SPEED_MULTIPLIERS: Record<GameSpeed, number> = {
 export function createInitialState(): GameState {
   return {
     company: null,
+    founder: null,
     employees: [],
     games: [],
     gachaItems: [],

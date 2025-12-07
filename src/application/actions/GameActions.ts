@@ -1,5 +1,5 @@
 import { GameState } from '../state';
-import { CampaignType, EmployeeTier, EmployeeRole, GameGenre, TrainingType } from '../../domain';
+import { CampaignType, EmployeeTier, EmployeeRole, GameGenre, TrainingType, FounderSpecialization, FounderExperience, FounderTrainingType, SkillType } from '../../domain';
 import { ImprovementFocus } from '../../domain/game/LiveGameImprovement';
 import { FeatureType } from '../../domain/game/FeatureRoadmap';
 import { OfficeUpgradeType } from '../../domain/company/OfficeUpgrades';
@@ -11,10 +11,16 @@ import { MonetizationStrategy } from '../../domain/economy/Monetization';
  * Following Redux-like pattern for predictable state updates
  */
 export type GameAction =
-  | { type: 'INITIALIZE_COMPANY'; payload: { name: string; headquarters?: string } }
+  | { type: 'INITIALIZE_COMPANY'; payload: { name: string; headquarters?: string; founderName: string; specialization: FounderSpecialization; experience: FounderExperience } }
   | { type: 'TICK'; payload: { deltaTime: number } }
   | { type: 'SET_GAME_SPEED'; payload: { speed: GameState['gameSpeed'] } }
   | { type: 'TOGGLE_PAUSE' }
+  // Founder Actions
+  | { type: 'START_FOUNDER_TRAINING'; payload: { trainingType: FounderTrainingType; targetSkill: SkillType } }
+  | { type: 'CANCEL_FOUNDER_TRAINING' }
+  | { type: 'ASSIGN_FOUNDER_TO_PROJECT'; payload: { gameId: string } }
+  | { type: 'UNASSIGN_FOUNDER_FROM_PROJECT'; payload: { gameId: string } }
+  // Employee Actions
   | { type: 'HIRE_EMPLOYEE'; payload: { tier: EmployeeTier; role: EmployeeRole } }
   | { type: 'FIRE_EMPLOYEE'; payload: { employeeId: string } }
   | { type: 'START_TRAINING'; payload: { employeeId: string; trainingType: TrainingType } }
@@ -63,9 +69,15 @@ export type GameAction =
  * Action creators - factory functions for type-safe action creation
  */
 export const GameActions = {
-  initializeCompany: (name: string, headquarters?: string): GameAction => ({
+  initializeCompany: (
+    name: string, 
+    founderName: string,
+    specialization: FounderSpecialization,
+    experience: FounderExperience,
+    headquarters?: string
+  ): GameAction => ({
     type: 'INITIALIZE_COMPANY',
-    payload: { name, headquarters },
+    payload: { name, headquarters, founderName, specialization, experience },
   }),
 
   tick: (deltaTime: number): GameAction => ({
@@ -80,6 +92,26 @@ export const GameActions = {
 
   togglePause: (): GameAction => ({
     type: 'TOGGLE_PAUSE',
+  }),
+
+  // Founder actions
+  startFounderTraining: (trainingType: FounderTrainingType, targetSkill: SkillType): GameAction => ({
+    type: 'START_FOUNDER_TRAINING',
+    payload: { trainingType, targetSkill },
+  }),
+
+  cancelFounderTraining: (): GameAction => ({
+    type: 'CANCEL_FOUNDER_TRAINING',
+  }),
+
+  assignFounderToProject: (gameId: string): GameAction => ({
+    type: 'ASSIGN_FOUNDER_TO_PROJECT',
+    payload: { gameId },
+  }),
+
+  unassignFounderFromProject: (gameId: string): GameAction => ({
+    type: 'UNASSIGN_FOUNDER_FROM_PROJECT',
+    payload: { gameId },
   }),
 
   hireEmployee: (tier: EmployeeTier, role: EmployeeRole): GameAction => ({
