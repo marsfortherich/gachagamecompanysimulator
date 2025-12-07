@@ -203,7 +203,7 @@ export const EmployeeCard: React.FC<EmployeeCardProps> = ({
       {expanded && (
         <div className="border-t border-gray-100 px-4 py-3 bg-gray-50">
           <h4 className="text-xs font-medium text-gray-500 uppercase mb-2">
-            All Skills
+            {t.employeeManagement.allSkills}
           </h4>
           <div className="grid grid-cols-2 gap-2">
             {employee.allSkills.map((skill) => (
@@ -216,8 +216,8 @@ export const EmployeeCard: React.FC<EmployeeCardProps> = ({
             <span>•</span>
             <span className="flex items-center gap-1">
               {employee.isAvailable 
-                ? <><Icon name="check" size="xs" className="text-green-500" /> Available</>
-                : <><Icon name="lock" size="xs" className="text-gray-400" /> Assigned</>
+                ? <><Icon name="check" size="xs" className="text-green-500" /> {t.employeeManagement.available}</>
+                : <><Icon name="lock" size="xs" className="text-gray-400" /> {t.employeeManagement.assigned}</>
               }
             </span>
           </div>

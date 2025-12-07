@@ -9,15 +9,15 @@ import { useI18n } from '../../../infrastructure/i18n';
 /**
  * Rarity info for display - using color squares instead of emoji
  */
-const RARITY_INFO = {
-  common: { name: 'Common', color: 'text-gray-400', bgColor: 'bg-gray-400' },
-  uncommon: { name: 'Uncommon', color: 'text-green-400', bgColor: 'bg-green-400' },
-  rare: { name: 'Rare', color: 'text-blue-400', bgColor: 'bg-blue-400' },
-  epic: { name: 'Epic', color: 'text-purple-400', bgColor: 'bg-purple-400' },
-  legendary: { name: 'Legendary', color: 'text-yellow-400', bgColor: 'bg-yellow-400' },
+const RARITY_STYLE = {
+  common: { color: 'text-gray-400', bgColor: 'bg-gray-400' },
+  uncommon: { color: 'text-green-400', bgColor: 'bg-green-400' },
+  rare: { color: 'text-blue-400', bgColor: 'bg-blue-400' },
+  epic: { color: 'text-purple-400', bgColor: 'bg-purple-400' },
+  legendary: { color: 'text-yellow-400', bgColor: 'bg-yellow-400' },
 } as const;
 
-type Rarity = keyof typeof RARITY_INFO;
+type Rarity = keyof typeof RARITY_STYLE;
 
 /**
  * GachaManagementView - Configure gacha rates and view player satisfaction
@@ -70,7 +70,7 @@ export function GachaManagementView() {
     // Validate rates sum to 1.0 (with small tolerance)
     const total = Object.values(editingRates).reduce((sum, rate) => sum + rate, 0);
     if (Math.abs(total - 1.0) > 0.001) {
-      setRateError(`Rates must sum to 100%. Current: ${(total * 100).toFixed(1)}%`);
+      setRateError(`${t.gacha.mustSum100} (${(total * 100).toFixed(1)}%)`);
       return;
     }
 
@@ -188,8 +188,9 @@ export function GachaManagementView() {
 
                     {/* Rate Sliders/Inputs */}
                     <div className="space-y-3">
-                      {(Object.keys(RARITY_INFO) as Rarity[]).map(rarity => {
-                        const info = RARITY_INFO[rarity];
+                      {(Object.keys(RARITY_STYLE) as Rarity[]).map(rarity => {
+                        const style = RARITY_STYLE[rarity];
+                        const rarityName = t.gacha.rarities[rarity];
                         const currentRate = editingRates
                           ? editingRates[rarity]
                           : selectedGame.monetization.gachaRates[rarity];
@@ -199,8 +200,8 @@ export function GachaManagementView() {
                           <div key={rarity} className="bg-gray-700 rounded-lg p-3">
                             <div className="flex items-center justify-between mb-2">
                               <div className="flex items-center gap-2">
-                                <span className={`w-4 h-4 rounded ${info.bgColor}`}></span>
-                                <span className={`font-medium ${info.color}`}>{info.name}</span>
+                                <span className={`w-4 h-4 rounded ${style.bgColor}`}></span>
+                                <span className={`font-medium ${style.color}`}>{rarityName}</span>
                               </div>
                               {editingRates ? (
                                 <div className="flex items-center gap-2">
@@ -242,7 +243,7 @@ export function GachaManagementView() {
                           : 'bg-red-900/30 border border-red-700'
                       }`}>
                         <div className="flex justify-between items-center">
-                          <span className="text-gray-300">Total</span>
+                          <span className="text-gray-300">{t.gacha.total}</span>
                           <span className={`font-bold ${
                             Math.abs(Object.values(editingRates).reduce((sum, r) => sum + r, 0) - 1.0) < 0.001
                               ? 'text-green-400'

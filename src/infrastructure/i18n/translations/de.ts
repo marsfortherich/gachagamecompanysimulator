@@ -487,6 +487,16 @@ export const de = {
     satisfactionStandard: 'Standard (Normale Zufriedenheit)',
     satisfactionStingy: 'Geizig (Niedrige Zufriedenheit)',
     satisfactionPredatory: 'Räuberisch (Sehr niedrige Zufriedenheit)',
+    total: 'Gesamt',
+    mustSum100: 'Raten müssen 100% ergeben',
+    // Rarity names
+    rarities: {
+      common: 'Gewöhnlich',
+      uncommon: 'Ungewöhnlich',
+      rare: 'Selten',
+      epic: 'Episch',
+      legendary: 'Legendär',
+    },
   },
 
   // Monetization
@@ -832,12 +842,20 @@ export const de = {
   // Employee Management
   employeeManagement: {
     allRoles: 'Alle Rollen',
+    allSkills: 'Alle Fähigkeiten',
     hideDetails: 'Details ausblenden',
     showDetails: 'Details anzeigen',
     employees: 'Mitarbeiter',
     monthlyPayroll: 'Monatliche Lohnkosten',
     avgMorale: 'Durchschn. Moral',
     avgLevel: 'Durchschn. Level',
+    available: 'Verfügbar',
+    assigned: 'Zugewiesen',
+    fire: 'Entlassen',
+    sortBy: 'Sortieren nach',
+    clear: 'Zurücksetzen',
+    searchEmployees: 'Mitarbeiter suchen...',
+    noEmployeesFound: 'Keine Mitarbeiter gefunden',
   },
 
   // Tutorial

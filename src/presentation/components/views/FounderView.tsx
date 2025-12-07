@@ -46,6 +46,29 @@ export function FounderView() {
     return t.skills[skillKeyMap[skill]];
   };
 
+  // Helper to get training name and description from translations
+  const getTrainingName = (trainingType: FounderTrainingType): string => {
+    const trainingKeyMap: Record<FounderTrainingType, keyof typeof t.training> = {
+      self_study: 'selfStudy',
+      online_course: 'onlineCourse',
+      workshop: 'workshop',
+      mentorship: 'mentorship',
+      hands_on_practice: 'handsOn',
+    };
+    return t.training[trainingKeyMap[trainingType]];
+  };
+
+  const getTrainingDesc = (trainingType: FounderTrainingType): string => {
+    const trainingKeyMap: Record<FounderTrainingType, keyof typeof t.training> = {
+      self_study: 'selfStudyDesc',
+      online_course: 'onlineCourseDesc',
+      workshop: 'workshopDesc',
+      mentorship: 'mentorshipDesc',
+      hands_on_practice: 'handsOnDesc',
+    };
+    return t.training[trainingKeyMap[trainingType]];
+  };
+
   if (!founder) {
     return (
       <div className="p-6">
@@ -118,7 +141,7 @@ export function FounderView() {
             <div className="flex items-center gap-2">
               <Icon name="book" size="md" className="text-green-400" />
               <div>
-                <p className="text-white font-semibold">{FOUNDER_TRAINING_CONFIGS[founder.currentTraining!].name}</p>
+                <p className="text-white font-semibold">{getTrainingName(founder.currentTraining!)}</p>
                 <p className="text-sm text-gray-400">
                   {t.founder.training}: {getSkillName(founder.trainingTargetSkill!)}
                 </p>
@@ -226,13 +249,13 @@ export function FounderView() {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-lg font-semibold text-green-400">
-                {FOUNDER_TRAINING_CONFIGS[founder.currentTraining!].name}
+                {getTrainingName(founder.currentTraining!)}
               </h3>
               <p className="text-gray-400">
                 {t.founder.training}: {getSkillName(founder.trainingTargetSkill!)}
               </p>
               <p className="text-sm text-gray-500 mt-1">
-                {FOUNDER_TRAINING_CONFIGS[founder.currentTraining!].description}
+                {getTrainingDesc(founder.currentTraining!)}
               </p>
             </div>
             <div className="text-right">
@@ -294,7 +317,7 @@ export function FounderView() {
               <div className="mb-6">
                 <h4 className="text-sm text-gray-400 mb-3">{t.founder.selectSkillToTrain}</h4>
                 <div className="grid grid-cols-4 gap-2">
-                  {SKILL_ORDER.filter(s => s !== 'management').map((skillType) => {
+                  {SKILL_ORDER.map((skillType) => {
                     const display = SKILL_DISPLAY[skillType];
                     return (
                       <button
@@ -339,8 +362,8 @@ export function FounderView() {
                       >
                         <div className="flex justify-between items-start">
                           <div>
-                            <p className="text-white font-semibold">{config.name}</p>
-                            <p className="text-sm text-gray-400">{config.description}</p>
+                            <p className="text-white font-semibold">{getTrainingName(config.type)}</p>
+                            <p className="text-sm text-gray-400">{getTrainingDesc(config.type)}</p>
                           </div>
                           <div className="text-right">
                             {totalCost > 0 ? (
