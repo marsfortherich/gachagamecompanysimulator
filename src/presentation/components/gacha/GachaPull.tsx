@@ -357,8 +357,8 @@ const ItemReveal: React.FC<ItemRevealProps> = ({ result, showParticles, isCelebr
 
           {/* Pity indicator */}
           {result.pityUsed && (
-            <div className="mt-2 px-2 py-1 rounded bg-yellow-500/50 text-xs">
-              ⭐ Guaranteed!
+            <div className="mt-2 px-2 py-1 rounded bg-yellow-500/50 text-xs flex items-center gap-1">
+              <Icon name="star" size="xs" className="text-yellow-300" /> Guaranteed!
             </div>
           )}
         </div>

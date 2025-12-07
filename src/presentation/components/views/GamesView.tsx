@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useGame } from '../../context';
 import { GameActions } from '../../../application/actions';
+import { useI18n } from '../../../infrastructure/i18n';
 import { Card, Button, Input, ProgressBar, Icon, IconName } from '../common';
 import { GameGenre, GENRE_CONFIGS, GenreTier } from '../../../domain';
 import { IMPROVEMENT_TASKS, ImprovementFocus } from '../../../domain/game/LiveGameImprovement';
@@ -51,6 +52,7 @@ function formatCurrency(value: number): string {
 export function GamesView() {
   const { state, dispatch } = useGame();
   const { games, employees, company, unlockedGenres, founder } = state;
+  const { t } = useI18n();
   const [showNewGame, setShowNewGame] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [showLaunchModal, setShowLaunchModal] = useState<string | null>(null); // gameId or null
@@ -153,22 +155,22 @@ export function GamesView() {
   return (
     <div className="p-4 md:p-6 space-y-6">
       <div className="flex justify-between items-center flex-wrap gap-2">
-        <h2 className="text-2xl font-bold text-white">Game Projects</h2>
+        <h2 className="text-2xl font-bold text-white">{t.games.projectTitle}</h2>
         <div className="flex gap-2 flex-wrap">
           {games.length > 1 && (
             <>
               <Button variant="secondary" size="sm" onClick={collapseAllGames}>
-                <Icon name="chevronUp" size="xs" className="mr-1" /> Collapse All
+                <Icon name="chevronUp" size="xs" className="mr-1" /> {t.games.collapseAll}
               </Button>
               <Button variant="secondary" size="sm" onClick={expandAllGames}>
-                <Icon name="chevronDown" size="xs" className="mr-1" /> Expand All
+                <Icon name="chevronDown" size="xs" className="mr-1" /> {t.games.expandAll}
               </Button>
             </>
           )}
           <Button variant="secondary" onClick={() => setShowHelp(true)}>
-            ? Help
+            ? {t.games.help}
           </Button>
-          <Button onClick={() => setShowNewGame(true)}>+ New Game</Button>
+          <Button onClick={() => setShowNewGame(true)}>+ {t.games.newGame}</Button>
         </div>
       </div>
 
@@ -179,17 +181,17 @@ export function GamesView() {
       {showNewGame && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
           <Card className="w-full max-w-lg my-8">
-            <h3 className="text-xl font-bold text-white mb-4">Start New Game Project</h3>
+            <h3 className="text-xl font-bold text-white mb-4">{t.games.startNewProject}</h3>
             <div className="space-y-4">
               <Input
-                label="Game Name"
-                placeholder="Enter game name..."
+                label={t.games.gameName}
+                placeholder={t.games.gameNamePlaceholder}
                 value={newGameName}
                 onChange={(e) => setNewGameName(e.target.value)}
               />
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Genre <span className="text-xs text-gray-500">(click to select, some require unlocking)</span>
+                  {t.games.genre} <span className="text-xs text-gray-500">{t.games.genreSelectHint}</span>
                 </label>
                 <div className="grid grid-cols-2 gap-2">
                   {GENRES.map((genre) => {
@@ -256,7 +258,7 @@ export function GamesView() {
                               }}
                             >
                               <Icon name="lock" size="xs" className="mr-1" />
-                              Unlock {formatCurrency(config.unlockCost)}
+                              {t.games.unlock} {formatCurrency(config.unlockCost)}
                             </Button>
                           </div>
                         )}
@@ -270,33 +272,33 @@ export function GamesView() {
               {selectedGenre && (
                 <div className="bg-gray-800 rounded-lg p-3 border border-gray-700">
                   <h4 className="text-sm font-semibold text-white mb-2">
-                    {GENRE_CONFIGS[selectedGenre].name} Details
+                    {GENRE_CONFIGS[selectedGenre].name} {t.games.details}
                   </h4>
                   <div className="grid grid-cols-2 gap-2 text-xs">
                     <div>
-                      <span className="text-gray-400">Dev Time:</span>
-                      <span className="text-white ml-1">{GENRE_CONFIGS[selectedGenre].baseDevelopmentTime} days</span>
+                      <span className="text-gray-400">{t.games.devTime}:</span>
+                      <span className="text-white ml-1">{GENRE_CONFIGS[selectedGenre].baseDevelopmentTime} {t.common.days}</span>
                     </div>
                     <div>
-                      <span className="text-gray-400">Team Size:</span>
-                      <span className="text-white ml-1">{GENRE_CONFIGS[selectedGenre].requiredTeamSize}+ members</span>
+                      <span className="text-gray-400">{t.games.teamSize}:</span>
+                      <span className="text-white ml-1">{GENRE_CONFIGS[selectedGenre].requiredTeamSize}+ {t.games.members}</span>
                     </div>
                     <div>
-                      <span className="text-gray-400">Max DAU:</span>
+                      <span className="text-gray-400">{t.games.maxDAU}:</span>
                       <span className="text-white ml-1">{GENRE_CONFIGS[selectedGenre].maxDAU.toLocaleString()}</span>
                     </div>
                     <div>
-                      <span className="text-gray-400">Whale Rate:</span>
+                      <span className="text-gray-400">{t.games.whaleRate}:</span>
                       <span className="text-gacha-gold ml-1">{(GENRE_CONFIGS[selectedGenre].whalePercentage * 100).toFixed(1)}%</span>
                     </div>
                     <div>
-                      <span className="text-gray-400">Retention:</span>
+                      <span className="text-gray-400">{t.games.retention}:</span>
                       <span className="text-green-400 ml-1">{(GENRE_CONFIGS[selectedGenre].retentionRate * 100).toFixed(0)}%</span>
                     </div>
                     <div>
-                      <span className="text-gray-400">Content Need:</span>
+                      <span className="text-gray-400">{t.games.contentNeed}:</span>
                       <span className={`ml-1 ${GENRE_CONFIGS[selectedGenre].contentDemand > 0.7 ? 'text-red-400' : GENRE_CONFIGS[selectedGenre].contentDemand > 0.4 ? 'text-yellow-400' : 'text-green-400'}`}>
-                        {GENRE_CONFIGS[selectedGenre].contentDemand > 0.7 ? 'High' : GENRE_CONFIGS[selectedGenre].contentDemand > 0.4 ? 'Medium' : 'Low'}
+                        {GENRE_CONFIGS[selectedGenre].contentDemand > 0.7 ? t.games.high : GENRE_CONFIGS[selectedGenre].contentDemand > 0.4 ? t.games.medium : t.games.low}
                       </span>
                     </div>
                   </div>
@@ -309,14 +311,14 @@ export function GamesView() {
                   fullWidth
                   onClick={() => setShowNewGame(false)}
                 >
-                  Cancel
+                  {t.common.cancel}
                 </Button>
                 <Button
                   fullWidth
                   onClick={handleCreateGame}
                   disabled={!newGameName.trim()}
                 >
-                  Create Project
+                  {t.games.createProject}
                 </Button>
               </div>
             </div>
@@ -329,7 +331,7 @@ export function GamesView() {
         <Card>
           <div className="text-center py-8">
             <Icon name="games" size="xl" className="mx-auto mb-4 text-gray-500" />
-            <p className="text-gray-400">No games yet. Start your first project!</p>
+            <p className="text-gray-400">{t.games.noGamesYet}</p>
           </div>
         </Card>
       ) : (
@@ -391,13 +393,13 @@ export function GamesView() {
                           game.monetization.playerSatisfaction >= 70 ? 'text-green-400' :
                           game.monetization.playerSatisfaction >= 40 ? 'text-yellow-400' : 'text-red-400'
                         }`}>
-                          {Math.round(game.monetization.playerSatisfaction)}% sat
+                          {Math.round(game.monetization.playerSatisfaction)}% {t.games.sat}
                         </span>
                       </>
                     )}
                     {isCollapsed && game.status !== 'live' && game.status !== 'shutdown' && (
                       <span className="text-xs text-purple-400">
-                        {Math.round(game.developmentProgress)}% done
+                        {Math.round(game.developmentProgress)}% {t.games.done}
                       </span>
                     )}
                   </div>
@@ -457,11 +459,11 @@ export function GamesView() {
               {/* Assigned Team (including Founder) */}
               <div className="mb-4">
                 <p className="text-sm text-gray-400 mb-2">
-                  Team ({game.assignedEmployees.length} members{isFounderAssignedTo(game.id) ? ' + You' : ''})
+                  {t.games.team} ({game.assignedEmployees.length} {t.games.members}{isFounderAssignedTo(game.id) ? ` + ${t.games.you}` : ''})
                 </p>
                 {game.assignedEmployees.length === 0 && !isFounderAssignedTo(game.id) && game.status !== 'live' && game.status !== 'shutdown' && (
                   <div className="text-sm text-yellow-400 bg-yellow-900/30 rounded-lg p-2 mb-2 flex items-center gap-2">
-                    <Icon name="warning" size="sm" className="text-yellow-400" /> No one assigned! Assign yourself or hire employees to make progress.
+                    <Icon name="warning" size="sm" className="text-yellow-400" /> {t.games.noOneAssignedHire}
                   </div>
                 )}
                 <div className="flex flex-wrap gap-1">
@@ -470,9 +472,9 @@ export function GamesView() {
                     <button
                       onClick={() => handleUnassignFounder(game.id)}
                       className="text-xs px-2 py-1 bg-gacha-purple/30 border border-gacha-purple rounded-full text-gacha-purple hover:bg-gacha-purple/50 transition-colors flex items-center gap-1"
-                      title="Click to unassign yourself"
+                      title={t.games.clickToUnassignYourself}
                     >
-                      <Icon name="star" size="xs" /> You ({founder.name.split(' ')[0]})
+                      <Icon name="star" size="xs" /> {t.games.you} ({founder.name.split(' ')[0]})
                     </button>
                   )}
                   {game.assignedEmployees.map((empId) => {
@@ -484,7 +486,7 @@ export function GamesView() {
                         key={empId}
                         onClick={() => handleUnassignEmployee(game.id, empId)}
                         className="text-xs px-2 py-1 bg-gray-700 rounded-full text-gray-300 hover:bg-red-900/30 hover:text-red-300 transition-colors"
-                        title="Click to unassign"
+                        title={t.games.clickToUnassign}
                       >
                         {emp.name.split(' ')[0]}
                       </button>
@@ -505,12 +507,12 @@ export function GamesView() {
                       onClick={() => handleAssignFounder(game.id)}
                       className="flex items-center justify-center gap-2"
                     >
-                      <Icon name="star" size="sm" /> Assign Yourself
+                      <Icon name="star" size="sm" /> {t.games.assignYourself}
                     </Button>
                   )}
                   {availableEmployees.length > 0 && (
                     <select
-                      aria-label="Assign employee to game"
+                      aria-label={t.games.assignEmployee}
                       className="w-full px-3 py-2 bg-gray-700 text-white rounded-lg text-sm"
                       onChange={(e) => {
                         if (e.target.value) {
@@ -520,7 +522,7 @@ export function GamesView() {
                       }}
                       defaultValue=""
                     >
-                      <option value="">+ Assign employee...</option>
+                      <option value="">+ {t.games.assignEmployee}</option>
                       {availableEmployees.map((emp) => (
                         <option key={emp.id} value={emp.id}>
                           {emp.name}
@@ -535,7 +537,7 @@ export function GamesView() {
                       onClick={() => setShowLaunchModal(game.id)}
                       className="flex items-center justify-center gap-2"
                     >
-                      <Icon name="rocket" size="sm" className="text-white" /> Launch Game
+                      <Icon name="rocket" size="sm" className="text-white" /> {t.games.launchGame}
                     </Button>
                   )}
                 </div>
@@ -547,16 +549,16 @@ export function GamesView() {
                   <div className="flex items-center gap-2">
                     <Icon name="flask" size="sm" className="text-blue-400" />
                     <span className="text-sm font-semibold text-white">
-                      {state.launchStates[game.id].currentPhase.toUpperCase()} Phase
+                      {state.launchStates[game.id].currentPhase.toUpperCase()} {t.games.phase}
                     </span>
                   </div>
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
-                      <p className="text-xs text-gray-400">Testers</p>
+                      <p className="text-xs text-gray-400">{t.games.testers}</p>
                       <p className="text-white">{game.monetization.dailyActiveUsers.toLocaleString()}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-400">Feedback Resolved</p>
+                      <p className="text-xs text-gray-400">{t.games.feedbackResolved}</p>
                       <p className="text-white">
                         {state.launchStates[game.id].resolvedFeedbackCount} / {state.launchStates[game.id].totalFeedbackCount}
                       </p>
@@ -568,7 +570,7 @@ export function GamesView() {
                     disabled={state.launchStates[game.id].currentPhase === 'alpha'}
                     onClick={() => dispatch(GameActions.advanceLaunchPhase(game.id))}
                   >
-                    Advance to Next Phase
+                    {t.games.advanceToNextPhase}
                   </Button>
                 </div>
               )}
@@ -579,13 +581,13 @@ export function GamesView() {
                   {/* Stats */}
                   <div className="grid grid-cols-3 gap-4">
                     <div>
-                      <p className="text-xs text-gray-400">DAU</p>
+                      <p className="text-xs text-gray-400">{t.games.dau}</p>
                       <p className="text-lg font-semibold text-white">
                         {game.monetization.dailyActiveUsers.toLocaleString()}
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-400">Est. Daily Churn</p>
+                      <p className="text-xs text-gray-400">{t.games.estDailyChurn}</p>
                       {(() => {
                         // Calculate estimated churn based on satisfaction and genre retention
                         const genreConfig = GENRE_CONFIGS[game.genre];
@@ -603,7 +605,7 @@ export function GamesView() {
                       })()}
                     </div>
                     <div>
-                      <p className="text-xs text-gray-400">Revenue</p>
+                      <p className="text-xs text-gray-400">{t.games.revenue}</p>
                       <p className="text-lg font-semibold text-gacha-gold">
                         ${game.monetization.monthlyRevenue.toLocaleString()}
                       </p>
@@ -613,7 +615,7 @@ export function GamesView() {
                   {/* Player Satisfaction */}
                   <div>
                     <div className="flex justify-between text-sm mb-1">
-                      <span className="text-gray-400">Player Satisfaction</span>
+                      <span className="text-gray-400">{t.games.playerSatisfaction}</span>
                       <span className={`${
                         game.monetization.playerSatisfaction >= 70 ? 'text-green-400' :
                         game.monetization.playerSatisfaction >= 40 ? 'text-yellow-400' : 'text-red-400'
@@ -631,7 +633,7 @@ export function GamesView() {
                     />
                     {game.monetization.playerSatisfaction < 50 && (
                       <p className="text-xs text-yellow-400 mt-1 flex items-center gap-1">
-                        <Icon name="warning" size="xs" /> Low satisfaction reduces revenue and causes player churn!
+                        <Icon name="warning" size="xs" /> {t.games.lowSatisfactionWarning}
                       </p>
                     )}
                   </div>
@@ -639,7 +641,7 @@ export function GamesView() {
                   {/* Maintenance Team */}
                   <div>
                     <p className="text-xs text-gray-400 mb-2">
-                      Maintenance Team <span className="text-gray-500">(assigns staff to maintain/improve the game)</span>
+                      {t.games.maintenanceTeam} <span className="text-gray-500">{t.games.maintenanceTeamHint}</span>
                     </p>
                     {game.assignedEmployees.length > 0 ? (
                       <div className="flex flex-wrap gap-1 mb-2">
@@ -661,7 +663,7 @@ export function GamesView() {
                               <button
                                 onClick={() => handleUnassignEmployee(game.id, empId)}
                                 className="ml-1 hover:text-red-400"
-                                title="Remove from game"
+                                title={t.games.removeFromGame}
                               >
                                 <Icon name="close" size="xs" />
                               </button>
@@ -671,20 +673,20 @@ export function GamesView() {
                       </div>
                     ) : (
                       <p className="text-xs text-yellow-400 bg-yellow-900/30 rounded-lg p-2 mb-2 flex items-center gap-1">
-                        <Icon name="lightbulb" size="xs" /> Assign staff to maintain the game and slow satisfaction decay!
+                        <Icon name="lightbulb" size="xs" /> {t.games.assignStaffHint}
                       </p>
                     )}
                     
                     {/* Staff Benefits Explainer */}
                     <div className="text-xs text-gray-500 mb-2 space-y-1">
-                      <p>• <span className="text-green-400">Marketers</span> boost DAU by 50%</p>
-                      <p>• <span className="text-blue-400">Developers</span> maintain satisfaction & improve quality</p>
+                      <p>• <span className="text-green-400">{t.roles.marketer}</span> {t.games.marketersBoost}</p>
+                      <p>• <span className="text-blue-400">{t.games.developers}</span> {t.games.developersHelp}</p>
                     </div>
                     
                     {/* Assign Staff */}
                     {availableEmployees.length > 0 && (
                       <select
-                        aria-label="Assign staff to live game"
+                        aria-label={t.games.assignStaff}
                         className="w-full px-3 py-2 bg-gray-700 text-white rounded-lg text-sm"
                         onChange={(e) => {
                           if (e.target.value) {
@@ -694,7 +696,7 @@ export function GamesView() {
                         }}
                         defaultValue=""
                       >
-                        <option value="">+ Assign staff...</option>
+                        <option value="">+ {t.games.assignStaff}</option>
                         {availableEmployees.map((emp) => (
                           <option key={emp.id} value={emp.id}>
                             {emp.name} ({emp.role})
@@ -706,7 +708,7 @@ export function GamesView() {
                   
                   {/* Improvement Tasks */}
                   <div>
-                    <p className="text-xs text-gray-400 mb-2">Quick Improvements</p>
+                    <p className="text-xs text-gray-400 mb-2">{t.games.quickImprovements}</p>
                     <div className="grid grid-cols-2 gap-2">
                       {(Object.entries(IMPROVEMENT_TASKS) as [ImprovementFocus, typeof IMPROVEMENT_TASKS[ImprovementFocus]][])
                         .slice(0, 4)
@@ -728,7 +730,7 @@ export function GamesView() {
                         ))}
                     </div>
                     <p className="text-xs text-gray-500 mt-2 italic">
-                      Assigned developers automatically work on improvements based on game needs.
+                      {t.games.autoImprovementNote}
                     </p>
                   </div>
 
@@ -739,7 +741,7 @@ export function GamesView() {
                     onClick={() => handleShutdownGame(game.id)}
                     className="flex items-center justify-center gap-2"
                   >
-                    <Icon name="blocked" size="sm" className="text-white" /> Shutdown Game
+                    <Icon name="blocked" size="sm" className="text-white" /> {t.games.shutdownGame}
                   </Button>
                 </div>
               )}
@@ -747,7 +749,7 @@ export function GamesView() {
               {/* Shutdown Game Display */}
               {game.status === 'shutdown' && (
                 <div className="pt-3 border-t border-gray-700">
-                  <p className="text-sm text-red-400 text-center flex items-center justify-center gap-2"><Icon name="blocked" size="sm" className="text-red-400" /> Game has been shutdown</p>
+                  <p className="text-sm text-red-400 text-center flex items-center justify-center gap-2"><Icon name="blocked" size="sm" className="text-red-400" /> {t.games.gameShutdown}</p>
                 </div>
               )}
                 </>
@@ -762,9 +764,9 @@ export function GamesView() {
       {showLaunchModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <Card className="w-full max-w-md">
-            <h3 className="text-xl font-bold text-white mb-4">Choose Launch Type</h3>
+            <h3 className="text-xl font-bold text-white mb-4">{t.games.chooseLaunchType}</h3>
             <p className="text-sm text-gray-400 mb-4">
-              How would you like to launch your game?
+              {t.games.howToLaunch}
             </p>
             
             <div className="space-y-3">
@@ -776,9 +778,9 @@ export function GamesView() {
                 <div className="flex items-center gap-3">
                   <Icon name="rocket" size="lg" className="text-green-400" />
                   <div>
-                    <h4 className="font-semibold text-white">Instant Global Launch</h4>
+                    <h4 className="font-semibold text-white">{t.games.instantGlobalLaunch}</h4>
                     <p className="text-xs text-gray-400">
-                      Launch directly to global audience. Faster to market but no early feedback.
+                      {t.games.instantLaunchDesc}
                     </p>
                   </div>
                 </div>
@@ -792,9 +794,9 @@ export function GamesView() {
                 <div className="flex items-center gap-3">
                   <Icon name="flask" size="lg" className="text-blue-400" />
                   <div>
-                    <h4 className="font-semibold text-white">Phased Launch</h4>
+                    <h4 className="font-semibold text-white">{t.games.phasedLaunch}</h4>
                     <p className="text-xs text-gray-400 mb-2">
-                      Alpha → Beta → Soft Launch → Global. Get player feedback and fix issues first.
+                      {t.games.phasedLaunchDesc}
                     </p>
                     <div className="flex gap-2 text-xs">
                       <span className="px-2 py-0.5 bg-blue-800/50 rounded text-blue-200">
@@ -811,7 +813,7 @@ export function GamesView() {
             
             <div className="mt-4 flex justify-end">
               <Button variant="secondary" onClick={() => setShowLaunchModal(null)}>
-                Cancel
+                {t.common.cancel}
               </Button>
             </div>
           </Card>

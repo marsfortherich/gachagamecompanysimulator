@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useGame } from '../../context';
 import { GameActions } from '../../../application/actions';
 import { Card, Button, Icon, ProgressBar, Input } from '../common';
+import { useI18n } from '../../../infrastructure/i18n';
 import { 
   FEATURE_TYPE_CONFIGS, 
   FeatureType,
@@ -29,6 +30,7 @@ const FEATURE_ICONS: Record<FeatureType, IconName> = {
 
 export function FeatureRoadmapView() {
   const { state, dispatch } = useGame();
+  const { t } = useI18n();
   const { company, games, scheduledFeatures, currentTick } = state;
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [selectedGame, setSelectedGame] = useState<string>('');
@@ -40,7 +42,7 @@ export function FeatureRoadmapView() {
     return (
       <div className="p-6">
         <Card>
-          <p className="text-gray-400 text-center">Start a company first to manage your feature roadmap.</p>
+          <p className="text-gray-400 text-center">{t.roadmap.startCompanyFirst}</p>
         </Card>
       </div>
     );
@@ -71,7 +73,7 @@ export function FeatureRoadmapView() {
   };
 
   const handleCancelFeature = (featureId: string) => {
-    if (confirm('Are you sure you want to cancel this feature?')) {
+    if (confirm(t.roadmap.confirmCancelFeature)) {
       dispatch(GameActions.cancelFeature(featureId));
     }
   };
@@ -95,13 +97,13 @@ export function FeatureRoadmapView() {
   return (
     <div className="p-4 md:p-6 space-y-6">
       <div className="flex justify-between items-center flex-wrap gap-2">
-        <h2 className="text-2xl font-bold text-white">Feature Roadmap</h2>
+        <h2 className="text-2xl font-bold text-white">{t.roadmap.title}</h2>
         <div className="flex gap-2">
           <span className="text-sm text-gray-400">
-            Day {currentTick}
+            {t.common.day} {currentTick}
           </span>
           <Button onClick={() => setShowScheduleModal(true)} disabled={liveGames.length === 0}>
-            + Schedule Feature
+            + {t.roadmap.scheduleFeature}
           </Button>
         </div>
       </div>
@@ -110,18 +112,18 @@ export function FeatureRoadmapView() {
       {showScheduleModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <Card className="w-full max-w-lg">
-            <h3 className="text-xl font-bold text-white mb-4">Schedule New Feature</h3>
+            <h3 className="text-xl font-bold text-white mb-4">{t.roadmap.scheduleNewFeature}</h3>
             
             <div className="space-y-4">
               {/* Game Selection */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Game</label>
+                <label className="block text-sm font-medium text-gray-300 mb-2">{t.roadmap.game}</label>
                 <select
                   className="w-full px-3 py-2 bg-gray-700 text-white rounded-lg"
                   value={selectedGame}
                   onChange={(e) => setSelectedGame(e.target.value)}
                 >
-                  <option value="">Select a game...</option>
+                  <option value="">{t.roadmap.selectGame}</option>
                   {liveGames.map(game => (
                     <option key={game.id} value={game.id}>{game.name}</option>
                   ))}
@@ -130,7 +132,7 @@ export function FeatureRoadmapView() {
 
               {/* Feature Type */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Feature Type</label>
+                <label className="block text-sm font-medium text-gray-300 mb-2">{t.roadmap.featureType}</label>
                 <div className="grid grid-cols-2 gap-2">
                   {(Object.entries(FEATURE_TYPE_CONFIGS) as [FeatureType, typeof FEATURE_TYPE_CONFIGS[FeatureType]][]).map(([type, config]) => (
                     <div
@@ -156,8 +158,8 @@ export function FeatureRoadmapView() {
 
               {/* Feature Name */}
               <Input
-                label="Feature Name"
-                placeholder="e.g., Summer Festival Event"
+                label={t.roadmap.featureName}
+                placeholder={t.roadmap.featureNamePlaceholder}
                 value={featureName}
                 onChange={(e) => setFeatureName(e.target.value)}
               />
@@ -165,7 +167,7 @@ export function FeatureRoadmapView() {
               {/* Schedule Date */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Start Development In (Days)
+                  {t.roadmap.startDevelopmentIn}
                 </label>
                 <input
                   type="range"
@@ -176,8 +178,8 @@ export function FeatureRoadmapView() {
                   className="w-full"
                 />
                 <div className="flex justify-between text-xs text-gray-400">
-                  <span>Day {currentTick + scheduledDays}</span>
-                  <span>{scheduledDays} days from now</span>
+                  <span>{t.common.day} {currentTick + scheduledDays}</span>
+                  <span>{scheduledDays} {t.roadmap.daysFromNow}</span>
                 </div>
               </div>
 
@@ -192,23 +194,23 @@ export function FeatureRoadmapView() {
                   </p>
                   <div className="grid grid-cols-2 gap-2 text-xs">
                     <div>
-                      <span className="text-gray-400">Dev Time:</span>
-                      <span className="text-white ml-1">{FEATURE_TYPE_CONFIGS[selectedFeatureType].baseDevelopmentDays} days</span>
+                      <span className="text-gray-400">{t.roadmap.devTime}:</span>
+                      <span className="text-white ml-1">{FEATURE_TYPE_CONFIGS[selectedFeatureType].baseDevelopmentDays} {t.common.days}</span>
                     </div>
                     <div>
-                      <span className="text-gray-400">Cost:</span>
+                      <span className="text-gray-400">{t.roadmap.cost}:</span>
                       <span className="text-white ml-1">{formatCurrency(FEATURE_TYPE_CONFIGS[selectedFeatureType].baseCost)}</span>
                     </div>
                     <div>
-                      <span className="text-gray-400">Satisfaction:</span>
+                      <span className="text-gray-400">{t.roadmap.satisfaction}:</span>
                       <span className={`ml-1 ${FEATURE_TYPE_CONFIGS[selectedFeatureType].satisfactionBoost >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                         {FEATURE_TYPE_CONFIGS[selectedFeatureType].satisfactionBoost >= 0 ? '+' : ''}{FEATURE_TYPE_CONFIGS[selectedFeatureType].satisfactionBoost}
                       </span>
                     </div>
                     <div>
-                      <span className="text-gray-400">Revenue Boost:</span>
+                      <span className="text-gray-400">{t.roadmap.revenueBoost}:</span>
                       <span className="text-gacha-gold ml-1">
-                        {Math.round((FEATURE_TYPE_CONFIGS[selectedFeatureType].revenueMultiplier - 1) * 100)}% for {FEATURE_TYPE_CONFIGS[selectedFeatureType].revenueBoostDays}d
+                        {Math.round((FEATURE_TYPE_CONFIGS[selectedFeatureType].revenueMultiplier - 1) * 100)}% {t.roadmap.forDays.replace('{days}', String(FEATURE_TYPE_CONFIGS[selectedFeatureType].revenueBoostDays))}
                       </span>
                     </div>
                   </div>
@@ -217,14 +219,14 @@ export function FeatureRoadmapView() {
 
               <div className="flex gap-2 pt-4">
                 <Button variant="secondary" fullWidth onClick={() => setShowScheduleModal(false)}>
-                  Cancel
+                  {t.common.cancel}
                 </Button>
                 <Button 
                   fullWidth 
                   onClick={handleScheduleFeature}
                   disabled={!selectedGame || !featureName.trim()}
                 >
-                  Schedule Feature
+                  {t.roadmap.scheduleFeature}
                 </Button>
               </div>
             </div>
@@ -237,7 +239,7 @@ export function FeatureRoadmapView() {
         <Card>
           <div className="text-center py-8">
             <Icon name="games" size="xl" className="mx-auto mb-4 text-gray-500" />
-            <p className="text-gray-400">Launch a game first to plan feature updates!</p>
+            <p className="text-gray-400">{t.roadmap.launchGameFirst}</p>
           </div>
         </Card>
       ) : (
@@ -255,7 +257,7 @@ export function FeatureRoadmapView() {
 
               {features.length === 0 ? (
                 <p className="text-gray-400 text-sm py-4 text-center">
-                  No features scheduled. Plan your content roadmap!
+                  {t.roadmap.noFeaturesScheduled}
                 </p>
               ) : (
                 <div className="space-y-3">
@@ -293,13 +295,13 @@ export function FeatureRoadmapView() {
                               
                               {feature.status === 'planned' && (
                                 <p className="text-xs text-blue-400 mt-1">
-                                  Starts in {daysUntilStart} days
+                                  {t.roadmap.startsInDays.replace('{days}', String(daysUntilStart))}
                                 </p>
                               )}
                               
                               {feature.status === 'ready' && (
                                 <p className="text-xs text-green-400 mt-1">
-                                  Ready to release!
+                                  {t.roadmap.readyToRelease}
                                 </p>
                               )}
                             </div>
@@ -314,7 +316,7 @@ export function FeatureRoadmapView() {
                                   onClick={() => handleStartDevelopment(feature.id)}
                                   disabled={company.funds < config.baseCost}
                                 >
-                                  Start ({formatCurrency(config.baseCost)})
+                                  {t.roadmap.start} ({formatCurrency(config.baseCost)})
                                 </Button>
                                 <Button 
                                   size="sm" 
@@ -332,7 +334,7 @@ export function FeatureRoadmapView() {
                                 variant="success"
                                 onClick={() => handleReleaseFeature(feature.id)}
                               >
-                                <Icon name="rocket" size="xs" className="mr-1" /> Release
+                                <Icon name="rocket" size="xs" className="mr-1" /> {t.roadmap.release}
                               </Button>
                             )}
                             
@@ -342,7 +344,7 @@ export function FeatureRoadmapView() {
                                 variant="danger"
                                 onClick={() => handleCancelFeature(feature.id)}
                               >
-                                Cancel
+                                {t.common.cancel}
                               </Button>
                             )}
                           </div>

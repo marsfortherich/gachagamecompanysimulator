@@ -1,12 +1,14 @@
 import { useGame } from '../../context';
 import { Card, ProgressBar, Icon, IconName } from '../common';
 import { OFFICE_TIERS } from '../../../domain';
+import { useI18n } from '../../../infrastructure/i18n';
 
 /**
  * FinanceView - Company financial overview and reports
  */
 export function FinanceView() {
   const { state } = useGame();
+  const { t } = useI18n();
   const { company, employees, games } = state;
 
   if (!company) return null;
@@ -60,10 +62,10 @@ export function FinanceView() {
     <div className="p-4 md:p-6 space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-          <Icon name="finance" size="lg" /> Finance
+          <Icon name="finance" size="lg" /> {t.finance.title}
         </h2>
         <div className="text-right">
-          <p className="text-sm text-gray-400">Current Funds</p>
+          <p className="text-sm text-gray-400">{t.finance.currentFunds}</p>
           <p className="text-2xl font-bold text-gacha-gold">
             ${company.funds.toLocaleString()}
           </p>
@@ -73,49 +75,49 @@ export function FinanceView() {
       {/* Key Metrics */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="text-center">
-          <p className="text-gray-400 text-sm">Monthly Revenue</p>
+          <p className="text-gray-400 text-sm">{t.finance.monthlyRevenue}</p>
           <p className="text-2xl font-bold text-green-400">
             ${monthlyRevenue.toLocaleString()}
           </p>
           <p className="text-xs text-gray-500">
-            ${dailyRevenue.toLocaleString()}/day
+            ${dailyRevenue.toLocaleString()}{t.common.perDay}
           </p>
         </Card>
         <Card className="text-center">
-          <p className="text-gray-400 text-sm">Monthly Expenses</p>
+          <p className="text-gray-400 text-sm">{t.finance.monthlyExpenses}</p>
           <p className="text-2xl font-bold text-red-400">
             ${totalMonthlyExpenses.toLocaleString()}
           </p>
           <p className="text-xs text-gray-500">
-            ${dailyExpenses.toLocaleString()}/day
+            ${dailyExpenses.toLocaleString()}{t.common.perDay}
           </p>
         </Card>
         <Card className="text-center">
-          <p className="text-gray-400 text-sm">Monthly Profit</p>
+          <p className="text-gray-400 text-sm">{t.finance.monthlyProfit}</p>
           <p className={`text-2xl font-bold ${isProfitable ? 'text-green-400' : 'text-red-400'}`}>
             {isProfitable ? '+' : '-'}${Math.abs(monthlyProfit).toLocaleString()}
           </p>
           <p className="text-xs text-gray-500">
-            {isProfitable ? '+' : '-'}${Math.abs(dailyProfit).toLocaleString()}/day
+            {isProfitable ? '+' : '-'}${Math.abs(dailyProfit).toLocaleString()}{t.common.perDay}
           </p>
         </Card>
         <Card className="text-center">
-          <p className="text-gray-400 text-sm">Runway</p>
+          <p className="text-gray-400 text-sm">{t.finance.runway}</p>
           <p className={`text-2xl font-bold ${
             runwayMonths > 6 ? 'text-green-400' :
             runwayMonths > 3 ? 'text-yellow-400' :
             'text-red-400'
           }`}>
-            {runwayMonths === Infinity ? '∞' : `${runwayMonths.toFixed(1)} mo`}
+            {runwayMonths === Infinity ? '∞' : `${runwayMonths.toFixed(1)} ${t.finance.monthsAbbrev}`}
           </p>
           <p className="text-xs text-gray-500">
-            {runwayMonths === Infinity ? 'No expenses' : 'Until funds depleted'}
+            {runwayMonths === Infinity ? t.finance.noExpenses : t.finance.untilFundsDepleted}
           </p>
         </Card>
       </div>
 
       {/* Profit/Loss Bar */}
-      <Card title="Monthly Profit/Loss">
+      <Card title={t.finance.monthlyProfitLoss}>
         <div className="space-y-4">
           <div className="relative h-8 bg-gray-700 rounded-full overflow-hidden">
             {/* Revenue bar (green, starts from left) */}
@@ -134,23 +136,23 @@ export function FinanceView() {
             />
             <div className="absolute inset-0 flex items-center justify-center text-sm font-medium text-white gap-1">
               <Icon name={isProfitable ? 'chart-up' : 'chart-down'} size="sm" />
-              {isProfitable ? 'Profitable' : 'Operating at Loss'}
+              {isProfitable ? t.finance.profitable : t.finance.operatingAtLoss}
             </div>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-green-400">Revenue: ${monthlyRevenue.toLocaleString()}</span>
-            <span className="text-red-400">Expenses: ${totalMonthlyExpenses.toLocaleString()}</span>
+            <span className="text-green-400">{t.finance.revenue}: ${monthlyRevenue.toLocaleString()}</span>
+            <span className="text-red-400">{t.finance.expenses}: ${totalMonthlyExpenses.toLocaleString()}</span>
           </div>
         </div>
       </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Revenue Breakdown */}
-        <Card title="Revenue by Game">
+        <Card title={t.finance.revenueByGame}>
           {liveGames.length === 0 ? (
             <div className="text-center py-8">
               <Icon name="games" size="xl" className="mx-auto mb-2 text-gray-500" />
-              <p className="text-gray-400">No live games generating revenue</p>
+              <p className="text-gray-400">{t.finance.noLiveGamesRevenue}</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -181,7 +183,7 @@ export function FinanceView() {
         </Card>
 
         {/* Expense Breakdown */}
-        <Card title="Expense Breakdown">
+        <Card title={t.finance.expenseBreakdown}>
           <div className="space-y-3">
             {/* Salaries by role */}
             {Object.entries(expensesByRole)
@@ -198,7 +200,7 @@ export function FinanceView() {
                   <div className="flex justify-between items-center mb-2">
                     <div className="flex items-center gap-2">
                       <Icon name={roleIcon} />
-                      <span className="text-white">{role} Salaries</span>
+                      <span className="text-white">{role} {t.finance.salaries}</span>
                     </div>
                     <span className="text-red-400 font-semibold">
                       ${amount.toLocaleString()}/mo
@@ -236,7 +238,7 @@ export function FinanceView() {
             {/* Total */}
             <div className="border-t border-gray-600 pt-3">
               <div className="flex justify-between items-center text-lg">
-                <span className="text-white font-semibold">Total Monthly Expenses</span>
+                <span className="text-white font-semibold">{t.finance.totalMonthlyExpenses}</span>
                 <span className="text-red-400 font-bold">
                   ${totalMonthlyExpenses.toLocaleString()}
                 </span>
@@ -247,43 +249,43 @@ export function FinanceView() {
       </div>
 
       {/* Financial Health Summary */}
-      <Card title="Financial Summary">
+      <Card title={t.finance.financialSummary}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Profitability Status */}
           <div className={`rounded-lg p-4 ${
             isProfitable ? 'bg-green-900/30 border border-green-700' : 'bg-red-900/30 border border-red-700'
           }`}>
-            <p className="text-sm text-gray-400 mb-1">Status</p>
+            <p className="text-sm text-gray-400 mb-1">{t.finance.status}</p>
             <p className={`text-xl font-bold ${isProfitable ? 'text-green-400' : 'text-red-400'} flex items-center gap-1`}>
               <Icon name={isProfitable ? 'check' : 'close'} size="sm" />
-              {isProfitable ? 'Profitable' : 'Losing Money'}
+              {isProfitable ? t.finance.profitable : t.finance.losingMoney}
             </p>
             <p className="text-xs text-gray-500 mt-1">
               {isProfitable
-                ? `Earning ${((monthlyProfit / totalMonthlyExpenses) * 100).toFixed(0)}% profit margin`
-                : `Losing ${((Math.abs(monthlyProfit) / company.funds) * 100).toFixed(1)}% of funds monthly`}
+                ? t.finance.earningProfitMargin.replace('{percent}', ((monthlyProfit / totalMonthlyExpenses) * 100).toFixed(0))
+                : t.finance.losingFundsMonthly.replace('{percent}', ((Math.abs(monthlyProfit) / company.funds) * 100).toFixed(1))}
             </p>
           </div>
 
           {/* Employee Efficiency */}
           <div className="bg-gray-700 rounded-lg p-4">
-            <p className="text-sm text-gray-400 mb-1">Revenue per Employee</p>
+            <p className="text-sm text-gray-400 mb-1">{t.finance.revenuePerEmployee}</p>
             <p className="text-xl font-bold text-white">
-              ${employees.length > 0 ? (monthlyRevenue / employees.length).toLocaleString() : 0}/mo
+              ${employees.length > 0 ? (monthlyRevenue / employees.length).toLocaleString() : 0}{t.common.perMonth}
             </p>
             <p className="text-xs text-gray-500 mt-1">
-              {employees.length} employees on payroll
+              {employees.length} {t.finance.employeesOnPayroll}
             </p>
           </div>
 
           {/* Game Efficiency */}
           <div className="bg-gray-700 rounded-lg p-4">
-            <p className="text-sm text-gray-400 mb-1">Revenue per Live Game</p>
+            <p className="text-sm text-gray-400 mb-1">{t.finance.revenuePerGame}</p>
             <p className="text-xl font-bold text-white">
-              ${liveGames.length > 0 ? (monthlyRevenue / liveGames.length).toLocaleString() : 0}/mo
+              ${liveGames.length > 0 ? (monthlyRevenue / liveGames.length).toLocaleString() : 0}{t.common.perMonth}
             </p>
             <p className="text-xs text-gray-500 mt-1">
-              {liveGames.length} games generating revenue
+              {liveGames.length} {t.finance.gamesGeneratingRevenue}
             </p>
           </div>
         </div>
@@ -295,16 +297,16 @@ export function FinanceView() {
           <div className="flex items-start gap-3">
             <Icon name="warning" size="lg" className="text-yellow-400" />
             <div>
-              <p className="text-red-400 font-semibold">Financial Warning</p>
+              <p className="text-red-400 font-semibold">{t.finance.financialWarning}</p>
               <p className="text-sm text-gray-300">
                 {runwayMonths < 1
-                  ? 'Critical: Less than 1 month of runway remaining!'
+                  ? t.finance.warningCritical
                   : runwayMonths < 3
-                  ? 'Warning: Less than 3 months of runway remaining.'
-                  : 'Caution: Less than 6 months of runway remaining.'}
+                  ? t.finance.warningLow
+                  : t.finance.warningCaution}
               </p>
               <p className="text-xs text-gray-400 mt-1">
-                Consider: Launching more games, reducing staff, or downgrading office.
+                {t.finance.warningAdvice}
               </p>
             </div>
           </div>

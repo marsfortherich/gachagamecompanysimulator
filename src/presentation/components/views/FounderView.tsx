@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useGame } from '../../context';
 import { GameActions } from '../../../application/actions';
-import { Card, Button, ProgressBar, Icon } from '../common';
+import { Card, Button, ProgressBar, Icon, IconName } from '../common';
 import { useI18n } from '../../../infrastructure/i18n';
 import { 
   SkillType,
@@ -13,14 +13,14 @@ import {
 
 type SkillColor = 'blue' | 'purple' | 'green' | 'gold' | 'red';
 
-const SKILL_DISPLAY: Record<SkillType, { name: string; icon: string; color: SkillColor }> = {
-  programming: { name: 'Programming', icon: '💻', color: 'blue' },
-  art: { name: 'Art', icon: '🎨', color: 'purple' },
-  game_design: { name: 'Game Design', icon: '🎮', color: 'green' },
-  marketing: { name: 'Marketing', icon: '📢', color: 'gold' },
-  management: { name: 'Management', icon: '📋', color: 'red' },
-  sound: { name: 'Sound', icon: '🎵', color: 'blue' },
-  writing: { name: 'Writing', icon: '✍️', color: 'purple' },
+const SKILL_DISPLAY: Record<SkillType, { icon: IconName; color: SkillColor }> = {
+  programming: { icon: 'code', color: 'blue' },
+  art: { icon: 'palette', color: 'purple' },
+  game_design: { icon: 'designer', color: 'green' },
+  marketing: { icon: 'bullhorn', color: 'gold' },
+  management: { icon: 'clipboard', color: 'red' },
+  sound: { icon: 'note', color: 'blue' },
+  writing: { icon: 'pencil', color: 'purple' },
 };
 
 const SKILL_ORDER: SkillType[] = ['programming', 'art', 'game_design', 'marketing', 'management', 'sound', 'writing'];
@@ -31,6 +31,20 @@ export function FounderView() {
   const { t } = useI18n();
   const [selectedSkill, setSelectedSkill] = useState<SkillType>('programming');
   const [showTrainingModal, setShowTrainingModal] = useState(false);
+
+  // Helper to get skill name from translations
+  const getSkillName = (skill: SkillType): string => {
+    const skillKeyMap: Record<SkillType, keyof typeof t.skills> = {
+      programming: 'programming',
+      art: 'art',
+      game_design: 'gameDesign',
+      marketing: 'marketing',
+      management: 'management',
+      sound: 'sound',
+      writing: 'writing',
+    };
+    return t.skills[skillKeyMap[skill]];
+  };
 
   if (!founder) {
     return (
@@ -106,7 +120,7 @@ export function FounderView() {
               <div>
                 <p className="text-white font-semibold">{FOUNDER_TRAINING_CONFIGS[founder.currentTraining!].name}</p>
                 <p className="text-sm text-gray-400">
-                  {t.founder.training}: {SKILL_DISPLAY[founder.trainingTargetSkill!].name}
+                  {t.founder.training}: {getSkillName(founder.trainingTargetSkill!)}
                 </p>
               </div>
             </div>
@@ -180,8 +194,8 @@ export function FounderView() {
               <div key={skillType} className="p-3 bg-gray-700/30 rounded-lg">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <span className="text-lg">{display.icon}</span>
-                    <span className="text-white font-medium">{display.name}</span>
+                    <Icon name={display.icon} size="md" />
+                    <span className="text-white font-medium">{getSkillName(skillType)}</span>
                     {isPrimary && (
                       <span className="text-xs px-1.5 py-0.5 bg-yellow-700/50 text-yellow-300 rounded">{t.founder.primary}</span>
                     )}
@@ -212,7 +226,7 @@ export function FounderView() {
                 {FOUNDER_TRAINING_CONFIGS[founder.currentTraining!].name}
               </h3>
               <p className="text-gray-400">
-                {t.founder.training}: {SKILL_DISPLAY[founder.trainingTargetSkill!].name}
+                {t.founder.training}: {getSkillName(founder.trainingTargetSkill!)}
               </p>
               <p className="text-sm text-gray-500 mt-1">
                 {FOUNDER_TRAINING_CONFIGS[founder.currentTraining!].description}
@@ -238,13 +252,13 @@ export function FounderView() {
           <div className="p-3 bg-gray-700/30 rounded-lg">
             <p className="text-gray-400">{t.founder.primary} {t.founder.skills.toLowerCase()}</p>
             <p className="text-yellow-400 font-semibold flex items-center gap-1">
-              {SKILL_DISPLAY[specConfig.primarySkill].icon} {SKILL_DISPLAY[specConfig.primarySkill].name}
+              <Icon name={SKILL_DISPLAY[specConfig.primarySkill].icon} size="sm" /> {getSkillName(specConfig.primarySkill)}
             </p>
           </div>
           <div className="p-3 bg-gray-700/30 rounded-lg">
             <p className="text-gray-400">{t.founder.secondary} {t.founder.skills.toLowerCase()}</p>
             <p className="text-blue-400 font-semibold flex items-center gap-1">
-              {SKILL_DISPLAY[specConfig.secondarySkill].icon} {SKILL_DISPLAY[specConfig.secondarySkill].name}
+              <Icon name={SKILL_DISPLAY[specConfig.secondarySkill].icon} size="sm" /> {getSkillName(specConfig.secondarySkill)}
             </p>
           </div>
           <div className="p-3 bg-gray-700/30 rounded-lg">
@@ -289,8 +303,10 @@ export function FounderView() {
                             : 'border-gray-700 bg-gray-700/30 hover:border-gray-600'
                         }`}
                       >
-                        <div className="text-2xl mb-1">{display.icon}</div>
-                        <p className="text-xs text-white">{display.name}</p>
+                        <div className="flex justify-center mb-1">
+                          <Icon name={display.icon} size="lg" />
+                        </div>
+                        <p className="text-xs text-white">{getSkillName(skillType)}</p>
                         <p className="text-xs text-gray-400">{Math.round(founder.skills[skillType])}</p>
                       </button>
                     );
@@ -339,7 +355,7 @@ export function FounderView() {
                         <div className="mt-2 flex items-center gap-4 text-sm text-gray-400">
                           <span>+{(config.skillGainPerDay * founder.learningMultiplier).toFixed(2)}{t.common.perDay}</span>
                           {config.durationDays > 0 && (
-                            <span>{t.common.total}: +{(config.skillGainPerDay * config.durationDays * founder.learningMultiplier).toFixed(1)} {SKILL_DISPLAY[selectedSkill].name}</span>
+                            <span>{t.common.total}: +{(config.skillGainPerDay * config.durationDays * founder.learningMultiplier).toFixed(1)} {getSkillName(selectedSkill)}</span>
                           )}
                         </div>
                       </button>

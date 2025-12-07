@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useGame } from '../../context';
 import { GameActions } from '../../../application/actions';
 import { Card, Button, Icon, ProgressBar } from '../common';
+import { useI18n } from '../../../infrastructure/i18n';
 import { 
   CrowdfundingCampaign,
 } from '../../../domain/economy/Crowdfunding';
@@ -37,6 +38,7 @@ const TIER_ICONS: Record<string, IconName> = {
 
 export function CrowdfundingView() {
   const { state, dispatch } = useGame();
+  const { t } = useI18n();
   const { company, games, crowdfundingCampaigns, currentTick } = state;
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [campaignConfig, setCampaignConfig] = useState({
@@ -51,7 +53,7 @@ export function CrowdfundingView() {
     return (
       <div className="p-6">
         <Card>
-          <p className="text-gray-400 text-center">Start a company first to launch crowdfunding campaigns.</p>
+          <p className="text-gray-400 text-center">{t.crowdfunding.startCompanyFirst}</p>
         </Card>
       </div>
     );
@@ -89,19 +91,19 @@ export function CrowdfundingView() {
   return (
     <div className="p-4 md:p-6 space-y-6">
       <div className="flex justify-between items-center flex-wrap gap-2">
-        <h2 className="text-2xl font-bold text-white">Crowdfunding</h2>
+        <h2 className="text-2xl font-bold text-white">{t.crowdfunding.title}</h2>
         <Button
           variant="primary"
           onClick={() => setShowCreateModal(true)}
         >
-          + New Campaign
+          + {t.crowdfunding.newCampaign}
         </Button>
       </div>
 
       {/* Active Campaigns */}
       {activeCampaigns.length > 0 && (
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-white">Active Campaigns</h3>
+          <h3 className="text-lg font-semibold text-white">{t.crowdfunding.activeCampaigns}</h3>
           {activeCampaigns.map(campaign => {
             const game = games.find(g => g.id === campaign.gameId);
             const progress = calculateProgress(campaign);
@@ -113,7 +115,7 @@ export function CrowdfundingView() {
                     <div className="flex items-center gap-2 flex-wrap">
                       <h4 className="text-xl font-bold text-white">{campaign.name}</h4>
                       <span className="text-xs px-2 py-0.5 bg-green-900/50 rounded-full text-green-300">
-                        Active
+                        {t.crowdfunding.active}
                       </span>
                     </div>
                     <p className="text-sm text-gray-400 mt-1">
@@ -134,7 +136,7 @@ export function CrowdfundingView() {
                     
                     {/* Milestones */}
                     <div className="mt-4">
-                      <h5 className="text-sm font-semibold text-gray-300 mb-2">Milestones</h5>
+                      <h5 className="text-sm font-semibold text-gray-300 mb-2">{t.crowdfunding.milestones}</h5>
                       <div className="space-y-2">
                         {campaign.milestones.map((milestone) => (
                           <div 
@@ -155,7 +157,7 @@ export function CrowdfundingView() {
                   
                   {/* Tier Breakdown */}
                   <div className="md:w-64 space-y-2">
-                    <h5 className="text-sm font-semibold text-gray-300">Reward Tiers</h5>
+                    <h5 className="text-sm font-semibold text-gray-300">{t.crowdfunding.rewardTiers}</h5>
                     {campaign.rewardTiers.map((tier) => (
                       <div key={tier.id} className="p-2 bg-gray-800/50 rounded text-sm">
                         <div className="flex items-center gap-1">
@@ -173,14 +175,14 @@ export function CrowdfundingView() {
                 <div className="mt-4 pt-4 border-t border-gray-700">
                   <div className="flex items-center gap-4">
                     <div className="flex-1">
-                      <p className="text-xs text-gray-400 mb-1">Backer Confidence</p>
+                      <p className="text-xs text-gray-400 mb-1">{t.crowdfunding.backerConfidence}</p>
                       <ProgressBar 
                         value={campaign.backerConfidence} 
                         color={campaign.backerConfidence > 70 ? 'green' : campaign.backerConfidence > 40 ? 'gold' : 'red'} 
                       />
                     </div>
                     <div className="text-right">
-                      <p className="text-xs text-gray-400">Monthly Payout</p>
+                      <p className="text-xs text-gray-400">{t.crowdfunding.monthlyPayout}</p>
                       <p className="text-lg font-bold text-gacha-gold">{formatCurrency(campaign.monthlyPayout)}</p>
                     </div>
                   </div>
@@ -194,18 +196,18 @@ export function CrowdfundingView() {
       {/* Planning Campaigns */}
       {crowdfundingCampaigns.filter(c => c.status === 'planning').length > 0 && (
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-white">Campaigns in Planning</h3>
+          <h3 className="text-lg font-semibold text-white">{t.crowdfunding.campaignsInPlanning}</h3>
           {crowdfundingCampaigns.filter(c => c.status === 'planning').map(campaign => (
             <Card key={campaign.id}>
               <div className="flex items-center justify-between">
                 <div>
                   <h4 className="font-semibold text-white">{campaign.name}</h4>
                   <p className="text-sm text-gray-400">
-                    Goal: {formatCurrency(campaign.fundingGoal)} • {campaign.campaignDurationDays} days
+                    {t.crowdfunding.goal}: {formatCurrency(campaign.fundingGoal)} • {campaign.campaignDurationDays} {t.common.days}
                   </p>
                 </div>
                 <Button variant="primary" onClick={() => handleLaunchCampaign(campaign.id)}>
-                  <Icon name="rocket" size="sm" className="mr-1" /> Launch
+                  <Icon name="rocket" size="sm" className="mr-1" /> {t.crowdfunding.launch}
                 </Button>
               </div>
             </Card>
@@ -218,12 +220,12 @@ export function CrowdfundingView() {
         <Card>
           <div className="text-center py-8">
             <Icon name="rocket" size="xl" className="mb-4 mx-auto text-gacha-purple" />
-            <h3 className="text-xl font-semibold text-white mb-2">No Active Campaigns</h3>
+            <h3 className="text-xl font-semibold text-white mb-2">{t.crowdfunding.noActiveCampaigns}</h3>
             <p className="text-gray-400 mb-4">
-              Launch a crowdfunding campaign to raise funds for your next game!
+              {t.crowdfunding.launchCampaignHint}
             </p>
             <Button variant="primary" onClick={() => setShowCreateModal(true)}>
-              Start Your First Campaign
+              {t.crowdfunding.startFirstCampaign}
             </Button>
           </div>
         </Card>
@@ -232,7 +234,7 @@ export function CrowdfundingView() {
       {/* Funded Campaigns */}
       {fundedCampaigns.length > 0 && (
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-white">Funded Campaigns</h3>
+          <h3 className="text-lg font-semibold text-white">{t.crowdfunding.fundedCampaigns}</h3>
           <div className="grid gap-4 md:grid-cols-2">
             {fundedCampaigns.map(campaign => (
               <Card key={campaign.id} className="border-green-600/30">
@@ -243,12 +245,12 @@ export function CrowdfundingView() {
                     <p className="text-xs text-gray-400">{campaign.genre}</p>
                   </div>
                   <span className="ml-auto text-xs px-2 py-0.5 rounded-full bg-green-900/50 text-green-300">
-                    {campaign.status === 'completed' ? 'Completed' : 'Funded'}
+                    {campaign.status === 'completed' ? t.crowdfunding.completed : t.crowdfunding.funded}
                   </span>
                 </div>
                 <div className="mt-3 flex justify-between text-sm">
-                  <span className="text-white">{formatCurrency(campaign.currentPledges)} raised</span>
-                  <span className="text-gray-400">{campaign.backerCount} backers</span>
+                  <span className="text-white">{formatCurrency(campaign.currentPledges)} {t.crowdfunding.raised}</span>
+                  <span className="text-gray-400">{campaign.backerCount} {t.crowdfunding.backers}</span>
                 </div>
               </Card>
             ))}
@@ -256,10 +258,10 @@ export function CrowdfundingView() {
         </div>
       )}
 
-      {/* Failed Campaigns */}
+      {/* Failed Campaigns */}}
       {failedCampaigns.length > 0 && (
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-white">Past Campaigns</h3>
+          <h3 className="text-lg font-semibold text-white">{t.crowdfunding.pastCampaigns}</h3>
           <div className="grid gap-4 md:grid-cols-2">
             {failedCampaigns.map(campaign => (
               <Card key={campaign.id} className="border-red-600/30">
@@ -270,12 +272,12 @@ export function CrowdfundingView() {
                     <p className="text-xs text-gray-400">{campaign.genre}</p>
                   </div>
                   <span className="ml-auto text-xs px-2 py-0.5 rounded-full bg-red-900/50 text-red-300">
-                    Failed
+                    {t.crowdfunding.failed}
                   </span>
                 </div>
                 <div className="mt-3 flex justify-between text-sm">
-                  <span className="text-white">{formatCurrency(campaign.currentPledges)} raised</span>
-                  <span className="text-gray-400">{campaign.backerCount} backers</span>
+                  <span className="text-white">{formatCurrency(campaign.currentPledges)} {t.crowdfunding.raised}</span>
+                  <span className="text-gray-400">{campaign.backerCount} {t.crowdfunding.backers}</span></span>
                 </div>
               </Card>
             ))}
@@ -288,7 +290,7 @@ export function CrowdfundingView() {
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
           <Card className="w-full max-w-lg max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-bold text-white">New Crowdfunding Campaign</h3>
+              <h3 className="text-xl font-bold text-white">{t.crowdfunding.newCrowdfundingCampaign}</h3>
               <Button variant="secondary" size="sm" onClick={() => setShowCreateModal(false)}>
                 <Icon name="times" size="sm" />
               </Button>
@@ -298,7 +300,7 @@ export function CrowdfundingView() {
               {/* Campaign Name */}
               <div>
                 <label className="text-sm font-semibold text-gray-300 block mb-2">
-                  Campaign Name
+                  {t.crowdfunding.campaignName}
                 </label>
                 <input
                   type="text"
@@ -312,7 +314,7 @@ export function CrowdfundingView() {
               {/* Description */}
               <div>
                 <label className="text-sm font-semibold text-gray-300 block mb-2">
-                  Description
+                  {t.crowdfunding.description}
                 </label>
                 <textarea
                   className="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white"
@@ -326,7 +328,7 @@ export function CrowdfundingView() {
               {/* Genre */}
               <div>
                 <label className="text-sm font-semibold text-gray-300 block mb-2">
-                  Game Genre
+                  {t.crowdfunding.gameGenre}
                 </label>
                 <select
                   className="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white"
@@ -346,7 +348,7 @@ export function CrowdfundingView() {
               {/* Campaign Goal */}
               <div>
                 <label className="text-sm font-semibold text-gray-300 block mb-2">
-                  Funding Goal
+                  {t.crowdfunding.fundingGoal}
                 </label>
                 <div className="flex gap-2">
                   {[25000, 50000, 100000, 250000].map(amount => (
@@ -368,7 +370,7 @@ export function CrowdfundingView() {
               {/* Duration */}
               <div>
                 <label className="text-sm font-semibold text-gray-300 block mb-2">
-                  Campaign Duration
+                  {t.crowdfunding.campaignDuration}
                 </label>
                 <div className="flex gap-2">
                   {[15, 30, 45, 60].map(days => (
@@ -390,14 +392,14 @@ export function CrowdfundingView() {
             
             <div className="mt-6 flex gap-2">
               <Button variant="secondary" onClick={() => setShowCreateModal(false)}>
-                Cancel
+                {t.common.cancel}
               </Button>
               <Button 
                 variant="primary" 
                 onClick={handleCreateCampaign}
                 disabled={!campaignConfig.name.trim()}
               >
-                Create Campaign
+                {t.crowdfunding.createCampaign}
               </Button>
             </div>
           </Card>

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useGame } from '../../context';
 import { GameActions } from '../../../application/actions';
 import { Card, Button, Icon, ProgressBar } from '../common';
+import { useI18n } from '../../../infrastructure/i18n';
 import { 
   MONETIZATION_CONFIGS, 
   MonetizationStrategy,
@@ -43,6 +44,7 @@ const AD_ICONS: Record<AdType, IconName> = {
 
 export function MonetizationView() {
   const { state, dispatch } = useGame();
+  const { t } = useI18n();
   const { company, games, monetizationSetups, gameAdConfigs, monetizationImplementations } = state;
   const [selectedGameId, setSelectedGameId] = useState<string>('');
   const [activeTab, setActiveTab] = useState<'strategies' | 'advertising'>('strategies');
@@ -51,7 +53,7 @@ export function MonetizationView() {
     return (
       <div className="p-6">
         <Card>
-          <p className="text-gray-400 text-center">Start a company first to manage monetization.</p>
+          <p className="text-gray-400 text-center">{t.monetization.startCompanyFirst}</p>
         </Card>
       </div>
     );
@@ -63,11 +65,11 @@ export function MonetizationView() {
   if (!selectedGame) {
     return (
       <div className="p-6 space-y-6">
-        <h2 className="text-2xl font-bold text-white">Monetization</h2>
+        <h2 className="text-2xl font-bold text-white">{t.monetization.title}</h2>
         <Card>
           <div className="text-center py-8">
             <Icon name="money" size="xl" className="mx-auto mb-4 text-gray-500" />
-            <p className="text-gray-400">Launch a game first to set up monetization!</p>
+            <p className="text-gray-400">{t.monetization.launchGameFirst}</p>
           </div>
         </Card>
       </div>
@@ -102,9 +104,9 @@ export function MonetizationView() {
   return (
     <div className="p-4 md:p-6 space-y-6">
       <div className="flex justify-between items-center flex-wrap gap-2">
-        <h2 className="text-2xl font-bold text-white">Monetization</h2>
+        <h2 className="text-2xl font-bold text-white">{t.monetization.title}</h2>
         <div className="text-sm text-gray-400">
-          Budget: <span className="text-gacha-gold font-semibold">{formatCurrency(company.funds)}</span>
+          {t.monetization.budget}: <span className="text-gacha-gold font-semibold">{formatCurrency(company.funds)}</span>
         </div>
       </div>
 
@@ -136,7 +138,7 @@ export function MonetizationView() {
           </div>
           {summary && (
             <div className="text-right">
-              <p className="text-xs text-gray-400">Est. Monthly from Monetization</p>
+              <p className="text-xs text-gray-400">{t.monetization.estMonthlyRevenue}</p>
               <p className="text-lg font-bold text-gacha-gold">{formatCurrency(summary.totalMonthlyRevenue)}</p>
             </div>
           )}
@@ -149,13 +151,13 @@ export function MonetizationView() {
           variant={activeTab === 'strategies' ? 'primary' : 'secondary'}
           onClick={() => setActiveTab('strategies')}
         >
-          <Icon name="money" size="sm" className="mr-1" /> Monetization Strategies
+          <Icon name="money" size="sm" className="mr-1" /> {t.monetization.strategies}
         </Button>
         <Button
           variant={activeTab === 'advertising' ? 'primary' : 'secondary'}
           onClick={() => setActiveTab('advertising')}
         >
-          <Icon name="megaphone" size="sm" className="mr-1" /> Advertising
+          <Icon name="megaphone" size="sm" className="mr-1" /> {t.monetization.advertising}
         </Button>
       </div>
 
@@ -188,7 +190,7 @@ export function MonetizationView() {
                       )}
                       {isPending && (
                         <span className="text-xs px-1.5 py-0.5 bg-yellow-900/50 rounded text-yellow-300">
-                          Implementing...
+                          {t.monetization.implementing}
                         </span>
                       )}
                     </div>
@@ -215,8 +217,8 @@ export function MonetizationView() {
                     {upgradeAvailable && (
                       <div className="mt-2 pt-2 border-t border-gray-700">
                         <p className="text-xs text-gray-400">
-                          Upgrade to {MONETIZATION_LEVELS[(currentLevel + 1) as 1 | 2 | 3].name}: 
-                          +{Math.round((MONETIZATION_LEVELS[(currentLevel + 1) as 1 | 2 | 3].conversionMultiplier - 1) * 100)}% conversion
+                          {t.monetization.upgradeTo} {MONETIZATION_LEVELS[(currentLevel + 1) as 1 | 2 | 3].name}: 
+                          +{Math.round((MONETIZATION_LEVELS[(currentLevel + 1) as 1 | 2 | 3].conversionMultiplier - 1) * 100)}% {t.monetization.conversion}
                         </p>
                       </div>
                     )}
@@ -233,8 +235,8 @@ export function MonetizationView() {
                       onClick={() => handleImplementStrategy(strategy)}
                     >
                       {config.implementationCost === 0 
-                        ? 'Included' 
-                        : `Implement (${formatCurrency(config.implementationCost)})`}
+                        ? t.monetization.included 
+                        : `${t.monetization.implement} (${formatCurrency(config.implementationCost)})`}
                     </Button>
                   )}
                   
@@ -245,13 +247,13 @@ export function MonetizationView() {
                       disabled={company.funds < upgradeCost}
                       onClick={() => handleUpgradeStrategy(strategy)}
                     >
-                      Upgrade ({formatCurrency(upgradeCost)})
+                      {t.monetization.upgrade} ({formatCurrency(upgradeCost)})
                     </Button>
                   )}
                   
                   {isEnabled && !upgradeAvailable && (
                     <div className="w-full text-center text-xs text-gray-400 py-2">
-                      Max Level
+                      {t.monetization.maxLevel}
                     </div>
                   )}
                   
@@ -259,7 +261,7 @@ export function MonetizationView() {
                     <div className="w-full">
                       <ProgressBar value={50} color="gold" size="sm" />
                       <p className="text-xs text-gray-400 text-center mt-1">
-                        {config.setupDays} days to complete
+                        {config.setupDays} {t.monetization.daysToComplete}
                       </p>
                     </div>
                   )}
@@ -274,9 +276,9 @@ export function MonetizationView() {
       {activeTab === 'advertising' && (
         <div className="space-y-4">
           <Card>
-            <h3 className="text-lg font-semibold text-white mb-4">Ad Revenue Settings</h3>
+            <h3 className="text-lg font-semibold text-white mb-4">{t.monetization.adRevenueSettings}</h3>
             <p className="text-sm text-gray-400 mb-4">
-              Enable ads to generate additional revenue. Be careful - too many ads can hurt player satisfaction!
+              {t.monetization.adRevenueHint}
             </p>
             
             <div className="grid gap-4 md:grid-cols-2">
@@ -321,7 +323,7 @@ export function MonetizationView() {
                           disabled={!canAfford}
                           onClick={() => handleEnableAd(adType)}
                         >
-                          Enable ({formatCurrency(config.setupCost)})
+                          {t.monetization.enable} ({formatCurrency(config.setupCost)})
                         </Button>
                       ) : (
                         <Button
@@ -330,7 +332,7 @@ export function MonetizationView() {
                           variant="danger"
                           onClick={() => handleDisableAd(adType)}
                         >
-                          Disable
+                          {t.monetization.disable}
                         </Button>
                       )}
                     </div>
@@ -343,7 +345,7 @@ export function MonetizationView() {
           {/* Active Ads Summary */}
           {currentAdConfig && currentAdConfig.enabledAdTypes.size > 0 && (
             <Card>
-              <h4 className="text-sm font-semibold text-white mb-2">Active Ads Revenue</h4>
+              <h4 className="text-sm font-semibold text-white mb-2">{t.monetization.activeAdsRevenue}</h4>
               <div className="text-2xl font-bold text-gacha-gold">
                 ~${(Array.from(currentAdConfig.enabledAdTypes).reduce((sum, adType) => {
                   const config = AD_TYPE_CONFIGS[adType];
@@ -351,7 +353,7 @@ export function MonetizationView() {
                 }, 0)).toLocaleString()}/day
               </div>
               <p className="text-xs text-gray-400 mt-1">
-                Based on {selectedGame.monetization.dailyActiveUsers.toLocaleString()} DAU
+                {t.monetization.basedOnDau.replace('{dau}', selectedGame.monetization.dailyActiveUsers.toLocaleString())}
               </p>
             </Card>
           )}

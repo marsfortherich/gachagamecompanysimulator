@@ -3,6 +3,7 @@ import { useGame } from '../../context';
 import { Button, Input, Card, Icon } from '../common';
 import { storageService } from '../../../infrastructure';
 import { LOCATIONS, LocationId } from '../../../domain/company/Location';
+import { useI18n } from '../../../infrastructure/i18n';
 import { 
   FounderSpecialization, 
   FounderExperience, 
@@ -27,6 +28,7 @@ const LOCATION_INFO = Object.fromEntries(
 
 export function StartScreen() {
   const { startGame, loadGame } = useGame();
+  const { t } = useI18n();
   const [companyName, setCompanyName] = useState('');
   const [founderName, setFounderName] = useState('');
   const [specialization, setSpecialization] = useState<FounderSpecialization>('programmer');
@@ -69,7 +71,7 @@ export function StartScreen() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-white">Loading...</div>
+        <div className="text-white">{t.common.loading}</div>
       </div>
     );
   }
@@ -80,10 +82,10 @@ export function StartScreen() {
         {/* Logo/Title */}
         <div className="text-center mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 flex items-center justify-center gap-3">
-            <Icon name="dice" size="xl" className="text-gacha-gold" /> Gacha Game Company Simulator
+            <Icon name="dice" size="xl" className="text-gacha-gold" /> {t.startScreen.title}
           </h1>
           <p className="text-gray-400">
-            Build your gacha game empire
+            {t.startScreen.subtitle}
           </p>
         </div>
 
@@ -93,7 +95,7 @@ export function StartScreen() {
             {hasSave && (
               <div className="pb-6 border-b border-gray-700">
                 <Button fullWidth size="lg" onClick={handleContinue}>
-                  Continue Game
+                  {t.startScreen.loadGame}
                 </Button>
               </div>
             )}
@@ -101,13 +103,13 @@ export function StartScreen() {
             {/* New Game */}
             <div className="space-y-4">
               <h2 className="text-lg font-semibold text-white text-center">
-                {hasSave ? 'Or Start New Game' : 'New Game'}
+                {hasSave ? t.startScreen.orStartNew : t.startScreen.newGame}
               </h2>
               
               {/* Company Info */}
               <Input
-                label="Company Name"
-                placeholder="Enter your company name..."
+                label={t.startScreen.companyName}
+                placeholder={t.startScreen.companyNamePlaceholder}
                 value={companyName}
                 onChange={(e) => setCompanyName(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleStart()}
@@ -117,12 +119,12 @@ export function StartScreen() {
               <div className="pt-2 border-t border-gray-700">
                 <h3 className="text-sm font-medium text-gray-300 mb-3 flex items-center gap-2">
                   <Icon name="users" size="sm" className="text-gacha-purple" />
-                  Your Character (Founder)
+                  {t.startScreen.yourCharacter}
                 </h3>
                 
                 <Input
-                  label="Your Name"
-                  placeholder="Enter your name..."
+                  label={t.startScreen.founderName}
+                  placeholder={t.startScreen.founderNamePlaceholder}
                   value={founderName}
                   onChange={(e) => setFounderName(e.target.value)}
                 />
@@ -130,7 +132,7 @@ export function StartScreen() {
                 <div className="grid grid-cols-2 gap-3 mt-3">
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-1">
-                      Specialization
+                      {t.startScreen.specialization}
                     </label>
                     <select
                       value={specialization}
@@ -147,7 +149,7 @@ export function StartScreen() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-1">
-                      Experience
+                      {t.startScreen.experience}
                     </label>
                     <select
                       value={experience}
@@ -192,7 +194,7 @@ export function StartScreen() {
                       +{SPECIALIZATION_CONFIGS[specialization].secondaryBonus} {SPECIALIZATION_CONFIGS[specialization].secondarySkill.replace('_', ' ')}
                     </span>
                     <span className="text-xs px-2 py-0.5 bg-yellow-500/20 text-yellow-300 rounded">
-                      ×{EXPERIENCE_CONFIGS[experience].learningSpeedMultiplier} learning
+                      ×{EXPERIENCE_CONFIGS[experience].learningSpeedMultiplier} {t.startScreen.learning}
                     </span>
                   </div>
                 </div>
@@ -201,14 +203,14 @@ export function StartScreen() {
               {/* Headquarters */}
               <div className="pt-2 border-t border-gray-700">
                 <label htmlFor="headquarters-select" className="block text-sm font-medium text-gray-300 mb-2">
-                  Headquarters
+                  {t.startScreen.headquarters}
                 </label>
                 <select
                   id="headquarters-select"
                   value={headquarters}
                   onChange={(e) => setHeadquarters(e.target.value as LocationId)}
                   className="w-full px-4 py-2 bg-gray-700 text-white border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-gacha-purple"
-                  aria-label="Select headquarters location"
+                  aria-label={t.startScreen.selectLocation}
                 >
                   {locations.map((loc) => (
                     <option key={loc} value={loc}>
@@ -228,7 +230,7 @@ export function StartScreen() {
                     <p className="text-sm text-gray-300 mb-2">{LOCATION_INFO[headquarters].description}</p>
                     
                     <div className="mb-2">
-                      <span className="text-xs text-gray-400 uppercase">Bonuses:</span>
+                      <span className="text-xs text-gray-400 uppercase">{t.startScreen.bonuses}:</span>
                       <ul className="mt-1 space-y-0.5">
                         {LOCATION_INFO[headquarters].bonuses.map((bonus, i) => (
                           <li key={i} className="text-xs text-green-400 flex items-center gap-1">
@@ -239,7 +241,7 @@ export function StartScreen() {
                     </div>
                     
                     <div>
-                      <span className="text-xs text-gray-400 uppercase">Target Audience:</span>
+                      <span className="text-xs text-gray-400 uppercase">{t.startScreen.targetAudience}:</span>
                       <p className="text-xs text-blue-300 mt-0.5">{LOCATION_INFO[headquarters].targetAudience}</p>
                     </div>
                   </div>
@@ -253,7 +255,7 @@ export function StartScreen() {
                 onClick={handleStart}
                 disabled={!companyName.trim() || !founderName.trim()}
               >
-                Start New Company
+                {t.startScreen.startGame}
               </Button>
             </div>
           </div>
@@ -261,8 +263,7 @@ export function StartScreen() {
 
         {/* Footer */}
         <p className="text-center text-gray-500 text-sm mt-6">
-          Start as a solo indie developer, create games, train your skills,
-          and grow into a gacha gaming empire!
+          {t.startScreen.footerText}
         </p>
       </div>
     </div>

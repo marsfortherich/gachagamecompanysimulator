@@ -237,7 +237,7 @@ export function toGachaBannerViewModel(
     timeRemaining,
     isActive,
     isLimited: banner.isLimited,
-    limitedBadge: banner.isLimited ? '⭐ Limited' : null,
+    limitedBadge: banner.isLimited ? 'Limited' : null,
     pullCostDisplay: toPullCostDisplay(banner.pullCost),
     ratesDisplay: toRatesDisplay(banner),
     pityInfo: toPityInfo(currentPity, banner.pityCounter),

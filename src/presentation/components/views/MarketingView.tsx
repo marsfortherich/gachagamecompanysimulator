@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useGame } from '../../context';
+import { useI18n } from '../../../infrastructure/i18n';
 import { GameActions } from '../../../application/actions';
 import { Card, Button, ProgressBar, Icon } from '../common';
 import { 
@@ -24,6 +25,7 @@ const CAMPAIGN_TYPES = Object.values(CAMPAIGN_DEFINITIONS);
  */
 export function MarketingView() {
   const { state, dispatch } = useGame();
+  const { t } = useI18n();
   const { games, employees, company, campaigns, currentTick } = state;
 
   // Get live games and marketers
@@ -75,29 +77,29 @@ export function MarketingView() {
     <div className="p-4 md:p-6 space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-          <Icon name="marketing" size="lg" /> Marketing
+          <Icon name="marketing" size="lg" /> {t.marketing.title}
         </h2>
         <div className="text-sm text-gray-400">
-          Budget: <span className="text-gacha-gold font-semibold">
+          {t.marketing.budget}: <span className="text-gacha-gold font-semibold">
             ${company?.funds.toLocaleString() ?? 0}
           </span>
         </div>
       </div>
 
       {/* Marketing Team Overview */}
-      <Card title="Marketing Team">
+      <Card title={t.marketing.marketingTeam}>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
           <div className="bg-gray-700 rounded-lg p-3 text-center">
             <p className="text-2xl font-bold text-white">{marketers.length}</p>
-            <p className="text-xs text-gray-400">Total Marketers</p>
+            <p className="text-xs text-gray-400">{t.marketing.totalMarketers}</p>
           </div>
           <div className="bg-gray-700 rounded-lg p-3 text-center">
             <p className="text-2xl font-bold text-green-400">{availableMarketers.length}</p>
-            <p className="text-xs text-gray-400">Available</p>
+            <p className="text-xs text-gray-400">{t.marketing.available}</p>
           </div>
           <div className="bg-gray-700 rounded-lg p-3 text-center">
             <p className="text-2xl font-bold text-blue-400">{marketers.length - availableMarketers.length}</p>
-            <p className="text-xs text-gray-400">Assigned</p>
+            <p className="text-xs text-gray-400">{t.marketing.assigned}</p>
           </div>
           <div className="bg-gray-700 rounded-lg p-3 text-center">
             <p className="text-2xl font-bold text-gacha-purple">
@@ -105,17 +107,17 @@ export function MarketingView() {
                 ? Math.round(marketers.reduce((sum, m) => sum + (m.skills.marketing || 50), 0) / marketers.length)
                 : 0}
             </p>
-            <p className="text-xs text-gray-400">Avg. Skill</p>
+            <p className="text-xs text-gray-400">{t.marketing.avgSkill}</p>
           </div>
         </div>
 
         {marketers.length === 0 && (
           <div className="bg-yellow-900/30 border border-yellow-700 rounded-lg p-4 text-center">
             <p className="text-yellow-400 flex items-center justify-center gap-1">
-              <Icon name="warning" size="sm" /> No marketers hired!
+              <Icon name="warning" size="sm" /> {t.marketing.noMarketersHired}
             </p>
             <p className="text-sm text-gray-400 mt-1">
-              Hire marketers from the Staff tab to boost your games' user acquisition.
+              {t.marketing.hireMarketersHint}
             </p>
           </div>
         )}
@@ -125,9 +127,9 @@ export function MarketingView() {
         <Card>
           <div className="text-center py-12">
             <Icon name="games" size="xl" className="mx-auto mb-4 text-gray-500" />
-            <p className="text-gray-400">No live games to market</p>
+            <p className="text-gray-400">{t.marketing.noLiveGamesToMarket}</p>
             <p className="text-sm text-gray-500 mt-2">
-              Launch a game first to run marketing campaigns.
+              {t.marketing.launchGameFirst}
             </p>
           </div>
         </Card>
@@ -135,7 +137,7 @@ export function MarketingView() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Game Selection */}
           <div className="lg:col-span-1">
-            <Card title="Live Games">
+            <Card title={t.dashboard.liveGames}>
               <div className="space-y-2">
                 {liveGames.map(game => {
                   const marketingBonus = calculateMarketingBonus(game);
@@ -157,7 +159,7 @@ export function MarketingView() {
                       </div>
                       <div className="flex items-center gap-2 mt-1">
                         <span className="text-xs flex items-center gap-1">
-                          <Icon name="megaphone" size="xs" /> {assignedMarketers.length} marketer{assignedMarketers.length !== 1 ? 's' : ''}
+                          <Icon name="megaphone" size="xs" /> {assignedMarketers.length} {assignedMarketers.length !== 1 ? t.marketing.marketers : t.marketing.marketer}
                         </span>
                         {marketingBonus > 0 && (
                           <span className="text-xs text-green-400">
@@ -177,14 +179,14 @@ export function MarketingView() {
             {selectedGame ? (
               <div className="space-y-4">
                 {/* Assigned Marketers */}
-                <Card title={`${selectedGame.name} - Marketing Team`}>
+                <Card title={`${selectedGame.name} - ${t.marketing.marketingTeam}`}>
                   <div className="space-y-4">
                     {/* Current DAU Boost */}
                     <div className="bg-gray-700 rounded-lg p-4">
                       <div className="flex justify-between items-center mb-2">
-                        <span className="text-gray-400">Marketing Boost</span>
+                        <span className="text-gray-400">{t.marketing.marketingBoost}</span>
                         <span className="text-green-400 font-semibold">
-                          +{(calculateMarketingBonus(selectedGame) * 100).toFixed(0)}% DAU Growth
+                          +{(calculateMarketingBonus(selectedGame) * 100).toFixed(0)}% {t.marketing.dauGrowth}
                         </span>
                       </div>
                       <ProgressBar
@@ -196,7 +198,7 @@ export function MarketingView() {
 
                     {/* Assigned Marketers List */}
                     <div>
-                      <p className="text-sm text-gray-400 mb-2">Assigned Marketers</p>
+                      <p className="text-sm text-gray-400 mb-2">{t.marketing.assignedMarketers}</p>
                       {getAssignedMarketers(selectedGame).length > 0 ? (
                         <div className="space-y-2">
                           {getAssignedMarketers(selectedGame).map(marketer => (
@@ -207,23 +209,23 @@ export function MarketingView() {
                               <div>
                                 <span className="text-white font-medium">{marketer.name}</span>
                                 <span className="text-sm text-gray-400 ml-2">
-                                  Marketing: {marketer.skills.marketing || 50}
+                                  {t.skills.marketing}: {marketer.skills.marketing || 50}
                                 </span>
                               </div>
                               <Button
                                 variant="danger"
                                 onClick={() => handleUnassignMarketer(selectedGame.id, marketer.id)}
                               >
-                                Remove
+                                {t.common.remove}
                               </Button>
                             </div>
                           ))}
                         </div>
                       ) : (
                         <div className="bg-yellow-900/30 border border-yellow-700 rounded-lg p-3 text-center">
-                          <p className="text-yellow-400 text-sm">No marketers assigned</p>
+                          <p className="text-yellow-400 text-sm">{t.marketing.noMarketersAssigned}</p>
                           <p className="text-xs text-gray-400 mt-1">
-                            Assign marketers to boost user acquisition
+                            {t.marketing.assignMarketersHint}
                           </p>
                         </div>
                       )}
@@ -232,9 +234,9 @@ export function MarketingView() {
                     {/* Assign Marketer Dropdown */}
                     {availableMarketers.length > 0 && (
                       <div>
-                        <p className="text-sm text-gray-400 mb-2">Add Marketer</p>
+                        <p className="text-sm text-gray-400 mb-2">{t.marketing.addMarketer}</p>
                         <select
-                          aria-label="Select a marketer to assign"
+                          aria-label={t.marketing.selectMarketer}
                           className="w-full px-3 py-2 bg-gray-700 text-white rounded-lg"
                           onChange={(e) => {
                             if (e.target.value) {
@@ -244,10 +246,10 @@ export function MarketingView() {
                           }}
                           defaultValue=""
                         >
-                          <option value="">+ Select a marketer...</option>
+                          <option value="">{t.marketing.selectMarketerOption}</option>
                           {availableMarketers.map(m => (
                             <option key={m.id} value={m.id}>
-                              {m.name} (Marketing: {m.skills.marketing || 50})
+                              {m.name} ({t.skills.marketing}: {m.skills.marketing || 50})
                             </option>
                           ))}
                         </select>
@@ -258,7 +260,7 @@ export function MarketingView() {
 
                 {/* Active Campaigns */}
                 {getActiveCampaigns(selectedGame.id, campaigns).length > 0 && (
-                  <Card title="Active Campaigns">
+                  <Card title={t.marketing.activeCampaigns}>
                     <div className="space-y-3">
                       {getActiveCampaigns(selectedGame.id, campaigns).map(campaign => {
                         const definition = CAMPAIGN_DEFINITIONS[campaign.type];
@@ -273,7 +275,7 @@ export function MarketingView() {
                                 <span className="text-white font-medium">{definition.name}</span>
                               </div>
                               <span className="text-green-400 text-sm">
-                                {remainingDays} days left
+                                {remainingDays} {t.marketing.daysLeft}
                               </span>
                             </div>
                             <ProgressBar value={progress} max={100} color="green" />
@@ -283,12 +285,12 @@ export function MarketingView() {
                               </span>
                               {campaign.effects.retentionBoost > 0 && (
                                 <span className="flex items-center gap-1">
-                                  <Icon name="refresh" size="xs" /> +{(campaign.effects.retentionBoost * 100).toFixed(0)}% Retention
+                                  <Icon name="refresh" size="xs" /> +{(campaign.effects.retentionBoost * 100).toFixed(0)}% {t.marketing.retention}
                                 </span>
                               )}
                               {campaign.effects.revenueBoost > 0 && (
                                 <span className="flex items-center gap-1">
-                                  <Icon name="money" size="xs" /> +{(campaign.effects.revenueBoost * 100).toFixed(0)}% Revenue
+                                  <Icon name="money" size="xs" /> +{(campaign.effects.revenueBoost * 100).toFixed(0)}% {t.marketing.revenue}
                                 </span>
                               )}
                             </div>
@@ -300,7 +302,7 @@ export function MarketingView() {
                 )}
 
                 {/* Campaign Types */}
-                <Card title="Launch Campaign">
+                <Card title={t.marketing.launchCampaign}>
                   <div className="space-y-3">
                     {CAMPAIGN_TYPES.map(campaignDef => {
                       const cost = calculateCampaignCost(campaignDef.type, selectedGame.monetization.dailyActiveUsers);
@@ -327,16 +329,16 @@ export function MarketingView() {
                                   </span>
                                   {campaignDef.retentionBoost > 0 && (
                                     <span className="flex items-center gap-1">
-                                      <Icon name="refresh" size="xs" /> +{(campaignDef.retentionBoost * 100).toFixed(0)}% Retention
+                                      <Icon name="refresh" size="xs" /> +{(campaignDef.retentionBoost * 100).toFixed(0)}% {t.marketing.retention}
                                     </span>
                                   )}
                                   {campaignDef.revenueBoost > 0 && (
                                     <span className="flex items-center gap-1">
-                                      <Icon name="money" size="xs" /> +{(campaignDef.revenueBoost * 100).toFixed(0)}% Revenue
+                                      <Icon name="money" size="xs" /> +{(campaignDef.revenueBoost * 100).toFixed(0)}% {t.marketing.revenue}
                                     </span>
                                   )}
                                   <span className="flex items-center gap-1">
-                                    <Icon name="clock" size="xs" /> {campaignDef.duration} days
+                                    <Icon name="clock" size="xs" /> {campaignDef.duration} {t.common.days}
                                   </span>
                                   <span className={`flex items-center gap-1 ${canAfford ? 'text-green-400' : 'text-red-400'}`}>
                                     <Icon name="money" size="xs" /> ${cost.toLocaleString()}
@@ -347,11 +349,11 @@ export function MarketingView() {
                             <div className="flex flex-col items-end gap-1">
                               {isActive ? (
                                 <span className="text-green-400 text-sm px-3 py-1 bg-green-900/30 rounded">
-                                  Active
+                                  {t.marketing.active}
                                 </span>
                               ) : onCooldown ? (
                                 <span className="text-yellow-400 text-sm px-3 py-1 bg-yellow-900/30 rounded flex items-center gap-1">
-                                  <Icon name="clock" size="xs" /> {cooldownRemaining} days
+                                  <Icon name="clock" size="xs" /> {cooldownRemaining} {t.common.days}
                                 </span>
                               ) : (
                                 <Button 
@@ -359,11 +361,11 @@ export function MarketingView() {
                                   disabled={!canStart}
                                   onClick={() => handleStartCampaign(selectedGame.id, campaignDef.type)}
                                 >
-                                  Start
+                                  {t.marketing.start}
                                 </Button>
                               )}
                               {!canAfford && !isActive && !onCooldown && (
-                                <span className="text-red-400 text-xs">Insufficient funds</span>
+                                <span className="text-red-400 text-xs">{t.marketing.insufficientFunds}</span>
                               )}
                             </div>
                           </div>
@@ -376,7 +378,7 @@ export function MarketingView() {
             ) : (
               <Card>
                 <div className="text-center py-8 text-gray-400">
-                  Select a game to manage its marketing
+                  {t.marketing.selectGameToManage}
                 </div>
               </Card>
             )}

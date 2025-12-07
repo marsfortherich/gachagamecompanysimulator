@@ -4,6 +4,7 @@ import { GameActions } from '../../../application/actions';
 import { Card, Button, ProgressBar } from '../common';
 import { Icon } from '../common/Icon';
 import { Game, GachaRates } from '../../../domain';
+import { useI18n } from '../../../infrastructure/i18n';
 
 /**
  * Rarity info for display - using color squares instead of emoji
@@ -23,6 +24,7 @@ type Rarity = keyof typeof RARITY_INFO;
  */
 export function GachaManagementView() {
   const { state, dispatch } = useGame();
+  const { t } = useI18n();
   const { games } = state;
 
   // Get live games only
@@ -102,26 +104,26 @@ export function GachaManagementView() {
   // Calculate satisfaction impact from rates
   const calculateSatisfactionImpact = (rates: GachaRates): string => {
     const legendaryRate = rates.legendary * 100;
-    if (legendaryRate >= 2) return 'Very Generous (High Satisfaction)';
-    if (legendaryRate >= 1) return 'Generous (Good Satisfaction)';
-    if (legendaryRate >= 0.5) return 'Standard (Normal Satisfaction)';
-    if (legendaryRate >= 0.1) return 'Stingy (Low Satisfaction)';
-    return 'Predatory (Very Low Satisfaction)';
+    if (legendaryRate >= 2) return t.gacha.satisfactionVeryGenerous;
+    if (legendaryRate >= 1) return t.gacha.satisfactionGenerous;
+    if (legendaryRate >= 0.5) return t.gacha.satisfactionStandard;
+    if (legendaryRate >= 0.1) return t.gacha.satisfactionStingy;
+    return t.gacha.satisfactionPredatory;
   };
 
   return (
     <div className="p-4 md:p-6 space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-white flex items-center gap-2"><Icon name="casino" size="md" className="text-purple-400" /> Gacha Management</h2>
+        <h2 className="text-2xl font-bold text-white flex items-center gap-2"><Icon name="casino" size="md" className="text-purple-400" /> {t.gacha.title}</h2>
       </div>
 
       {liveGames.length === 0 ? (
         <Card>
           <div className="text-center py-12">
             <Icon name="games" size="lg" className="text-gray-500 mb-4" />
-            <p className="text-gray-400">No live games to manage</p>
+            <p className="text-gray-400">{t.gacha.noLiveGames}</p>
             <p className="text-sm text-gray-500 mt-2">
-              Launch a game first to configure its gacha rates.
+              {t.gacha.launchGameFirst}
             </p>
           </div>
         </Card>
@@ -129,7 +131,7 @@ export function GachaManagementView() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Game Selection */}
           <div className="lg:col-span-1">
-            <Card title="Live Games">
+            <Card title={t.gacha.liveGames}>
               <div className="space-y-2">
                 {liveGames.map(game => (
                   <button
@@ -162,7 +164,7 @@ export function GachaManagementView() {
                     {/* Player Satisfaction */}
                     <div className="bg-gray-700 rounded-lg p-4">
                       <div className="flex justify-between items-center mb-2">
-                        <span className="text-gray-400">Player Satisfaction</span>
+                        <span className="text-gray-400">{t.gacha.playerSatisfaction}</span>
                         <span className={`font-semibold ${
                           selectedGame.monetization.playerSatisfaction >= 70 ? 'text-green-400' :
                           selectedGame.monetization.playerSatisfaction >= 40 ? 'text-yellow-400' :
@@ -260,18 +262,18 @@ export function GachaManagementView() {
                       {editingRates ? (
                         <>
                           <Button variant="secondary" onClick={handleAutoBalance}>
-                            <Icon name="balance" size="sm" className="inline mr-1" /> Auto-Balance
+                            <Icon name="balance" size="sm" className="inline mr-1" /> {t.gacha.autoBalance}
                           </Button>
                           <Button variant="secondary" onClick={handleCancelEdit}>
-                            Cancel
+                            {t.common.cancel}
                           </Button>
                           <Button onClick={handleSaveRates}>
-                            <Icon name="save" size="sm" className="inline mr-1" /> Save Changes
+                            <Icon name="save" size="sm" className="inline mr-1" /> {t.gacha.saveChanges}
                           </Button>
                         </>
                       ) : (
                         <Button onClick={() => handleStartEditing(selectedGame)}>
-                          <Icon name="edit" size="sm" className="inline mr-1" /> Edit Rates
+                          <Icon name="edit" size="sm" className="inline mr-1" /> {t.gacha.editRates}
                         </Button>
                       )}
                     </div>
@@ -279,32 +281,32 @@ export function GachaManagementView() {
                 </Card>
 
                 {/* Revenue Impact Info */}
-                <Card title={<span className="flex items-center gap-2"><Icon name="lightbulb" size="sm" className="text-yellow-400" /> Rate Strategy Tips</span>}>
+                <Card title={<span className="flex items-center gap-2"><Icon name="lightbulb" size="sm" className="text-yellow-400" /> {t.gacha.strategyTips}</span>}>
                   <div className="space-y-3 text-sm">
                     <div className="flex items-start gap-3">
                       <Icon name="target" size="md" className="text-purple-400" />
                       <div>
-                        <p className="text-white font-medium">Higher Legendary Rates</p>
+                        <p className="text-white font-medium">{t.gacha.higherLegendaryRates}</p>
                         <p className="text-gray-400">
-                          More players get rare items → Higher satisfaction → Better retention
+                          {t.gacha.higherLegendaryRatesDesc}
                         </p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
                       <Icon name="money" size="md" className="text-green-400" />
                       <div>
-                        <p className="text-white font-medium">Lower Legendary Rates</p>
+                        <p className="text-white font-medium">{t.gacha.lowerLegendaryRates}</p>
                         <p className="text-gray-400">
-                          Players spend more per rare item → Higher ARPDAU → But lower satisfaction
+                          {t.gacha.lowerLegendaryRatesDesc}
                         </p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
                       <Icon name="balance" size="md" className="text-blue-400" />
                       <div>
-                        <p className="text-white font-medium">Industry Standard</p>
+                        <p className="text-white font-medium">{t.gacha.industryStandard}</p>
                         <p className="text-gray-400">
-                          Legendary: 0.5-1% | Epic: 2-4% | Rare: 7-10%
+                          {t.gacha.industryStandardDesc}
                         </p>
                       </div>
                     </div>
@@ -314,7 +316,7 @@ export function GachaManagementView() {
             ) : (
               <Card>
                 <div className="text-center py-8 text-gray-400">
-                  Select a game to manage its gacha rates
+                  {t.gacha.selectGameToManage}
                 </div>
               </Card>
             )}

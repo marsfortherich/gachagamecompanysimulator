@@ -69,7 +69,7 @@ export function EmployeesView() {
   };
 
   const handleFire = (employeeId: string) => {
-    if (confirm('Are you sure you want to fire this employee?')) {
+    if (confirm(t.employees.confirmFire)) {
       dispatch(GameActions.fireEmployee(employeeId));
     }
   };
@@ -131,7 +131,7 @@ export function EmployeesView() {
                 <Icon name="chevronDown" size="xs" className="mr-1" /> {t.employees.expandAll}
               </Button>
               <Button variant="secondary" size="sm" onClick={collapseAllEmployees}>
-                <Icon name="chevronUp" size="xs" className="mr-1" /> Collapse All
+                <Icon name="chevronUp" size="xs" className="mr-1" /> {t.employees.collapseAll}
               </Button>
             </>
           )}
@@ -140,7 +140,7 @@ export function EmployeesView() {
               onClick={() => setShowHireModal(true)}
               disabled={isAtMaxEmployees}
             >
-              + Hire Employee
+              + {t.employees.hireEmployee}
             </Button>
           )}
         </div>
@@ -152,7 +152,7 @@ export function EmployeesView() {
           <div className="bg-gray-800 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-bold text-white">Hire New Employee</h3>
+                <h3 className="text-xl font-bold text-white">{t.employees.hireNew}</h3>
                 <button 
                   onClick={() => setShowHireModal(false)}
                   className="text-gray-400 hover:text-white text-2xl"
@@ -163,7 +163,7 @@ export function EmployeesView() {
 
               {/* Tier Selection */}
               <div className="mb-6">
-                <label className="block text-sm text-gray-400 mb-3">Experience Level</label>
+                <label className="block text-sm text-gray-400 mb-3">{t.employees.experienceLevel}</label>
                 <div className="grid grid-cols-3 gap-3">
                   {(Object.keys(TIER_CONFIGS) as EmployeeTier[]).map((tier) => {
                     const config = TIER_CONFIGS[tier];
@@ -187,13 +187,13 @@ export function EmployeesView() {
                         <div className="text-xs text-gray-400 mt-1">{config.description}</div>
                         <div className="mt-3 space-y-1 text-xs">
                           <div className={affordable ? 'text-green-400' : 'text-red-400'}>
-                            Hiring: ${config.hiringCost.toLocaleString()}
+                            {t.employees.hiring}: ${config.hiringCost.toLocaleString()}
                           </div>
                           <div className="text-gray-400">
-                            Salary: ${config.salaryRange.min.toLocaleString()}-${config.salaryRange.max.toLocaleString()}/mo
+                            {t.employees.salary}: ${config.salaryRange.min.toLocaleString()}-${config.salaryRange.max.toLocaleString()}/mo
                           </div>
                           <div className="text-gray-400">
-                            Skills: {config.skillRange.min}-{config.skillRange.max}
+                            {t.employees.skills}: {config.skillRange.min}-{config.skillRange.max}
                           </div>
                         </div>
                       </button>
@@ -204,7 +204,7 @@ export function EmployeesView() {
 
               {/* Role Selection */}
               <div className="mb-6">
-                <label className="block text-sm text-gray-400 mb-3">Role</label>
+                <label className="block text-sm text-gray-400 mb-3">{t.employees.role}</label>
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
                   {getAvailableRoles().map((role) => (
                     <button
@@ -226,13 +226,13 @@ export function EmployeesView() {
               <div className="bg-gray-700/50 rounded-lg p-4 mb-6">
                 <div className="flex justify-between items-center">
                   <div>
-                    <span className="text-gray-400">Hiring Cost:</span>
+                    <span className="text-gray-400">{t.employees.hiringCost}:</span>
                     <span className={`ml-2 font-bold ${canAfford(selectedTier) ? 'text-green-400' : 'text-red-400'}`}>
                       ${TIER_CONFIGS[selectedTier].hiringCost.toLocaleString()}
                     </span>
                   </div>
                   <div className="text-gray-400">
-                    Available: <span className="text-gacha-gold">${company?.funds.toLocaleString() ?? 0}</span>
+                    {t.employees.available}: <span className="text-gacha-gold">${company?.funds.toLocaleString() ?? 0}</span>
                   </div>
                 </div>
               </div>
@@ -244,7 +244,7 @@ export function EmployeesView() {
                   fullWidth
                   onClick={() => setShowHireModal(false)}
                 >
-                  Cancel
+                  {t.common.cancel}
                 </Button>
                 <Button 
                   variant="primary" 
@@ -252,7 +252,7 @@ export function EmployeesView() {
                   disabled={!canAfford(selectedTier)}
                   onClick={handleHire}
                 >
-                  Hire {TIER_CONFIGS[selectedTier].label} {selectedRole}
+                  {t.employees.hire} {TIER_CONFIGS[selectedTier].label} {selectedRole}
                 </Button>
               </div>
             </div>
@@ -267,7 +267,7 @@ export function EmployeesView() {
             <div className="p-6">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-xl font-bold text-white">
-                  Send to Training: {employees.find(e => e.id === trainingEmployeeId)?.name}
+                  {t.employees.sendToTraining}: {employees.find(e => e.id === trainingEmployeeId)?.name}
                 </h3>
                 <button 
                   onClick={() => setTrainingEmployeeId(null)}
@@ -292,7 +292,7 @@ export function EmployeesView() {
                             {type.replace(/_/g, ' ')}
                           </h4>
                           <div className="flex gap-3 text-xs text-gray-400 mt-1">
-                            <span><Icon name="clock" size="xs" className="inline mr-1" />{config.durationDays} days</span>
+                            <span><Icon name="clock" size="xs" className="inline mr-1" />{config.durationDays} {t.common.days}</span>
                             <span className={affordable ? 'text-green-400' : 'text-red-400'}>
                               <Icon name="money" size="xs" className="inline mr-1" />${config.cost.toLocaleString()}
                             </span>
@@ -308,7 +308,7 @@ export function EmployeesView() {
                         ))}
                         {config.moraleBoost > 0 && (
                           <span className="text-xs px-2 py-1 bg-green-900/30 rounded text-green-400">
-                            +{config.moraleBoost} morale
+                            +{config.moraleBoost} {t.employees.morale.toLowerCase()}
                           </span>
                         )}
                       </div>
@@ -323,7 +323,7 @@ export function EmployeesView() {
                 className="mt-4"
                 onClick={() => setTrainingEmployeeId(null)}
               >
-                Cancel
+                {t.common.cancel}
               </Button>
             </div>
           </div>
@@ -337,7 +337,7 @@ export function EmployeesView() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
             </div>
-            <p className="text-gray-400">No employees yet. Hire your first team member!</p>
+            <p className="text-gray-400">{t.employees.noEmployeesYet}</p>
           </div>
         </Card>
       ) : (
@@ -363,16 +363,16 @@ export function EmployeesView() {
                           ? 'bg-green-900 text-green-300'
                           : 'bg-blue-900 text-blue-300'
                       }`}>
-                        {employee.isAvailable ? 'Available' : 'Assigned'}
+                        {employee.isAvailable ? t.employees.available : t.employees.assigned}
                       </span>
                       {training && (
                         <span className="text-xs px-2 py-0.5 rounded bg-blue-900 text-blue-300">
-                          Training
+                          {t.employees.training}
                         </span>
                       )}
                       {employee.morale < 40 && (
                         <span className="text-xs px-2 py-0.5 rounded bg-red-900 text-red-300">
-                          Low Morale
+                          {t.employees.lowMorale}
                         </span>
                       )}
                     </div>
@@ -382,7 +382,7 @@ export function EmployeesView() {
                       <p className="text-gacha-gold font-semibold">
                         ${employee.salary.toLocaleString()}
                       </p>
-                      <p className="text-xs text-gray-400">/month</p>
+                      <p className="text-xs text-gray-400">{t.employees.perMonth}</p>
                     </div>
                     <button
                       className="p-1 hover:bg-gray-700 rounded transition-colors"
@@ -424,14 +424,14 @@ export function EmployeesView() {
                 {/* Assignment */}
                 {assignedGame && (
                   <p className="text-sm text-gray-400 mb-3">
-                    Working on: <span className="text-white">{assignedGame.name}</span>
+                    {t.employees.workingOn}: <span className="text-white">{assignedGame.name}</span>
                   </p>
                 )}
 
                 {/* Morale */}
                 <div className="mb-3">
                   <div className="flex justify-between text-sm mb-1">
-                    <span className="text-gray-400">Morale</span>
+                    <span className="text-gray-400">{t.employees.morale}</span>
                     <span className={`${
                       employee.morale >= 70 ? 'text-green-400' :
                       employee.morale >= 40 ? 'text-yellow-400' : 'text-red-400'
@@ -465,7 +465,7 @@ export function EmployeesView() {
                             onClick={() => handleCancelTraining(employee.id)}
                             className="text-xs text-red-400 hover:text-red-300"
                           >
-                            Cancel
+                            {t.common.cancel}
                           </button>
                         </div>
                         <ProgressBar
@@ -474,7 +474,7 @@ export function EmployeesView() {
                           size="sm"
                         />
                         <p className="text-xs text-gray-400 mt-1">
-                          {Math.ceil(config.durationDays - (state.currentTick - training.startTick))} days remaining
+                          {Math.ceil(config.durationDays - (state.currentTick - training.startTick))} {t.employees.daysRemaining}
                         </p>
                       </div>
                     );
@@ -492,7 +492,7 @@ export function EmployeesView() {
                       onClick={() => setTrainingEmployeeId(employee.id)}
                     >
                       <Icon name="book" size="xs" className="mr-1" />
-                      Train
+                      {t.employees.train}
                     </Button>
                   )}
                   <Button
@@ -501,7 +501,7 @@ export function EmployeesView() {
                     fullWidth
                     onClick={() => handleFire(employee.id)}
                   >
-                    Fire
+                    {t.employees.fire}
                   </Button>
                 </div>
                   </>
