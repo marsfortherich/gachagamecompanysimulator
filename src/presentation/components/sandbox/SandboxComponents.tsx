@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useReducer, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useReducer, useCallback, ReactNode, useMemo } from 'react';
 import { Icon } from '../common/Icon';
-import { useI18n } from '../../../infrastructure/i18n';
+import { useI18n, type Translations } from '../../../infrastructure/i18n';
 import {
   SandboxFlags,
   SandboxManager,
@@ -155,160 +155,62 @@ interface CheatInfo {
   category: 'resources' | 'development' | 'company' | 'gacha' | 'debug';
 }
 
-const CHEAT_INFO: CheatInfo[] = [
+// Cheat configuration with just non-translatable data
+interface CheatConfig {
+  key: BooleanSandboxFlags;
+  iconName: CheatInfo['iconName'];
+  category: CheatInfo['category'];
+}
+
+const CHEAT_CONFIG: CheatConfig[] = [
   // Resources
-  {
-    key: 'infiniteMoney',
-    name: 'Infinite Money',
-    description: 'Never run out of funds. All purchases are free.',
-    iconName: 'money' as const,
-    category: 'resources',
-  },
-  {
-    key: 'freeHiring',
-    name: 'Free Hiring',
-    description: 'Hire employees without paying salaries.',
-    iconName: 'users' as const,
-    category: 'resources',
-  },
-  {
-    key: 'noSalaries',
-    name: 'No Salaries',
-    description: 'Employees work for free.',
-    iconName: 'money' as const,
-    category: 'resources',
-  },
-  {
-    key: 'noServerCosts',
-    name: 'No Server Costs',
-    description: 'Server infrastructure is free.',
-    iconName: 'settings' as const,
-    category: 'resources',
-  },
+  { key: 'infiniteMoney', iconName: 'money', category: 'resources' },
+  { key: 'freeHiring', iconName: 'users', category: 'resources' },
+  { key: 'noSalaries', iconName: 'money', category: 'resources' },
+  { key: 'noServerCosts', iconName: 'settings', category: 'resources' },
   // Company
-  {
-    key: 'noReputationDecay',
-    name: 'No Reputation Decay',
-    description: 'Reputation never decreases over time.',
-    iconName: 'star' as const,
-    category: 'company',
-  },
-  {
-    key: 'maxReputation',
-    name: 'Max Reputation',
-    description: 'Always have maximum reputation.',
-    iconName: 'trophy' as const,
-    category: 'company',
-  },
-  {
-    key: 'noMoraleDecay',
-    name: 'No Morale Decay',
-    description: 'Employee morale never decreases.',
-    iconName: 'happy' as const,
-    category: 'company',
-  },
-  {
-    key: 'noEmployeeQuit',
-    name: 'No Employee Quit',
-    description: 'Employees never leave the company.',
-    iconName: 'handshake' as const,
-    category: 'company',
-  },
-  {
-    key: 'maxEmployeeSkills',
-    name: 'Max Employee Skills',
-    description: 'All employees have maximum skills.',
-    iconName: 'graduation' as const,
-    category: 'company',
-  },
+  { key: 'noReputationDecay', iconName: 'star', category: 'company' },
+  { key: 'maxReputation', iconName: 'trophy', category: 'company' },
+  { key: 'noMoraleDecay', iconName: 'happy', category: 'company' },
+  { key: 'noEmployeeQuit', iconName: 'handshake', category: 'company' },
+  { key: 'maxEmployeeSkills', iconName: 'graduation', category: 'company' },
   // Development
-  {
-    key: 'instantDevelopment',
-    name: 'Instant Development',
-    description: 'All development projects complete instantly.',
-    iconName: 'bolt' as const,
-    category: 'development',
-  },
-  {
-    key: 'noBugs',
-    name: 'No Bugs',
-    description: 'Games never have bugs.',
-    iconName: 'bug' as const,
-    category: 'development',
-  },
-  {
-    key: 'maxQuality',
-    name: 'Max Quality',
-    description: 'Games always have maximum quality.',
-    iconName: 'gem' as const,
-    category: 'development',
-  },
-  {
-    key: 'instantResearch',
-    name: 'Instant Research',
-    description: 'All research completes instantly.',
-    iconName: 'research' as const,
-    category: 'development',
-  },
-  {
-    key: 'freeResearch',
-    name: 'Free Research',
-    description: 'Research costs nothing.',
-    iconName: 'flask' as const,
-    category: 'development',
-  },
+  { key: 'instantDevelopment', iconName: 'bolt', category: 'development' },
+  { key: 'noBugs', iconName: 'bug', category: 'development' },
+  { key: 'maxQuality', iconName: 'gem', category: 'development' },
+  { key: 'instantResearch', iconName: 'research', category: 'development' },
+  { key: 'freeResearch', iconName: 'flask', category: 'development' },
   // Gacha
-  {
-    key: 'guaranteedLegendary',
-    name: 'Guaranteed Legendary',
-    description: 'Every pull is a legendary.',
-    iconName: 'sparkles' as const,
-    category: 'gacha',
-  },
-  {
-    key: 'freePulls',
-    name: 'Free Pulls',
-    description: 'Gacha pulls cost nothing.',
-    iconName: 'casino' as const,
-    category: 'gacha',
-  },
+  { key: 'guaranteedLegendary', iconName: 'sparkles', category: 'gacha' },
+  { key: 'freePulls', iconName: 'casino', category: 'gacha' },
   // Debug
-  {
-    key: 'noCompetitors',
-    name: 'No Competitors',
-    description: 'Remove all market competition.',
-    iconName: 'flag' as const,
-    category: 'debug',
-  },
-  {
-    key: 'manipulateMarket',
-    name: 'Manipulate Market',
-    description: 'Control market trends manually.',
-    iconName: 'chart-up' as const,
-    category: 'debug',
-  },
-  {
-    key: 'forceEvents',
-    name: 'Force Events',
-    description: 'Trigger specific events manually.',
-    iconName: 'dice' as const,
-    category: 'debug',
-  },
-  {
-    key: 'noNegativeEvents',
-    name: 'No Negative Events',
-    description: 'Only positive events occur.',
-    iconName: 'clover' as const,
-    category: 'debug',
-  },
-  {
-    key: 'revealHiddenAchievements',
-    name: 'Reveal Achievements',
-    description: 'Show all hidden achievements.',
-    iconName: 'eye' as const,
-    category: 'debug',
-  },
+  { key: 'noCompetitors', iconName: 'flag', category: 'debug' },
+  { key: 'manipulateMarket', iconName: 'chart-up', category: 'debug' },
+  { key: 'forceEvents', iconName: 'dice', category: 'debug' },
+  { key: 'noNegativeEvents', iconName: 'clover', category: 'debug' },
+  { key: 'revealHiddenAchievements', iconName: 'eye', category: 'debug' },
 ];
+
+/**
+ * Get translated cheat info
+ */
+function getCheatInfo(t: Translations): CheatInfo[] {
+  return CHEAT_CONFIG.map(config => {
+    const translation = t.sandboxCheats[config.key as keyof typeof t.sandboxCheats] as { name: string; description: string } | undefined;
+    return {
+      ...config,
+      name: translation?.name ?? config.key,
+      description: translation?.description ?? '',
+    };
+  });
+}
+
+/**
+ * Get translated category labels
+ */
+function getCategoryLabels(t: Translations): Record<string, string> {
+  return t.sandboxCheats.categories;
+}
 
 const CATEGORY_ICONS: Record<string, 'money' | 'settings' | 'dashboard' | 'casino' | 'bug'> = {
   resources: 'money',
@@ -316,14 +218,6 @@ const CATEGORY_ICONS: Record<string, 'money' | 'settings' | 'dashboard' | 'casin
   company: 'dashboard',
   gacha: 'casino',
   debug: 'bug',
-};
-
-const CATEGORY_LABELS: Record<string, string> = {
-  resources: 'Resources',
-  development: 'Development',
-  company: 'Company',
-  gacha: 'Gacha',
-  debug: 'Debug',
 };
 
 // ============================================================================
@@ -388,13 +282,19 @@ export function SandboxPanel({ className = '' }: SandboxPanelProps) {
   const { state, toggleFlag, enableSandbox, disableSandbox } = useSandbox();
   const { t } = useI18n();
 
-  const cheatsByCategory = CHEAT_INFO.reduce((acc, cheat) => {
-    if (!acc[cheat.category]) {
-      acc[cheat.category] = [];
-    }
-    acc[cheat.category].push(cheat);
-    return acc;
-  }, {} as Record<string, CheatInfo[]>);
+  // Get translated cheat info
+  const cheatInfo = useMemo(() => getCheatInfo(t), [t]);
+  const categoryLabels = useMemo(() => getCategoryLabels(t), [t]);
+
+  const cheatsByCategory = useMemo(() => {
+    return cheatInfo.reduce((acc, cheat) => {
+      if (!acc[cheat.category]) {
+        acc[cheat.category] = [];
+      }
+      acc[cheat.category].push(cheat);
+      return acc;
+    }, {} as Record<string, CheatInfo[]>);
+  }, [cheatInfo]);
 
   return (
     <div className={`bg-gray-900 rounded-lg p-6 ${className}`}>
@@ -441,7 +341,7 @@ export function SandboxPanel({ className = '' }: SandboxPanelProps) {
           {Object.entries(cheatsByCategory).map(([category, cheats]) => (
             <div key={category}>
               <h3 className="text-lg font-semibold text-gray-300 mb-3 flex items-center gap-2">
-                <Icon name={CATEGORY_ICONS[category] || 'settings'} size="sm" /> {CATEGORY_LABELS[category] || category}
+                <Icon name={CATEGORY_ICONS[category] || 'settings'} size="sm" /> {categoryLabels[category] || category}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {cheats.map((cheat) => (
@@ -518,6 +418,9 @@ export function QuickCheats({ className = '' }: QuickCheatsProps) {
   const { state, toggleFlag, enableSandbox } = useSandbox();
   const { t } = useI18n();
 
+  // Get translated cheat info
+  const cheatInfo = useMemo(() => getCheatInfo(t), [t]);
+
   const quickCheats: BooleanSandboxFlags[] = [
     'infiniteMoney',
     'instantDevelopment',
@@ -546,7 +449,7 @@ export function QuickCheats({ className = '' }: QuickCheatsProps) {
       <h4 className="text-sm font-semibold text-gray-300 mb-3">{t.sandbox.quickCheats}</h4>
       <div className="space-y-2">
         {quickCheats.map((key) => {
-          const cheat = CHEAT_INFO.find((c) => c.key === key);
+          const cheat = cheatInfo.find((c) => c.key === key);
           if (!cheat) return null;
           return (
             <div

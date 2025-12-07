@@ -122,3 +122,6 @@ export function useTranslation(): Translations {
 
 // Re-export types and translations for direct access if needed
 export { en, de };
+
+// Alias for TranslationKeys (some components use this name)
+export type TranslationKeys = Translations;

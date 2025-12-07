@@ -9,7 +9,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { Icon } from '../common/Icon';
-import { useI18n } from '@infrastructure/i18n';
+import { useI18n, type TranslationKeys } from '@infrastructure/i18n';
 
 // =============================================================================
 // Phase Configuration Data
@@ -29,108 +29,62 @@ export interface PhaseInfoData {
   readonly qualityMultiplier: number;
 }
 
-export const PHASE_INFO: Record<string, PhaseInfoData> = {
-  planning: {
-    id: 'planning',
-    name: 'Planning',
-    description: 'Define the game concept, target audience, and core mechanics.',
-    requirements: [
-      'Reach 100% progress to complete',
-      'Progress speed depends on team effectiveness',
-    ],
-    tips: [
-      'Assign employees with high game_design skills',
-      'A Producer can help coordinate the team',
-      'Higher team morale = faster progress',
-    ],
-    baseProgressPerTick: 2.0,
-    qualityMultiplier: 0.3,
-  },
-  development: {
-    id: 'development',
-    name: 'Development',
-    description: 'Build the game - programming, art, and content creation.',
-    requirements: [
-      'Reach 100% progress to complete',
-      'This is the longest phase',
-      'Quality improvements are highest here',
-    ],
-    tips: [
-      'Balance your team: Programmers, Artists, and Designers',
-      'More employees = faster progress (up to 5)',
-      'Diverse roles give a coverage bonus',
-    ],
-    baseProgressPerTick: 1.0,
-    qualityMultiplier: 1.0,
-  },
-  testing: {
-    id: 'testing',
-    name: 'Testing',
-    description: 'QA, bug fixing, and polish. Find and fix issues before launch.',
-    requirements: [
-      'Reach 100% progress to complete',
-      'No minimum quality requirement',
-      'Faster than development phase',
-    ],
-    tips: [
-      'Programmers help fix bugs faster',
-      'Designers ensure gameplay feels right',
-      "Don't rush - quality improvements still happen",
-      'Team effectiveness = skill avg × 0.4 + team size × 0.2 + morale × 0.2 + role coverage × 0.2',
-    ],
-    baseProgressPerTick: 1.5,
-    qualityMultiplier: 0.6,
-  },
-  soft_launch: {
-    id: 'soft_launch',
-    name: 'Soft Launch',
-    description: 'Limited release to gather feedback and metrics.',
-    requirements: [
-      'Reach 100% progress to complete',
-      'Players start joining (limited)',
-      'Revenue begins flowing',
-    ],
-    tips: [
-      'Monitor player feedback',
-      'Marketers help with player acquisition',
-      'Good time to adjust monetization',
-    ],
-    baseProgressPerTick: 1.2,
-    qualityMultiplier: 0.4,
-  },
-  live: {
-    id: 'live',
-    name: 'Live',
-    description: 'Game is fully launched and operating.',
-    requirements: [
-      'No progress requirement - game is live!',
-      'Focus shifts to content updates',
-      'Revenue is maximized',
-    ],
-    tips: [
-      'Regular content updates retain players',
-      'Watch for player churn',
-      'Consider new banners and events',
-    ],
-    baseProgressPerTick: 0,
-    qualityMultiplier: 0.2,
-  },
-  maintenance: {
-    id: 'maintenance',
-    name: 'Maintenance',
-    description: 'Minimal updates, game is winding down.',
-    requirements: [
-      'Reduced revenue',
-      'Minimal team needed',
-    ],
-    tips: [
-      'Consider sunsetting or reviving with major update',
-      'Reallocate team to new projects',
-    ],
-    baseProgressPerTick: 0,
-    qualityMultiplier: 0,
-  },
+// Phase IDs that map to translation keys
+type PhaseId = 'planning' | 'development' | 'testing' | 'soft_launch' | 'live' | 'maintenance';
+
+// Phase configuration with just numerical data (non-translatable)
+const PHASE_CONFIG: Record<PhaseId, { baseProgressPerTick: number; qualityMultiplier: number }> = {
+  planning: { baseProgressPerTick: 2.0, qualityMultiplier: 0.3 },
+  development: { baseProgressPerTick: 1.0, qualityMultiplier: 1.0 },
+  testing: { baseProgressPerTick: 1.5, qualityMultiplier: 0.6 },
+  soft_launch: { baseProgressPerTick: 1.2, qualityMultiplier: 0.4 },
+  live: { baseProgressPerTick: 0, qualityMultiplier: 0.2 },
+  maintenance: { baseProgressPerTick: 0, qualityMultiplier: 0 },
 };
+
+// Map phase IDs to translation keys
+const PHASE_TRANSLATION_KEYS: Record<PhaseId, keyof TranslationKeys['phases']> = {
+  planning: 'planning',
+  development: 'development',
+  testing: 'testing',
+  soft_launch: 'softLaunch',
+  live: 'live',
+  maintenance: 'maintenance',
+};
+
+/**
+ * Get phase info with translated content
+ */
+export function getPhaseInfo(phaseId: string, t: TranslationKeys): PhaseInfoData | null {
+  const config = PHASE_CONFIG[phaseId as PhaseId];
+  const translationKey = PHASE_TRANSLATION_KEYS[phaseId as PhaseId];
+  
+  if (!config || !translationKey) return null;
+  
+  const phaseTranslation = t.phases[translationKey] as {
+    name: string;
+    description: string;
+    requirements: readonly string[];
+    tips: readonly string[];
+  };
+  
+  return {
+    id: phaseId,
+    name: phaseTranslation.name,
+    description: phaseTranslation.description,
+    requirements: phaseTranslation.requirements,
+    tips: phaseTranslation.tips,
+    baseProgressPerTick: config.baseProgressPerTick,
+    qualityMultiplier: config.qualityMultiplier,
+  };
+}
+
+/**
+ * Get all phase info data with translations
+ */
+export function getAllPhaseInfo(t: TranslationKeys): PhaseInfoData[] {
+  return Object.keys(PHASE_CONFIG).map(id => getPhaseInfo(id, t)).filter((p): p is PhaseInfoData => p !== null);
+}
 
 // =============================================================================
 // Team Effectiveness Calculation
@@ -208,8 +162,8 @@ export interface PhaseInfoTooltipProps {
  */
 export const PhaseInfoTooltip: React.FC<PhaseInfoTooltipProps> = ({ phaseId, children }) => {
   const [isVisible, setIsVisible] = useState(false);
-  const info = PHASE_INFO[phaseId];
   const { t } = useI18n();
+  const info = getPhaseInfo(phaseId, t);
 
   if (!info) {
     return <>{children}</>;
@@ -233,7 +187,7 @@ export const PhaseInfoTooltip: React.FC<PhaseInfoTooltipProps> = ({ phaseId, chi
           className="absolute z-50 w-72 p-4 bg-slate-800 border border-slate-600 rounded-lg shadow-xl -top-2 left-full ml-2"
           role="tooltip"
         >
-          <h4 className="font-bold text-white mb-2">{info.name} Phase</h4>
+          <h4 className="font-bold text-white mb-2">{info.name}</h4>
           <p className="text-sm text-slate-300 mb-3">{info.description}</p>
           
           <div className="mb-3">
@@ -263,10 +217,10 @@ export const PhaseInfoTooltip: React.FC<PhaseInfoTooltipProps> = ({ phaseId, chi
           {info.baseProgressPerTick > 0 && (
             <div className="mt-3 pt-3 border-t border-slate-600">
               <p className="text-xs text-slate-400">
-                Base progress: <span className="text-white">{info.baseProgressPerTick}</span> per day
+                {t.phases.baseProgress}: <span className="text-white">{info.baseProgressPerTick}</span> {t.phases.perDay}
               </p>
               <p className="text-xs text-slate-400">
-                Quality gain: <span className="text-white">{info.qualityMultiplier * 100}%</span> of base
+                {t.phases.qualityGain}: <span className="text-white">{info.qualityMultiplier * 100}%</span> {t.phases.ofBase}
               </p>
             </div>
           )}
@@ -293,7 +247,7 @@ export const ProgressBreakdownPanel: React.FC<ProgressBreakdownPanelProps> = ({
   currentPhase 
 }) => {
   const { t } = useI18n();
-  const phaseInfo = PHASE_INFO[currentPhase];
+  const phaseInfo = getPhaseInfo(currentPhase, t);
   const baseProgress = phaseInfo?.baseProgressPerTick ?? 1;
   const actualProgress = baseProgress * breakdown.total;
 
@@ -492,8 +446,8 @@ export const PhaseHelpModal: React.FC<PhaseHelpModalProps> = ({ isOpen, onClose 
           <section>
             <h3 className="text-lg font-semibold text-white mb-3">{t.phaseInfo.developmentPhases}</h3>
             <div className="space-y-4">
-              {Object.values(PHASE_INFO).map(phase => (
-                <PhaseCard key={phase.id} phase={phase} />
+              {getAllPhaseInfo(t).map(phase => (
+                <PhaseCard key={phase.id} phase={phase} t={t} />
               ))}
             </div>
           </section>
@@ -512,7 +466,7 @@ export const PhaseHelpModal: React.FC<PhaseHelpModalProps> = ({ isOpen, onClose 
             onClick={onClose}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
           >
-            Got it!
+            {t.phases.gotIt}
           </button>
         </div>
       </div>
@@ -526,9 +480,10 @@ export const PhaseHelpModal: React.FC<PhaseHelpModalProps> = ({ isOpen, onClose 
 
 interface PhaseCardProps {
   phase: PhaseInfoData;
+  t: TranslationKeys;
 }
 
-const PhaseCard: React.FC<PhaseCardProps> = ({ phase }) => {
+const PhaseCard: React.FC<PhaseCardProps> = ({ phase, t }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   
   const phaseIconNames: Record<string, 'planning' | 'development' | 'testing' | 'launch' | 'live' | 'maintenance'> = {
@@ -559,7 +514,7 @@ const PhaseCard: React.FC<PhaseCardProps> = ({ phase }) => {
       {isExpanded && (
         <div className="p-3 bg-slate-800 space-y-3">
           <div>
-            <h5 className="text-xs font-semibold text-slate-400 uppercase mb-1">Requirements</h5>
+            <h5 className="text-xs font-semibold text-slate-400 uppercase mb-1">{t.phaseInfo.requirements}</h5>
             <ul className="text-sm text-slate-300 space-y-1">
               {phase.requirements.map((req, i) => (
                 <li key={i}>• {req}</li>
@@ -568,7 +523,7 @@ const PhaseCard: React.FC<PhaseCardProps> = ({ phase }) => {
           </div>
           
           <div>
-            <h5 className="text-xs font-semibold text-slate-400 uppercase mb-1">Tips</h5>
+            <h5 className="text-xs font-semibold text-slate-400 uppercase mb-1">{t.phaseInfo.tips}</h5>
             <ul className="text-sm text-green-300 space-y-1">
               {phase.tips.map((tip, i) => (
                 <li key={i} className="flex items-center gap-2"><Icon name="lightbulb" size="sm" className="text-green-400" /> {tip}</li>
@@ -578,8 +533,8 @@ const PhaseCard: React.FC<PhaseCardProps> = ({ phase }) => {
           
           {phase.baseProgressPerTick > 0 && (
             <div className="flex gap-4 text-xs text-slate-400 pt-2 border-t border-slate-700">
-              <span>Base speed: {phase.baseProgressPerTick}/day</span>
-              <span>Quality gain: {phase.qualityMultiplier * 100}%</span>
+              <span>{t.phases.baseSpeed}: {phase.baseProgressPerTick}/{t.common.day}</span>
+              <span>{t.phases.qualityGain}: {phase.qualityMultiplier * 100}%</span>
             </div>
           )}
         </div>
@@ -611,13 +566,14 @@ export const GameProgressWithHelp: React.FC<GameProgressWithHelpProps> = ({
 }) => {
   const [showHelp, setShowHelp] = useState(false);
   const [showBreakdown, setShowBreakdown] = useState(false);
+  const { t } = useI18n();
 
   const breakdown = useMemo(
     () => calculateTeamEffectivenessBreakdown(assignedEmployees),
     [assignedEmployees]
   );
   
-  const phaseInfo = PHASE_INFO[game.status];
+  const phaseInfo = getPhaseInfo(game.status, t);
   const baseProgress = phaseInfo?.baseProgressPerTick ?? 1;
   const actualProgress = baseProgress * breakdown.total;
   const daysRemaining = actualProgress > 0 
@@ -653,7 +609,7 @@ export const GameProgressWithHelp: React.FC<GameProgressWithHelpProps> = ({
             onClick={() => setShowBreakdown(!showBreakdown)}
             className="text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 px-2 py-1 rounded"
           >
-            {showBreakdown ? 'Hide Details' : 'Show Details'}
+            {showBreakdown ? t.buttons.hideDetails : t.buttons.showDetails}
           </button>
         )}
       </div>
@@ -662,7 +618,7 @@ export const GameProgressWithHelp: React.FC<GameProgressWithHelpProps> = ({
       {isActivePhase && (
         <div className="mb-4">
           <div className="flex justify-between text-sm mb-1">
-            <span className="text-slate-400">Progress</span>
+            <span className="text-slate-400">{t.games.progress}</span>
             <span className="text-white">{game.developmentProgress.toFixed(1)}%</span>
           </div>
           <div className="h-3 bg-slate-700 rounded-full overflow-hidden">
@@ -675,15 +631,15 @@ export const GameProgressWithHelp: React.FC<GameProgressWithHelpProps> = ({
           {/* Time estimate */}
           <div className="flex justify-between text-xs mt-1 text-slate-400">
             <span>
-              Speed: {actualProgress.toFixed(2)}/day
+              {t.phases.speed}: {actualProgress.toFixed(2)}/{t.common.day}
               {breakdown.total < 0.3 && breakdown.total > 0 && (
-                <span className="text-red-400 ml-1">(slow!)</span>
+                <span className="text-red-400 ml-1">({t.phases.slow})</span>
               )}
             </span>
             <span>
               {daysRemaining === Infinity 
-                ? 'No team assigned!' 
-                : `~${daysRemaining} days remaining`}
+                ? t.phases.noTeamAssigned 
+                : `~${daysRemaining} ${t.phases.daysRemaining}`}
             </span>
           </div>
         </div>
@@ -691,9 +647,9 @@ export const GameProgressWithHelp: React.FC<GameProgressWithHelpProps> = ({
 
       {/* Team info */}
       <div className="flex items-center gap-2 mb-4">
-        <span className="text-sm text-slate-400">Team:</span>
+        <span className="text-sm text-slate-400">{t.games.team}:</span>
         {assignedEmployees.length === 0 ? (
-          <span className="text-sm text-red-400 flex items-center gap-1"><Icon name="warning" size="sm" /> No employees assigned!</span>
+          <span className="text-sm text-red-400 flex items-center gap-1"><Icon name="warning" size="sm" /> {t.phases.noEmployeesAssigned}</span>
         ) : (
           <div className="flex -space-x-2">
             {assignedEmployees.slice(0, 5).map((emp, i) => (
@@ -726,12 +682,12 @@ export const GameProgressWithHelp: React.FC<GameProgressWithHelpProps> = ({
       {assignedEmployees.length === 0 && isActivePhase && (
         <div className="bg-red-900/30 border border-red-700 rounded-lg p-3 mt-3">
           <p className="text-sm text-red-300">
-            <strong><Icon name="warning" size="sm" className="inline mr-1" /> No Progress!</strong> Assign employees to this project to make progress.
+            <strong><Icon name="warning" size="sm" className="inline mr-1" /> {t.phases.noProgress}</strong> {t.phases.assignEmployeesToMakeProgress}
             <button 
               onClick={() => setShowHelp(true)}
               className="ml-2 text-red-400 underline"
             >
-              Learn more
+              {t.phases.learnMore}
             </button>
           </p>
         </div>
@@ -740,12 +696,12 @@ export const GameProgressWithHelp: React.FC<GameProgressWithHelpProps> = ({
       {breakdown.total < 0.3 && breakdown.total > 0 && assignedEmployees.length > 0 && isActivePhase && (
         <div className="bg-yellow-900/30 border border-yellow-700 rounded-lg p-3 mt-3">
           <p className="text-sm text-yellow-300">
-            <strong><Icon name="warning" size="sm" className="inline mr-1" /> Low Effectiveness!</strong> Your team could be more productive.
+            <strong><Icon name="warning" size="sm" className="inline mr-1" /> {t.phases.lowEffectiveness}</strong> {t.phases.teamCouldBeMoreProductive}
             <button 
               onClick={() => setShowBreakdown(true)}
               className="ml-2 text-yellow-400 underline"
             >
-              See breakdown
+              {t.phases.seeBreakdown}
             </button>
           </p>
         </div>

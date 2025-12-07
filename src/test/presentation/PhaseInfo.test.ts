@@ -2,24 +2,56 @@
  * Phase Info Tests
  * 
  * Tests for the phase info help system including:
- * - PHASE_INFO data structure
+ * - getPhaseInfo and getAllPhaseInfo functions
  * - Team effectiveness calculations
  * - Phase progress calculations
  */
 
 import { describe, it, expect } from 'vitest';
 import {
-  PHASE_INFO,
+  getPhaseInfo,
+  getAllPhaseInfo,
   calculateTeamEffectivenessBreakdown,
   TeamMemberForCalculation,
 } from '@presentation/components/games/PhaseInfo';
+import { en } from '@infrastructure/i18n/translations/en';
+
+// Use English translations for testing
+const t = en;
+
+// Helper to get all phase info as a record for easier testing
+function getPhaseInfoRecord() {
+  const phases = getAllPhaseInfo(t);
+  return Object.fromEntries(phases.map(p => [p.id, p]));
+}
 
 // =============================================================================
-// PHASE_INFO Data Tests
+// Phase Info Function Tests
 // =============================================================================
 
-describe('PHASE_INFO', () => {
+describe('getPhaseInfo', () => {
+  it('returns phase info for valid phase id', () => {
+    const planning = getPhaseInfo('planning', t);
+    expect(planning).not.toBeNull();
+    expect(planning!.id).toBe('planning');
+    expect(planning!.name).toBeTruthy();
+  });
+
+  it('returns null for invalid phase id', () => {
+    const invalid = getPhaseInfo('invalid_phase', t);
+    expect(invalid).toBeNull();
+  });
+
+  it('returns correct numerical data', () => {
+    const testing = getPhaseInfo('testing', t);
+    expect(testing!.baseProgressPerTick).toBe(1.5);
+    expect(testing!.qualityMultiplier).toBe(0.6);
+  });
+});
+
+describe('getAllPhaseInfo', () => {
   it('contains all development phases', () => {
+    const PHASE_INFO = getPhaseInfoRecord();
     expect(PHASE_INFO).toHaveProperty('planning');
     expect(PHASE_INFO).toHaveProperty('development');
     expect(PHASE_INFO).toHaveProperty('testing');
@@ -29,12 +61,14 @@ describe('PHASE_INFO', () => {
   });
 
   it('testing phase has correct base progress', () => {
+    const PHASE_INFO = getPhaseInfoRecord();
     const testing = PHASE_INFO.testing;
     expect(testing.baseProgressPerTick).toBe(1.5);
     expect(testing.qualityMultiplier).toBe(0.6);
   });
 
   it('all phases have required fields', () => {
+    const PHASE_INFO = getPhaseInfoRecord();
     for (const [id, phase] of Object.entries(PHASE_INFO)) {
       expect(phase.id).toBe(id);
       expect(phase.name).toBeTruthy();
@@ -45,28 +79,29 @@ describe('PHASE_INFO', () => {
   });
 
   it('testing phase explains requirements clearly', () => {
-    const testing = PHASE_INFO.testing;
-    expect(testing.requirements).toContain('Reach 100% progress to complete');
-    expect(testing.description).toContain('QA');
+    const testing = getPhaseInfo('testing', t);
+    expect(testing!.requirements.some(r => r.toLowerCase().includes('100%'))).toBe(true);
+    expect(testing!.description.toLowerCase()).toContain('qa');
   });
 
   it('development phase is the main production phase', () => {
-    const dev = PHASE_INFO.development;
-    expect(dev.qualityMultiplier).toBe(1.0); // Highest quality gain
-    expect(dev.baseProgressPerTick).toBe(1.0); // Base speed
+    const dev = getPhaseInfo('development', t);
+    expect(dev!.qualityMultiplier).toBe(1.0); // Highest quality gain
+    expect(dev!.baseProgressPerTick).toBe(1.0); // Base speed
   });
 
   it('planning is the fastest phase', () => {
-    const planning = PHASE_INFO.planning;
-    expect(planning.baseProgressPerTick).toBe(2.0);
-    expect(planning.baseProgressPerTick).toBeGreaterThan(
-      PHASE_INFO.testing.baseProgressPerTick
-    );
+    const planning = getPhaseInfo('planning', t);
+    const testing = getPhaseInfo('testing', t);
+    expect(planning!.baseProgressPerTick).toBe(2.0);
+    expect(planning!.baseProgressPerTick).toBeGreaterThan(testing!.baseProgressPerTick);
   });
 
   it('live and maintenance phases have zero progress rate', () => {
-    expect(PHASE_INFO.live.baseProgressPerTick).toBe(0);
-    expect(PHASE_INFO.maintenance.baseProgressPerTick).toBe(0);
+    const live = getPhaseInfo('live', t);
+    const maintenance = getPhaseInfo('maintenance', t);
+    expect(live!.baseProgressPerTick).toBe(0);
+    expect(maintenance!.baseProgressPerTick).toBe(0);
   });
 });
 
@@ -247,7 +282,7 @@ describe('calculateTeamEffectivenessBreakdown', () => {
 
 describe('Phase Progress Calculations', () => {
   it('calculates days to complete testing phase with full effectiveness', () => {
-    const testingPhase = PHASE_INFO.testing;
+    const testingPhase = getPhaseInfo('testing', t)!;
     const baseProgress = testingPhase.baseProgressPerTick;
     
     // With 100% effectiveness
@@ -260,7 +295,7 @@ describe('Phase Progress Calculations', () => {
   });
 
   it('calculates days with low effectiveness team', () => {
-    const testingPhase = PHASE_INFO.testing;
+    const testingPhase = getPhaseInfo('testing', t)!;
     const baseProgress = testingPhase.baseProgressPerTick;
     
     // With 50% effectiveness
@@ -273,9 +308,9 @@ describe('Phase Progress Calculations', () => {
   });
 
   it('development phase is slower than testing', () => {
-    expect(PHASE_INFO.development.baseProgressPerTick).toBeLessThan(
-      PHASE_INFO.testing.baseProgressPerTick
-    );
+    const development = getPhaseInfo('development', t)!;
+    const testing = getPhaseInfo('testing', t)!;
+    expect(development.baseProgressPerTick).toBeLessThan(testing.baseProgressPerTick);
   });
 
   it('calculates correct days for each phase at full effectiveness', () => {
@@ -288,24 +323,27 @@ describe('Phase Progress Calculations', () => {
     };
     
     for (const phase of phases) {
-      const baseProgress = PHASE_INFO[phase].baseProgressPerTick;
+      const phaseInfo = getPhaseInfo(phase, t)!;
+      const baseProgress = phaseInfo.baseProgressPerTick;
       const daysToComplete = Math.ceil(100 / baseProgress);
       expect(daysToComplete).toBeCloseTo(expectedDays[phase], 0);
     }
   });
 
   it('quality multipliers are ordered correctly', () => {
+    const development = getPhaseInfo('development', t)!;
+    const testing = getPhaseInfo('testing', t)!;
+    const planning = getPhaseInfo('planning', t)!;
+    
     // Development should have highest quality multiplier
-    expect(PHASE_INFO.development.qualityMultiplier).toBe(1.0);
+    expect(development.qualityMultiplier).toBe(1.0);
     
     // Testing should have moderate quality multiplier
-    expect(PHASE_INFO.testing.qualityMultiplier).toBe(0.6);
-    expect(PHASE_INFO.testing.qualityMultiplier).toBeLessThan(
-      PHASE_INFO.development.qualityMultiplier
-    );
+    expect(testing.qualityMultiplier).toBe(0.6);
+    expect(testing.qualityMultiplier).toBeLessThan(development.qualityMultiplier);
     
     // Planning should have low quality multiplier
-    expect(PHASE_INFO.planning.qualityMultiplier).toBe(0.3);
+    expect(planning.qualityMultiplier).toBe(0.3);
   });
 });
 
@@ -379,7 +417,8 @@ describe('Team Effectiveness Scenarios', () => {
     let totalDays = 0;
     
     for (const phase of phases) {
-      const baseProgress = PHASE_INFO[phase].baseProgressPerTick;
+      const phaseInfo = getPhaseInfo(phase, t)!;
+      const baseProgress = phaseInfo.baseProgressPerTick;
       const actualProgress = baseProgress * breakdown.total;
       const daysForPhase = 100 / actualProgress;
       totalDays += daysForPhase;

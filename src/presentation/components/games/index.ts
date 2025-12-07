@@ -22,7 +22,8 @@ export type {
 
 // Phase Info / Help System
 export {
-  PHASE_INFO,
+  getPhaseInfo,
+  getAllPhaseInfo,
   calculateTeamEffectivenessBreakdown,
   PhaseInfoTooltip,
   ProgressBreakdownPanel,

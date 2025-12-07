@@ -210,15 +210,15 @@ export const GameCard: React.FC<GameCardProps> = ({
             onLaunch(game.id);
           }}
         >
-          <Icon name="rocket" size="sm" /> Launch Game
+          <Icon name="rocket" size="sm" /> {t.games.launchGame}
         </button>
       )}
 
       {/* Footer info */}
       <div className="flex justify-between text-xs text-gray-400 mt-3 pt-3 border-t border-gray-100">
-        <span>Started {game.startDateFormatted}</span>
+        <span>{t.gameProgressLabels.started} {game.startDateFormatted}</span>
         {game.launchDateFormatted && (
-          <span>Launched {game.launchDateFormatted}</span>
+          <span>{t.gameProgressLabels.launched} {game.launchDateFormatted}</span>
         )}
       </div>
     </div>
@@ -360,13 +360,15 @@ export interface GamesPipelineViewProps {
 
 export const GamesPipelineView: React.FC<GamesPipelineViewProps> = ({ onGameSelect }) => {
   const gamesByStatus = useGamesByStatus();
+  const { t } = useI18n();
 
+  // Pipeline phases with translations
   const pipelinePhases: { status: GameStatus; label: string; color: string }[] = [
-    { status: 'planning', label: 'Planning', color: '#6B7280' },
-    { status: 'development', label: 'Development', color: '#3B82F6' },
-    { status: 'testing', label: 'Testing', color: '#F59E0B' },
-    { status: 'soft_launch', label: 'Soft Launch', color: '#8B5CF6' },
-    { status: 'live', label: 'Live', color: '#10B981' },
+    { status: 'planning', label: t.phases.planning.name, color: '#6B7280' },
+    { status: 'development', label: t.phases.development.name, color: '#3B82F6' },
+    { status: 'testing', label: t.phases.testing.name, color: '#F59E0B' },
+    { status: 'soft_launch', label: t.phases.softLaunch.name, color: '#8B5CF6' },
+    { status: 'live', label: t.phases.live.name, color: '#10B981' },
   ];
 
   return (
@@ -602,7 +604,7 @@ export const GameDetailPanel: React.FC<GameDetailPanelProps> = ({
                        rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
             onClick={() => onLaunch(game.id)}
           >
-            <Icon name="rocket" size="sm" /> Launch Game
+            <Icon name="rocket" size="sm" /> {t.games.launchGame}
           </button>
         )}
         {game.canShutdown && (
@@ -610,7 +612,7 @@ export const GameDetailPanel: React.FC<GameDetailPanelProps> = ({
             className="flex-1 py-3 bg-red-100 hover:bg-red-200 text-red-600 
                        rounded-lg font-medium transition-colors"
           >
-            Shutdown
+            {t.games.shutdown}
           </button>
         )}
       </div>

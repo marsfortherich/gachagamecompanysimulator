@@ -13,7 +13,7 @@ import { useEmployees, EmployeeFilters, TeamStats } from '@presentation/hooks/us
 import { EmployeeViewModel, SkillDisplay, MoraleDisplay } from '@presentation/viewmodels/EmployeeViewModel';
 import { EmployeeRole } from '@domain/employee';
 import { Icon, IconName } from '@presentation/components/common/Icon';
-import { useI18n } from '@infrastructure/i18n';
+import { useI18n, type Translations } from '@infrastructure/i18n';
 
 // =============================================================================
 // Filter Bar Component
@@ -25,20 +25,28 @@ export interface EmployeeFilterBarProps {
   onClear: () => void;
 }
 
-const ROLE_OPTIONS: Array<{ value: EmployeeRole | ''; label: string; icon?: IconName }> = [
-  { value: '', label: 'All Roles' },
-  { value: 'Programmer', label: 'Programmer', icon: 'programmer' },
-  { value: 'Artist', label: 'Artist', icon: 'artist' },
-  { value: 'Designer', label: 'Designer', icon: 'designer' },
-  { value: 'Marketer', label: 'Marketer', icon: 'marketer' },
-  { value: 'Producer', label: 'Producer', icon: 'producer' },
+interface RoleOption {
+  value: EmployeeRole | '';
+  labelKey: keyof Translations['roleFilters'];
+  icon?: IconName;
+}
+
+// Role configuration with translation keys
+const ROLE_CONFIG: RoleOption[] = [
+  { value: '', labelKey: 'allRoles' },
+  { value: 'Programmer', labelKey: 'programmer', icon: 'programmer' },
+  { value: 'Artist', labelKey: 'artist', icon: 'artist' },
+  { value: 'Designer', labelKey: 'designer', icon: 'designer' },
+  { value: 'Marketer', labelKey: 'marketer', icon: 'marketer' },
+  { value: 'Producer', labelKey: 'producer', icon: 'producer' },
 ];
 
-const SORT_OPTIONS = [
-  { value: 'name', label: 'Name' },
-  { value: 'level', label: 'Level' },
-  { value: 'salary', label: 'Salary' },
-  { value: 'morale', label: 'Morale' },
+// Sort configuration with translation keys
+const SORT_CONFIG = [
+  { value: 'name', labelKey: 'name' as const },
+  { value: 'level', labelKey: 'level' as const },
+  { value: 'salary', labelKey: 'salary' as const },
+  { value: 'morale', labelKey: 'morale' as const },
 ] as const;
 
 export const EmployeeFilterBar: React.FC<EmployeeFilterBarProps> = ({
@@ -73,8 +81,8 @@ export const EmployeeFilterBar: React.FC<EmployeeFilterBarProps> = ({
         className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 
                    focus:ring-blue-500 focus:border-blue-500"
       >
-        {ROLE_OPTIONS.map((opt) => (
-          <option key={opt.value} value={opt.value}>{opt.label}</option>
+        {ROLE_CONFIG.map((opt) => (
+          <option key={opt.value} value={opt.value}>{t.roleFilters[opt.labelKey]}</option>
         ))}
       </select>
 
@@ -89,8 +97,8 @@ export const EmployeeFilterBar: React.FC<EmployeeFilterBarProps> = ({
         className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 
                    focus:ring-blue-500 focus:border-blue-500"
       >
-        {SORT_OPTIONS.map((opt) => (
-          <option key={opt.value} value={opt.value}>Sort by {opt.label}</option>
+        {SORT_CONFIG.map((opt) => (
+          <option key={opt.value} value={opt.value}>{t.common.sort}: {t.sortOptions[opt.labelKey]}</option>
         ))}
       </select>
 
@@ -102,7 +110,7 @@ export const EmployeeFilterBar: React.FC<EmployeeFilterBarProps> = ({
         })}
         className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
       >
-        {filters.sortOrder === 'asc' ? '↑ Asc' : '↓ Desc'}
+        {filters.sortOrder === 'asc' ? `↑ ${t.employeeManagement.ascending}` : `↓ ${t.employeeManagement.descending}`}
       </button>
 
       {/* Clear Filters */}
@@ -111,7 +119,7 @@ export const EmployeeFilterBar: React.FC<EmployeeFilterBarProps> = ({
         className="px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 
                    rounded-lg transition-colors"
       >
-        Clear
+        {t.employeeManagement.clear}
       </button>
     </div>
   );

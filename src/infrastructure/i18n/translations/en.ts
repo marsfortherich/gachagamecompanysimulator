@@ -914,6 +914,8 @@ export const en = {
     fire: 'Fire',
     sortBy: 'Sort by',
     clear: 'Clear',
+    ascending: 'Asc',
+    descending: 'Desc',
     searchEmployees: 'Search employees...',
     noEmployeesFound: 'No employees found',
   },
@@ -980,11 +982,359 @@ export const en = {
     performance: 'Performance',
     arpu: 'ARPU',
     satisfaction: 'Satisfaction',
+    started: 'Started',
+    launched: 'Launched',
   },
 
   // Placeholder
   placeholder: {
     comingSoon: 'This feature is coming soon!',
+  },
+
+  // Development Phases (for PhaseInfo)
+  phases: {
+    planning: {
+      name: 'Planning',
+      description: 'Define the game concept, target audience, and core mechanics.',
+      requirements: [
+        'Reach 100% progress to complete',
+        'Progress speed depends on team effectiveness',
+      ],
+      tips: [
+        'Assign employees with high game_design skills',
+        'A Producer can help coordinate the team',
+        'Higher team morale = faster progress',
+      ],
+    },
+    development: {
+      name: 'Development',
+      description: 'Build the game - programming, art, and content creation.',
+      requirements: [
+        'Reach 100% progress to complete',
+        'This is the longest phase',
+        'Quality improvements are highest here',
+      ],
+      tips: [
+        'Balance your team: Programmers, Artists, and Designers',
+        'More employees = faster progress (up to 5)',
+        'Diverse roles give a coverage bonus',
+      ],
+    },
+    testing: {
+      name: 'Testing',
+      description: 'QA, bug fixing, and polish. Find and fix issues before launch.',
+      requirements: [
+        'Reach 100% progress to complete',
+        'No minimum quality requirement',
+        'Faster than development phase',
+      ],
+      tips: [
+        'Programmers help fix bugs faster',
+        'Designers ensure gameplay feels right',
+        "Don't rush - quality improvements still happen",
+        'Team effectiveness = skill avg × 0.4 + team size × 0.2 + morale × 0.2 + role coverage × 0.2',
+      ],
+    },
+    softLaunch: {
+      name: 'Soft Launch',
+      description: 'Limited release to gather feedback and metrics.',
+      requirements: [
+        'Reach 100% progress to complete',
+        'Players start joining (limited)',
+        'Revenue begins flowing',
+      ],
+      tips: [
+        'Monitor player feedback',
+        'Marketers help with player acquisition',
+        'Good time to adjust monetization',
+      ],
+    },
+    live: {
+      name: 'Live',
+      description: 'Game is fully launched and operating.',
+      requirements: [
+        'No progress requirement - game is live!',
+        'Focus shifts to content updates',
+        'Revenue is maximized',
+      ],
+      tips: [
+        'Regular content updates retain players',
+        'Watch for player churn',
+        'Consider new banners and events',
+      ],
+    },
+    maintenance: {
+      name: 'Maintenance',
+      description: 'Minimal updates, game is winding down.',
+      requirements: [
+        'Reduced revenue',
+        'Minimal team needed',
+      ],
+      tips: [
+        'Consider sunsetting or reviving with major update',
+        'Reallocate team to new projects',
+      ],
+    },
+    // Common labels
+    baseProgress: 'Base progress',
+    perDay: 'per day',
+    qualityGain: 'Quality gain',
+    ofBase: 'of base',
+    baseSpeed: 'Base speed',
+    gotIt: 'Got it!',
+    noProgress: 'No Progress!',
+    assignEmployeesToMakeProgress: 'Assign employees to this project to make progress.',
+    learnMore: 'Learn more',
+    lowEffectiveness: 'Low Effectiveness!',
+    teamCouldBeMoreProductive: 'Your team could be more productive.',
+    seeBreakdown: 'See breakdown',
+    noEmployeesAssigned: 'No employees assigned!',
+    speed: 'Speed',
+    slow: 'slow!',
+    daysRemaining: 'days remaining',
+    noTeamAssigned: 'No team assigned!',
+  },
+
+  // Sandbox Cheats
+  sandboxCheats: {
+    infiniteMoney: {
+      name: 'Infinite Money',
+      description: 'Never run out of funds. All purchases are free.',
+    },
+    freeHiring: {
+      name: 'Free Hiring',
+      description: 'Hire employees without paying salaries.',
+    },
+    noSalaries: {
+      name: 'No Salaries',
+      description: 'Employees work for free.',
+    },
+    noServerCosts: {
+      name: 'No Server Costs',
+      description: 'Server infrastructure is free.',
+    },
+    noReputationDecay: {
+      name: 'No Reputation Decay',
+      description: 'Reputation never decreases over time.',
+    },
+    maxReputation: {
+      name: 'Max Reputation',
+      description: 'Always have maximum reputation.',
+    },
+    noMoraleDecay: {
+      name: 'No Morale Decay',
+      description: 'Employee morale never decreases.',
+    },
+    noEmployeeQuit: {
+      name: 'No Employee Quit',
+      description: 'Employees never leave the company.',
+    },
+    maxEmployeeSkills: {
+      name: 'Max Employee Skills',
+      description: 'All employees have maximum skills.',
+    },
+    instantDevelopment: {
+      name: 'Instant Development',
+      description: 'All development projects complete instantly.',
+    },
+    noBugs: {
+      name: 'No Bugs',
+      description: 'Games never have bugs.',
+    },
+    maxQuality: {
+      name: 'Max Quality',
+      description: 'Games always have maximum quality.',
+    },
+    instantResearch: {
+      name: 'Instant Research',
+      description: 'All research completes instantly.',
+    },
+    freeResearch: {
+      name: 'Free Research',
+      description: 'Research costs nothing.',
+    },
+    guaranteedLegendary: {
+      name: 'Guaranteed Legendary',
+      description: 'Every gacha pull is legendary.',
+    },
+    freePulls: {
+      name: 'Free Pulls',
+      description: 'Gacha pulls cost nothing.',
+    },
+    noCompetitors: {
+      name: 'No Competitors',
+      description: 'Disable competitor games in market.',
+    },
+    manipulateMarket: {
+      name: 'Manipulate Market',
+      description: 'Control market trends and demand.',
+    },
+    forceEvents: {
+      name: 'Force Events',
+      description: 'Trigger specific game events.',
+    },
+    revealAchievements: {
+      name: 'Reveal Achievements',
+      description: 'Show all hidden achievements.',
+    },
+    noNegativeEvents: {
+      name: 'No Negative Events',
+      description: 'Only positive events occur.',
+    },
+    revealHiddenAchievements: {
+      name: 'Reveal Achievements',
+      description: 'Show all hidden achievements.',
+    },
+    // Categories
+    categories: {
+      resources: 'Resources',
+      development: 'Development',
+      company: 'Company',
+      gacha: 'Gacha',
+      debug: 'Debug',
+    },
+  },
+
+  // Tutorial Steps
+  tutorialSteps: {
+    welcome: {
+      title: 'Welcome to Gacha Game Simulator!',
+      description: 'Ready to build your gacha game empire? This tutorial will guide you through the basics. You can skip at any time.',
+    },
+    companyFounded: {
+      title: 'Your Company Awaits',
+      description: "You've just founded your game development company! Let's start by checking your dashboard.",
+    },
+    firstEmployeeIntro: {
+      title: 'Building Your Team',
+      description: "Every great game needs talented people. Let's hire your first employee!",
+    },
+    firstEmployeeHire: {
+      title: 'Hire an Employee',
+      description: 'Click the "Gacha Pull" button to recruit new talent. Each pull may reveal common to legendary employees!',
+    },
+    firstProjectIntro: {
+      title: 'Starting a Game Project',
+      description: "Now that you have an employee, let's create your first game!",
+    },
+    firstProjectStart: {
+      title: 'Create New Game',
+      description: 'Click "New Game" to start development. Choose a genre and assign your team.',
+    },
+    developmentPhases: {
+      title: 'Development Phases',
+      description: 'Games go through phases: Planning → Development → Testing → Soft Launch → Live. Each phase needs different skills.',
+    },
+    launchGame: {
+      title: 'Launch Your Game',
+      description: 'When development is complete, your game will launch and start generating revenue!',
+    },
+    firstRevenue: {
+      title: 'Your First Revenue!',
+      description: 'Congratulations! Your game is making money. Revenue depends on game quality, marketing, and player satisfaction.',
+    },
+    hireMoreEmployees: {
+      title: 'Expand Your Team',
+      description: 'With revenue coming in, you can hire more employees. A diverse team with different skills makes better games!',
+    },
+    researchIntro: {
+      title: 'Research & Development',
+      description: 'Unlock new game genres, features, and office upgrades through research. Invest in R&D to stay competitive!',
+    },
+    marketAwareness: {
+      title: 'Know Your Market',
+      description: 'Keep an eye on market trends and competitor games. The most profitable genres change over time!',
+    },
+    firstEthicalDecision: {
+      title: 'Ethical Choices',
+      description: "You'll face decisions that affect your reputation. Fair gacha rates and honest marketing build loyal players!",
+    },
+    tutorialComplete: {
+      title: 'Tutorial Complete!',
+      description: 'You\'re ready to build your gacha empire! Remember: great games, happy players, and ethical practices lead to long-term success.',
+    },
+  },
+
+  // Research Effects
+  researchEffects: {
+    devSpeedBonus: 'Development Speed',
+    baseQualityBonus: 'Base Quality',
+    bugReductionBonus: 'Bug Reduction',
+    featureValueBonus: 'Feature Value',
+    conversionRateBonus: 'Conversion Rate',
+    arppuBonus: 'ARPPU',
+    retentionBonus: 'Player Retention',
+    ethicalMonetizationUnlock: 'Ethical Monetization',
+    predatoryMonetizationUnlock: 'Predatory Monetization',
+    playerAcquisitionBonus: 'Player Acquisition',
+    viralCoefficientBonus: 'Viral Coefficient',
+    brandAwarenessBonus: 'Brand Awareness',
+    adEfficiencyBonus: 'Ad Efficiency',
+    serverCostReduction: 'Server Cost Reduction',
+    scalingBonus: 'Scaling Efficiency',
+    uptimeBonus: 'Uptime',
+    maxPlayersBonus: 'Max Players',
+    moraleDecayReduction: 'Morale Decay Reduction',
+    skillGrowthBonus: 'Skill Growth',
+    salaryEfficiencyBonus: 'Salary Efficiency',
+    hiringSpeedBonus: 'Hiring Speed',
+    trainingEfficiencyBonus: 'Training Efficiency',
+    completed: 'Completed',
+    inProgress: 'In Progress',
+    startResearch: 'Start Research',
+    cannotResearch: 'Cannot Research',
+  },
+
+  // Prestige Effects
+  prestigeEffects: {
+    startingMoney: 'Starting Money',
+    startingReputation: 'Starting Reputation',
+    devSpeedBonus: 'Dev Speed',
+    gameQualityBonus: 'Game Quality',
+    revenueMultiplier: 'Revenue',
+    costReduction: 'Cost Reduction',
+    employeeSkillBonus: 'Employee Skill',
+    employeeMoraleBonus: 'Employee Morale',
+    hiringCostReduction: 'Hiring Cost',
+    gachaRateBonus: 'Gacha Rates',
+    pityReduction: 'Pity Reduction',
+    researchSpeedBonus: 'Research Speed',
+    researchCostReduction: 'Research Cost',
+    reputationGainBonus: 'Reputation Gain',
+    marketShareBonus: 'Market Share',
+    criticalSuccessChance: 'Crit Chance',
+  },
+
+  // Role filters
+  roleFilters: {
+    allRoles: 'All Roles',
+    programmer: 'Programmer',
+    artist: 'Artist',
+    designer: 'Designer',
+    marketer: 'Marketer',
+    producer: 'Producer',
+  },
+
+  // Sort options
+  sortOptions: {
+    name: 'Name',
+    level: 'Level',
+    salary: 'Salary',
+    morale: 'Morale',
+  },
+
+  // Common button labels
+  buttons: {
+    hideDetails: 'Hide Details',
+    showDetails: 'Show Details',
+    completed: 'Completed',
+  },
+
+  // Achievement accessibility
+  achievementLabels: {
+    removeFromFavorites: 'Remove from favorites',
+    addToFavorites: 'Add to favorites',
+    hiddenAchievement: 'Hidden achievement',
   },
 } as const;
 

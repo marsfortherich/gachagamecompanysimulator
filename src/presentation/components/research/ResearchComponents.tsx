@@ -6,7 +6,7 @@
 
 import { useState, useEffect, createContext, useContext, useReducer, type ReactNode } from 'react';
 import { Icon } from '../common/Icon';
-import { useI18n } from '../../../infrastructure/i18n';
+import { useI18n, type Translations } from '../../../infrastructure/i18n';
 import {
   ResearchNode,
   ResearchState,
@@ -357,7 +357,7 @@ function ResearchDetailModal({
           <ul className="space-y-1">
             {node.effects.map((effect, i) => (
               <li key={i} className="text-green-400 text-sm">
-                +{effect.value}{effect.isPercentage ? '%' : ''} {formatEffectType(effect.type)}
+                +{effect.value}{effect.isPercentage ? '%' : ''} {formatEffectType(effect.type, t)}
               </li>
             ))}
           </ul>
@@ -428,32 +428,10 @@ function ResearchDetailModal({
   );
 }
 
-function formatEffectType(type: string): string {
-  const labels: Record<string, string> = {
-    devSpeedBonus: 'Development Speed',
-    baseQualityBonus: 'Base Quality',
-    bugReductionBonus: 'Bug Reduction',
-    featureValueBonus: 'Feature Value',
-    conversionRateBonus: 'Conversion Rate',
-    arppuBonus: 'ARPPU',
-    retentionBonus: 'Player Retention',
-    ethicalMonetizationUnlock: 'Ethical Monetization',
-    predatoryMonetizationUnlock: 'Predatory Monetization',
-    playerAcquisitionBonus: 'Player Acquisition',
-    viralCoefficientBonus: 'Viral Coefficient',
-    brandAwarenessBonus: 'Brand Awareness',
-    adEfficiencyBonus: 'Ad Efficiency',
-    serverCostReduction: 'Server Cost Reduction',
-    scalingBonus: 'Scaling Efficiency',
-    uptimeBonus: 'Uptime',
-    maxPlayersBonus: 'Max Players',
-    moraleDecayReduction: 'Morale Decay Reduction',
-    skillGrowthBonus: 'Skill Growth',
-    salaryEfficiencyBonus: 'Salary Efficiency',
-    hiringSpeedBonus: 'Hiring Speed',
-    trainingEfficiencyBonus: 'Training Efficiency',
-  };
-  return labels[type] || type;
+function formatEffectType(type: string, t: Translations): string {
+  const researchEffects = t.researchEffects;
+  const key = type as keyof typeof researchEffects;
+  return typeof researchEffects[key] === 'string' ? researchEffects[key] : type;
 }
 
 // =============================================================================
@@ -467,6 +445,7 @@ interface ResearchWidgetProps {
 export function ResearchWidget({ onClick }: ResearchWidgetProps) {
   const { state: contextState } = useResearch();
   const { manager, state } = contextState;
+  const { t } = useI18n();
   const activeResearch = manager.getActiveResearch();
   const stats = manager.getOverallStats();
 
@@ -484,8 +463,8 @@ export function ResearchWidget({ onClick }: ResearchWidgetProps) {
       <div className="text-left">
         <div className="text-sm font-bold text-white">
           {activeResearch 
-            ? `${activeResearch.daysRemaining}d remaining`
-            : 'No Research'
+            ? `${activeResearch.daysRemaining}d ${t.founder.daysRemaining}`
+            : t.research.noResearch
           }
         </div>
         <div className="text-xs text-gray-400">
