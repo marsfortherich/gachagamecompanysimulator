@@ -23,6 +23,43 @@ export function OfficeUpgradesView() {
   const { company, officeUpgrades } = state;
   const [activeTab, setActiveTab] = useState<'upgrades' | 'office'>('upgrades');
 
+  // Helper functions for translated upgrade names and descriptions
+  const getUpgradeName = (type: OfficeUpgradeType): string => {
+    const upgrades = t.office.upgrades;
+    switch (type) {
+      case 'workstations': return upgrades.workstations;
+      case 'meeting_room': return upgrades.meetingRoom;
+      case 'server_room': return upgrades.serverRoom;
+      case 'break_room': return upgrades.breakRoom;
+      case 'training_center': return upgrades.trainingCenter;
+      case 'recording_studio': return upgrades.recordingStudio;
+      case 'art_studio': return upgrades.artStudio;
+      case 'motion_capture': return upgrades.motionCapture;
+      case 'cafeteria': return upgrades.cafeteria;
+      case 'gym': return upgrades.gym;
+      case 'rooftop_garden': return upgrades.rooftopGarden;
+      default: return type;
+    }
+  };
+
+  const getUpgradeDesc = (type: OfficeUpgradeType): string => {
+    const upgrades = t.office.upgrades;
+    switch (type) {
+      case 'workstations': return upgrades.workstationsDesc;
+      case 'meeting_room': return upgrades.meetingRoomDesc;
+      case 'server_room': return upgrades.serverRoomDesc;
+      case 'break_room': return upgrades.breakRoomDesc;
+      case 'training_center': return upgrades.trainingCenterDesc;
+      case 'recording_studio': return upgrades.recordingStudioDesc;
+      case 'art_studio': return upgrades.artStudioDesc;
+      case 'motion_capture': return upgrades.motionCaptureDesc;
+      case 'cafeteria': return upgrades.cafeteriaDesc;
+      case 'gym': return upgrades.gymDesc;
+      case 'rooftop_garden': return upgrades.rooftopGardenDesc;
+      default: return '';
+    }
+  };
+
   if (!company) {
     return (
       <div className="p-6">
@@ -172,8 +209,8 @@ export function OfficeUpgradesView() {
                       className="text-gacha-gold"
                     />
                     <div className="flex-1">
-                      <h4 className="font-semibold text-white">{upgrade.name}</h4>
-                      <p className="text-xs text-gray-400 mt-1">{upgrade.description}</p>
+                      <h4 className="font-semibold text-white">{getUpgradeName(upgrade.type)}</h4>
+                      <p className="text-xs text-gray-400 mt-1">{getUpgradeDesc(upgrade.type)}</p>
                       
                       {/* Effects */}
                       <div className="flex flex-wrap gap-1 mt-2">
@@ -249,12 +286,12 @@ export function OfficeUpgradesView() {
                   />
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <h4 className="font-semibold text-white">{upgrade.name}</h4>
+                      <h4 className="font-semibold text-white">{getUpgradeName(upgrade.type)}</h4>
                       <span className="text-xs px-1.5 py-0.5 bg-green-900/50 rounded text-green-300">
                         {t.office.active}
                       </span>
                     </div>
-                    <p className="text-xs text-gray-400 mt-1">{upgrade.description}</p>
+                    <p className="text-xs text-gray-400 mt-1">{getUpgradeDesc(upgrade.type)}</p>
                     
                     {/* Active Effects */}
                     <div className="flex flex-wrap gap-1 mt-2">
