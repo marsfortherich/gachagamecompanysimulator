@@ -3,8 +3,9 @@ import { Employee } from '../employee';
 
 /**
  * Office levels with associated costs and employee capacity
+ * Level 0 = Parents' Basement (starting point, no employees allowed)
  */
-export type OfficeLevel = 1 | 2 | 3 | 4 | 5;
+export type OfficeLevel = 0 | 1 | 2 | 3 | 4 | 5;
 
 export interface OfficeTier {
   readonly level: OfficeLevel;
@@ -15,7 +16,8 @@ export interface OfficeTier {
 }
 
 export const OFFICE_TIERS: Record<OfficeLevel, OfficeTier> = {
-  1: { level: 1, name: 'Garage Startup', maxEmployees: 5, monthlyCost: 1000, upgradeCost: 0 },
+  0: { level: 0, name: "Parents' Basement", maxEmployees: 0, monthlyCost: 0, upgradeCost: 0 },
+  1: { level: 1, name: 'Garage Startup', maxEmployees: 5, monthlyCost: 1000, upgradeCost: 5000 },
   2: { level: 2, name: 'Small Office', maxEmployees: 15, monthlyCost: 5000, upgradeCost: 50000 },
   3: { level: 3, name: 'Medium Office', maxEmployees: 30, monthlyCost: 15000, upgradeCost: 200000 },
   4: { level: 4, name: 'Large Studio', maxEmployees: 60, monthlyCost: 40000, upgradeCost: 500000 },
@@ -61,7 +63,7 @@ export interface CreateCompanyParams {
  * Creates a new company entity
  */
 export function createCompany(params: CreateCompanyParams): Company {
-  const officeLevel: OfficeLevel = 1;
+  const officeLevel: OfficeLevel = 0; // Start in parents' basement
   return {
     id: generateId(),
     name: params.name,

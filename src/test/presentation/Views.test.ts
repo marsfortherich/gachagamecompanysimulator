@@ -231,15 +231,15 @@ describe('FinanceView Logic', () => {
       });
       
       const officeCost = OFFICE_TIERS[company.officeLevel].monthlyCost;
-      expect(officeCost).toBe(1000); // Level 1 office
+      expect(officeCost).toBe(0); // Level 0 basement has no rent
     });
 
     it('should calculate total monthly expenses', () => {
       const salaries = 15000;
-      const officeCost = 1000;
+      const officeCost = 0; // Basement has no rent
       const totalExpenses = salaries + officeCost;
       
-      expect(totalExpenses).toBe(16000);
+      expect(totalExpenses).toBe(15000);
     });
   });
 

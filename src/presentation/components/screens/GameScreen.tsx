@@ -6,7 +6,8 @@ import { Button } from '../common';
 import { 
   DashboardView, 
   GamesView, 
-  EmployeesView, 
+  EmployeesView,
+  FounderView,
   GachaManagementView,
   MarketingView,
   FinanceView,
@@ -72,6 +73,8 @@ export function GameScreen() {
     switch (activeTab) {
       case 'dashboard':
         return <DashboardView />;
+      case 'founder':
+        return <FounderView />;
       case 'games':
         return <GamesView />;
       case 'employees':

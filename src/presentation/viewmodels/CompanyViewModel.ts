@@ -65,6 +65,7 @@ export interface CompanyViewModel {
 // =============================================================================
 
 const OFFICE_LABELS: Record<OfficeLevel, string> = {
+  0: "Parents' Basement",
   1: 'Garage Startup',
   2: 'Small Office',
   3: 'Medium Office',
@@ -73,6 +74,7 @@ const OFFICE_LABELS: Record<OfficeLevel, string> = {
 };
 
 const OFFICE_CAPACITY: Record<OfficeLevel, number> = {
+  0: 0,
   1: 5,
   2: 15,
   3: 50,
@@ -81,6 +83,7 @@ const OFFICE_CAPACITY: Record<OfficeLevel, number> = {
 };
 
 const OFFICE_UPGRADE_COST: Record<OfficeLevel, number | null> = {
+  0: 5000,
   1: 50000,
   2: 200000,
   3: 1000000,

@@ -8,6 +8,7 @@ interface SidebarProps {
 
 const tabs: { id: string; label: string; icon: IconName }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: 'dashboard' },
+  { id: 'founder', label: 'Founder', icon: 'star' },
   { id: 'games', label: 'Games', icon: 'games' },
   { id: 'employees', label: 'Staff', icon: 'staff' },
   { id: 'gacha', label: 'Gacha', icon: 'gacha' },
