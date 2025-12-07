@@ -216,10 +216,10 @@ export function FeatureRoadmapView() {
               {selectedFeatureType && (
                 <div className="bg-gray-800 rounded-lg p-3 border border-gray-700">
                   <h4 className="text-sm font-semibold text-white mb-2">
-                    {FEATURE_TYPE_CONFIGS[selectedFeatureType].name}
+                    {getFeatureTypeName(selectedFeatureType)}
                   </h4>
                   <p className="text-xs text-gray-400 mb-2">
-                    {FEATURE_TYPE_CONFIGS[selectedFeatureType].description}
+                    {getFeatureTypeDesc(selectedFeatureType)}
                   </p>
                   <div className="grid grid-cols-2 gap-2 text-xs">
                     <div>
