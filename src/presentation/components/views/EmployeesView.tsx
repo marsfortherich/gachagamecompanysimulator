@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useGame } from '../../context';
 import { GameActions } from '../../../application/actions';
 import { Card, Button, ProgressBar, Icon } from '../common';
+import { useI18n } from '../../../infrastructure/i18n';
 import { 
   getPrimarySkill, 
   SkillType, 
@@ -97,6 +98,7 @@ export function EmployeesView() {
   const currentOffice = company ? OFFICE_TIERS[company.officeLevel] : OFFICE_TIERS[0];
   const canHireEmployees = currentOffice.maxEmployees > 0;
   const isAtMaxEmployees = employees.length >= currentOffice.maxEmployees;
+  const { t } = useI18n();
 
   return (
     <div className="p-4 md:p-6 space-y-6">
@@ -106,9 +108,9 @@ export function EmployeesView() {
           <div className="flex items-center gap-3">
             <Icon name="warning" size="lg" className="text-yellow-400" />
             <div>
-              <p className="text-yellow-200 font-semibold">Working from Parents' Basement</p>
+              <p className="text-yellow-200 font-semibold">{t.employees.basementWarning}</p>
               <p className="text-yellow-400 text-sm">
-                You're working solo from your parents' basement. Upgrade to a Garage Startup to hire your first employees!
+                {t.employees.basementWarningDesc}
               </p>
             </div>
           </div>
@@ -117,16 +119,16 @@ export function EmployeesView() {
 
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-white">Staff</h2>
+          <h2 className="text-2xl font-bold text-white">{t.employees.title}</h2>
           <p className="text-gray-400">
-            {employees.length}{canHireEmployees ? ` / ${currentOffice.maxEmployees}` : ''} employees · ${totalSalaries.toLocaleString()}/month
+            {employees.length}{canHireEmployees ? ` / ${currentOffice.maxEmployees}` : ''} {t.employees.title.toLowerCase()} · ${totalSalaries.toLocaleString()}{t.common.perMonth}
           </p>
         </div>
         <div className="flex gap-2 items-center">
           {employees.length > 0 && (
             <>
               <Button variant="secondary" size="sm" onClick={expandAllEmployees}>
-                <Icon name="chevronDown" size="xs" className="mr-1" /> Expand All
+                <Icon name="chevronDown" size="xs" className="mr-1" /> {t.employees.expandAll}
               </Button>
               <Button variant="secondary" size="sm" onClick={collapseAllEmployees}>
                 <Icon name="chevronUp" size="xs" className="mr-1" /> Collapse All

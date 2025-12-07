@@ -9,3 +9,4 @@ export * from './performance';
 export * from './config';
 export * from './debug';
 export * from './mods';
+export * from './i18n';

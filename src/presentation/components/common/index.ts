@@ -6,3 +6,4 @@ export { MetricCard, MetricGrid, FinancialMetricCard, ProgressMetricCard } from 
 export type { MetricCardProps, MetricTrend, MetricVariant, MetricGridProps, FinancialMetricCardProps, ProgressMetricCardProps } from './MetricCard';
 export { Icon } from './Icon';
 export type { IconName } from './Icon';
+export { LanguageSelector } from './LanguageSelector';

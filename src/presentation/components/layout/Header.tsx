@@ -1,7 +1,7 @@
 import { useGame } from '../../context';
 import { GameActions } from '../../../application/actions';
 import { GameSpeed } from '../../../application/state';
-import { Icon } from '../common/Icon';
+import { Icon, LanguageSelector } from '../common';
 
 export function Header() {
   const { state, dispatch, saveGame } = useGame();
@@ -112,6 +112,9 @@ export function Header() {
           >
             <Icon name="save" size="sm" className="text-green-400" /> Save
           </button>
+
+          {/* Language Selector */}
+          <LanguageSelector />
         </div>
       </div>
 

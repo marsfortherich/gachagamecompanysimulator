@@ -1,27 +1,31 @@
 import { useState } from 'react';
 import { Icon, IconName } from '../common';
+import { useI18n } from '../../../infrastructure/i18n';
 
 interface SidebarProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
 }
 
-const tabs: { id: string; label: string; icon: IconName }[] = [
-  { id: 'dashboard', label: 'Dashboard', icon: 'dashboard' },
-  { id: 'founder', label: 'Founder', icon: 'star' },
-  { id: 'games', label: 'Games', icon: 'games' },
-  { id: 'employees', label: 'Staff', icon: 'staff' },
-  { id: 'gacha', label: 'Gacha', icon: 'gacha' },
-  { id: 'marketing', label: 'Marketing', icon: 'marketing' },
-  { id: 'finance', label: 'Finance', icon: 'finance' },
-  { id: 'office', label: 'Office', icon: 'settings' },
-  { id: 'roadmap', label: 'Roadmap', icon: 'calendar' },
-  { id: 'monetization', label: 'Monetize', icon: 'money' },
-  { id: 'crowdfunding', label: 'Funding', icon: 'rocket' },
+type NavTab = { id: string; labelKey: keyof typeof import('../../../infrastructure/i18n').en.nav; icon: IconName };
+
+const tabsConfig: NavTab[] = [
+  { id: 'dashboard', labelKey: 'dashboard', icon: 'dashboard' },
+  { id: 'founder', labelKey: 'founder', icon: 'star' },
+  { id: 'games', labelKey: 'games', icon: 'games' },
+  { id: 'employees', labelKey: 'employees', icon: 'staff' },
+  { id: 'gacha', labelKey: 'gacha', icon: 'gacha' },
+  { id: 'marketing', labelKey: 'marketing', icon: 'marketing' },
+  { id: 'finance', labelKey: 'finance', icon: 'finance' },
+  { id: 'office', labelKey: 'office', icon: 'settings' },
+  { id: 'roadmap', labelKey: 'roadmap', icon: 'calendar' },
+  { id: 'monetization', labelKey: 'monetization', icon: 'money' },
+  { id: 'crowdfunding', labelKey: 'crowdfunding', icon: 'rocket' },
 ];
 
 export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const { t } = useI18n();
 
   return (
     <>
@@ -40,7 +44,7 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
           </button>
         </div>
         <nav className="flex-1 p-2">
-          {tabs.map((tab) => (
+          {tabsConfig.map((tab) => (
             <button
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
@@ -52,7 +56,7 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
             >
               <Icon name={tab.icon} size="lg" />
               {!isCollapsed && (
-                <span className="font-medium">{tab.label}</span>
+                <span className="font-medium">{t.nav[tab.labelKey]}</span>
               )}
             </button>
           ))}
@@ -62,7 +66,7 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
       {/* Mobile Bottom Navigation */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-gray-800 border-t border-gray-700 z-50">
         <div className="flex justify-around">
-          {tabs.slice(0, 5).map((tab) => (
+          {tabsConfig.slice(0, 5).map((tab) => (
             <button
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
@@ -73,7 +77,7 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
               }`}
             >
               <Icon name={tab.icon} size="lg" />
-              <span className="text-xs mt-1">{tab.label}</span>
+              <span className="text-xs mt-1">{t.nav[tab.labelKey]}</span>
             </button>
           ))}
         </div>

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useGame } from '../../context';
 import { GameActions } from '../../../application/actions';
 import { Card, Button, ProgressBar, Icon } from '../common';
+import { useI18n } from '../../../infrastructure/i18n';
 import { 
   SkillType,
   SPECIALIZATION_CONFIGS,
@@ -27,6 +28,7 @@ const SKILL_ORDER: SkillType[] = ['programming', 'art', 'game_design', 'marketin
 export function FounderView() {
   const { state, dispatch } = useGame();
   const { founder, games } = state;
+  const { t } = useI18n();
   const [selectedSkill, setSelectedSkill] = useState<SkillType>('programming');
   const [showTrainingModal, setShowTrainingModal] = useState(false);
 
@@ -34,7 +36,7 @@ export function FounderView() {
     return (
       <div className="p-6">
         <Card>
-          <p className="text-gray-400">No founder data available.</p>
+          <p className="text-gray-400">{t.common.loading}</p>
         </Card>
       </div>
     );
@@ -53,12 +55,12 @@ export function FounderView() {
   };
 
   const getSkillLevel = (value: number): string => {
-    if (value >= 80) return 'Master';
-    if (value >= 60) return 'Expert';
-    if (value >= 40) return 'Proficient';
-    if (value >= 25) return 'Competent';
-    if (value >= 10) return 'Novice';
-    return 'Beginner';
+    if (value >= 80) return t.founder.skillLevels.master;
+    if (value >= 60) return t.founder.skillLevels.expert;
+    if (value >= 40) return t.founder.skillLevels.proficient;
+    if (value >= 25) return t.founder.skillLevels.competent;
+    if (value >= 10) return t.founder.skillLevels.novice;
+    return t.founder.skillLevels.beginner;
   };
 
   const getSkillColor = (value: number): string => {
@@ -87,14 +89,14 @@ export function FounderView() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Current Activity */}
         <Card>
-          <h3 className="text-sm text-gray-400 mb-2">Current Activity</h3>
+          <h3 className="text-sm text-gray-400 mb-2">{t.founder.currentActivity}</h3>
           {assignedGame ? (
             <div className="flex items-center gap-2">
               <Icon name="games" size="md" className="text-blue-400" />
               <div>
-                <p className="text-white font-semibold">Working on: {assignedGame.name}</p>
+                <p className="text-white font-semibold">{t.founder.workingOn}: {assignedGame.name}</p>
                 <p className="text-sm text-gray-400">
-                  {assignedGame.status === 'live' ? 'Maintaining live game' : `Development: ${Math.round(assignedGame.developmentProgress)}%`}
+                  {assignedGame.status === 'live' ? t.founder.maintainingLiveGame : `${t.founder.development}: ${Math.round(assignedGame.developmentProgress)}%`}
                 </p>
               </div>
             </div>
@@ -104,7 +106,7 @@ export function FounderView() {
               <div>
                 <p className="text-white font-semibold">{FOUNDER_TRAINING_CONFIGS[founder.currentTraining!].name}</p>
                 <p className="text-sm text-gray-400">
-                  Training: {SKILL_DISPLAY[founder.trainingTargetSkill!].name}
+                  {t.founder.training}: {SKILL_DISPLAY[founder.trainingTargetSkill!].name}
                 </p>
               </div>
             </div>
@@ -112,8 +114,8 @@ export function FounderView() {
             <div className="flex items-center gap-2">
               <Icon name="coffee" size="md" className="text-gray-400" />
               <div>
-                <p className="text-white font-semibold">Idle</p>
-                <p className="text-sm text-gray-400">Assign to a project or start training</p>
+                <p className="text-white font-semibold">{t.founder.idle}</p>
+                <p className="text-sm text-gray-400">{t.founder.assignToProjectOrTrain}</p>
               </div>
             </div>
           )}
@@ -121,26 +123,26 @@ export function FounderView() {
 
         {/* Experience */}
         <Card>
-          <h3 className="text-sm text-gray-400 mb-2">Experience</h3>
+          <h3 className="text-sm text-gray-400 mb-2">{t.founder.experience}</h3>
           <div className="space-y-1">
             <p className="text-white">
               <span className="text-2xl font-bold">{founder.totalDaysWorked}</span>
-              <span className="text-gray-400 ml-1">days worked</span>
+              <span className="text-gray-400 ml-1">{t.founder.daysWorked}</span>
             </p>
             <p className="text-gray-400 text-sm">
-              {founder.gamesCompleted} game{founder.gamesCompleted !== 1 ? 's' : ''} completed
+              {founder.gamesCompleted} {t.founder.gamesCompleted}
             </p>
           </div>
         </Card>
 
         {/* Energy */}
         <Card>
-          <h3 className="text-sm text-gray-400 mb-2">Energy</h3>
+          <h3 className="text-sm text-gray-400 mb-2">{t.founder.energy}</h3>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-2xl font-bold text-white">{Math.round(founder.energy)}%</span>
               <span className={`text-sm ${founder.energy >= 70 ? 'text-green-400' : founder.energy >= 40 ? 'text-yellow-400' : 'text-red-400'}`}>
-                {founder.energy >= 70 ? 'Energetic' : founder.energy >= 40 ? 'Normal' : 'Tired'}
+                {founder.energy >= 70 ? t.founder.energetic : founder.energy >= 40 ? t.founder.normal : t.founder.tired}
               </span>
             </div>
             <ProgressBar 
@@ -155,7 +157,7 @@ export function FounderView() {
       {/* Skills Section */}
       <Card>
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-white">Skills</h3>
+          <h3 className="text-lg font-semibold text-white">{t.founder.skills}</h3>
           <Button 
             variant="secondary" 
             size="sm" 
@@ -163,7 +165,7 @@ export function FounderView() {
             disabled={isTraining}
           >
             <Icon name="book" size="sm" className="mr-1" />
-            {isTraining ? 'Training in Progress...' : 'Start Training'}
+            {isTraining ? t.founder.trainingInProgress : t.founder.startTraining}
           </Button>
         </div>
         
@@ -181,10 +183,10 @@ export function FounderView() {
                     <span className="text-lg">{display.icon}</span>
                     <span className="text-white font-medium">{display.name}</span>
                     {isPrimary && (
-                      <span className="text-xs px-1.5 py-0.5 bg-yellow-700/50 text-yellow-300 rounded">Primary</span>
+                      <span className="text-xs px-1.5 py-0.5 bg-yellow-700/50 text-yellow-300 rounded">{t.founder.primary}</span>
                     )}
                     {isSecondary && (
-                      <span className="text-xs px-1.5 py-0.5 bg-blue-700/50 text-blue-300 rounded">Secondary</span>
+                      <span className="text-xs px-1.5 py-0.5 bg-blue-700/50 text-blue-300 rounded">{t.founder.secondary}</span>
                     )}
                   </div>
                   <span className={`font-bold ${getSkillColor(skill)}`}>
@@ -210,7 +212,7 @@ export function FounderView() {
                 {FOUNDER_TRAINING_CONFIGS[founder.currentTraining!].name}
               </h3>
               <p className="text-gray-400">
-                Training: {SKILL_DISPLAY[founder.trainingTargetSkill!].name}
+                {t.founder.training}: {SKILL_DISPLAY[founder.trainingTargetSkill!].name}
               </p>
               <p className="text-sm text-gray-500 mt-1">
                 {FOUNDER_TRAINING_CONFIGS[founder.currentTraining!].description}
@@ -218,10 +220,10 @@ export function FounderView() {
             </div>
             <div className="text-right">
               <p className="text-green-400 font-semibold">
-                {Math.max(0, founder.trainingEndTick - state.currentTick)} days remaining
+                {Math.max(0, founder.trainingEndTick - state.currentTick)} {t.founder.daysRemaining}
               </p>
               <p className="text-sm text-gray-400">
-                +{FOUNDER_TRAINING_CONFIGS[founder.currentTraining!].skillGainPerDay * founder.learningMultiplier}/day
+                +{FOUNDER_TRAINING_CONFIGS[founder.currentTraining!].skillGainPerDay * founder.learningMultiplier}{t.common.perDay}
               </p>
             </div>
           </div>
@@ -230,27 +232,27 @@ export function FounderView() {
 
       {/* Specialization Info */}
       <Card>
-        <h3 className="text-lg font-semibold text-white mb-3">Specialization: {specConfig.name}</h3>
+        <h3 className="text-lg font-semibold text-white mb-3">{t.founder.specialization}: {specConfig.name}</h3>
         <p className="text-gray-400 mb-4">{specConfig.description}</p>
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div className="p-3 bg-gray-700/30 rounded-lg">
-            <p className="text-gray-400">Primary Skill</p>
+            <p className="text-gray-400">{t.founder.primary} {t.founder.skills.toLowerCase()}</p>
             <p className="text-yellow-400 font-semibold flex items-center gap-1">
               {SKILL_DISPLAY[specConfig.primarySkill].icon} {SKILL_DISPLAY[specConfig.primarySkill].name}
             </p>
           </div>
           <div className="p-3 bg-gray-700/30 rounded-lg">
-            <p className="text-gray-400">Secondary Skill</p>
+            <p className="text-gray-400">{t.founder.secondary} {t.founder.skills.toLowerCase()}</p>
             <p className="text-blue-400 font-semibold flex items-center gap-1">
               {SKILL_DISPLAY[specConfig.secondarySkill].icon} {SKILL_DISPLAY[specConfig.secondarySkill].name}
             </p>
           </div>
           <div className="p-3 bg-gray-700/30 rounded-lg">
-            <p className="text-gray-400">Learning Speed</p>
+            <p className="text-gray-400">{t.founder.learningSpeed}</p>
             <p className="text-white font-semibold">{founder.learningMultiplier}x</p>
           </div>
           <div className="p-3 bg-gray-700/30 rounded-lg">
-            <p className="text-gray-400">Role Equivalent</p>
+            <p className="text-gray-400">{t.founder.roleEquivalent}</p>
             <p className="text-white font-semibold">{specConfig.equivalentRole}</p>
           </div>
         </div>
@@ -262,7 +264,7 @@ export function FounderView() {
           <div className="bg-gray-800 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-bold text-white">Start Training</h3>
+                <h3 className="text-xl font-bold text-white">{t.founder.startTraining}</h3>
                 <button 
                   onClick={() => setShowTrainingModal(false)}
                   className="text-gray-400 hover:text-white text-2xl"
@@ -273,7 +275,7 @@ export function FounderView() {
 
               {/* Skill Selection */}
               <div className="mb-6">
-                <h4 className="text-sm text-gray-400 mb-3">Select Skill to Train</h4>
+                <h4 className="text-sm text-gray-400 mb-3">{t.founder.selectSkillToTrain}</h4>
                 <div className="grid grid-cols-4 gap-2">
                   {SKILL_ORDER.filter(s => s !== 'management').map((skillType) => {
                     const display = SKILL_DISPLAY[skillType];
@@ -298,7 +300,7 @@ export function FounderView() {
 
               {/* Training Options */}
               <div className="space-y-3">
-                <h4 className="text-sm text-gray-400 mb-3">Select Training Type</h4>
+                <h4 className="text-sm text-gray-400 mb-3">{t.founder.selectTrainingType}</h4>
                 {Object.values(FOUNDER_TRAINING_CONFIGS)
                   .filter(config => !config.requiresActiveProject || assignedGame)
                   .map((config) => {
@@ -327,17 +329,17 @@ export function FounderView() {
                                 ${totalCost.toLocaleString()}
                               </p>
                             ) : (
-                              <p className="text-green-400 font-semibold">Free</p>
+                              <p className="text-green-400 font-semibold">{t.common.free}</p>
                             )}
                             {config.durationDays > 0 && (
-                              <p className="text-xs text-gray-400">{config.durationDays} days</p>
+                              <p className="text-xs text-gray-400">{config.durationDays} {t.common.days}</p>
                             )}
                           </div>
                         </div>
                         <div className="mt-2 flex items-center gap-4 text-sm text-gray-400">
-                          <span>+{(config.skillGainPerDay * founder.learningMultiplier).toFixed(2)}/day</span>
+                          <span>+{(config.skillGainPerDay * founder.learningMultiplier).toFixed(2)}{t.common.perDay}</span>
                           {config.durationDays > 0 && (
-                            <span>Total: +{(config.skillGainPerDay * config.durationDays * founder.learningMultiplier).toFixed(1)} {SKILL_DISPLAY[selectedSkill].name}</span>
+                            <span>{t.common.total}: +{(config.skillGainPerDay * config.durationDays * founder.learningMultiplier).toFixed(1)} {SKILL_DISPLAY[selectedSkill].name}</span>
                           )}
                         </div>
                       </button>
@@ -347,7 +349,7 @@ export function FounderView() {
 
               <div className="mt-6 flex justify-end">
                 <Button variant="secondary" onClick={() => setShowTrainingModal(false)}>
-                  Cancel
+                  {t.common.cancel}
                 </Button>
               </div>
             </div>

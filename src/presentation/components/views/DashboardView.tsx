@@ -1,8 +1,10 @@
 import { useGame } from '../../context';
 import { Card, ProgressBar } from '../common';
+import { useI18n } from '../../../infrastructure/i18n';
 
 export function DashboardView() {
   const { state } = useGame();
+  const { t } = useI18n();
   const { company, employees, games } = state;
 
   if (!company) return null;
@@ -22,24 +24,24 @@ export function DashboardView() {
 
   return (
     <div className="p-4 md:p-6 space-y-6">
-      <h2 className="text-2xl font-bold text-white">Dashboard</h2>
+      <h2 className="text-2xl font-bold text-white">{t.dashboard.title}</h2>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="text-center">
-          <p className="text-gray-400 text-sm">Employees</p>
+          <p className="text-gray-400 text-sm">{t.dashboard.employees}</p>
           <p className="text-3xl font-bold text-white">{employees.length}</p>
         </Card>
         <Card className="text-center">
-          <p className="text-gray-400 text-sm">Active Games</p>
+          <p className="text-gray-400 text-sm">{t.dashboard.activeGames}</p>
           <p className="text-3xl font-bold text-gacha-green">{activeGames}</p>
         </Card>
         <Card className="text-center">
-          <p className="text-gray-400 text-sm">In Development</p>
+          <p className="text-gray-400 text-sm">{t.dashboard.inDevelopment}</p>
           <p className="text-3xl font-bold text-gacha-blue">{gamesInDev}</p>
         </Card>
         <Card className="text-center">
-          <p className="text-gray-400 text-sm">Total DAU</p>
+          <p className="text-gray-400 text-sm">{t.dashboard.totalDAU}</p>
           <p className="text-3xl font-bold text-gacha-purple">
             {totalDAU.toLocaleString()}
           </p>
@@ -47,10 +49,10 @@ export function DashboardView() {
       </div>
 
       {/* Games in Development */}
-      <Card title="Games in Development">
+      <Card title={t.dashboard.gamesInDevelopment}>
         {gamesInDev === 0 ? (
           <p className="text-gray-400 text-center py-4">
-            No games in development. Start a new project!
+            {t.dashboard.noGamesInDev}
           </p>
         ) : (
           <div className="space-y-4">
@@ -68,10 +70,10 @@ export function DashboardView() {
                     value={game.developmentProgress}
                     color="purple"
                     showLabel
-                    label="Progress"
+                    label={t.dashboard.progress}
                   />
                   <p className="text-sm text-gray-400 mt-2">
-                    {game.assignedEmployees.length} employees assigned
+                    {game.assignedEmployees.length} {t.dashboard.employeesAssigned}
                   </p>
                 </div>
               ))}
@@ -80,10 +82,10 @@ export function DashboardView() {
       </Card>
 
       {/* Live Games Performance */}
-      <Card title="Live Games">
+      <Card title={t.dashboard.liveGames}>
         {activeGames === 0 ? (
           <p className="text-gray-400 text-center py-4">
-            No live games yet. Develop and launch your first game!
+            {t.dashboard.noLiveGames}
           </p>
         ) : (
           <div className="space-y-4">
@@ -94,18 +96,18 @@ export function DashboardView() {
                   <div className="flex justify-between items-center mb-2">
                     <h4 className="font-semibold text-white">{game.name}</h4>
                     <span className="text-gacha-gold font-semibold">
-                      ${game.monetization.monthlyRevenue.toLocaleString()}/mo
+                      ${game.monetization.monthlyRevenue.toLocaleString()}{t.common.perMonth}
                     </span>
                   </div>
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
-                      <p className="text-gray-400">DAU</p>
+                      <p className="text-gray-400">{t.dashboard.dau}</p>
                       <p className="text-white">
                         {game.monetization.dailyActiveUsers.toLocaleString()}
                       </p>
                     </div>
                     <div>
-                      <p className="text-gray-400">Satisfaction</p>
+                      <p className="text-gray-400">{t.dashboard.satisfaction}</p>
                       <p className="text-white">
                         {game.monetization.playerSatisfaction}%
                       </p>
@@ -118,11 +120,11 @@ export function DashboardView() {
       </Card>
 
       {/* Company Stats */}
-      <Card title="Company Performance">
+      <Card title={t.dashboard.companyPerformance}>
         <div className="space-y-4">
           <div>
             <div className="flex justify-between text-sm mb-1">
-              <span className="text-gray-400">Reputation</span>
+              <span className="text-gray-400">{t.dashboard.reputation}</span>
               <span className="text-white">{company.reputation}/100</span>
             </div>
             <ProgressBar
@@ -132,13 +134,13 @@ export function DashboardView() {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <p className="text-sm text-gray-400">Monthly Revenue</p>
+              <p className="text-sm text-gray-400">{t.dashboard.monthlyRevenue}</p>
               <p className="text-xl font-semibold text-gacha-gold">
                 ${totalMonthlyRevenue.toLocaleString()}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-400">Monthly Expenses</p>
+              <p className="text-sm text-gray-400">{t.dashboard.monthlyExpenses}</p>
               <p className="text-xl font-semibold text-gacha-red">
                 ${employees.reduce((sum, e) => sum + e.salary, 0).toLocaleString()}
               </p>

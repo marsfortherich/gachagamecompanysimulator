@@ -1,0 +1,351 @@
+/**
+ * German translations
+ */
+export const de = {
+  // Common
+  common: {
+    save: 'Speichern',
+    cancel: 'Abbrechen',
+    confirm: 'Bestätigen',
+    close: 'Schließen',
+    back: 'Zurück',
+    next: 'Weiter',
+    loading: 'Lädt...',
+    error: 'Fehler',
+    success: 'Erfolg',
+    warning: 'Warnung',
+    yes: 'Ja',
+    no: 'Nein',
+    ok: 'OK',
+    delete: 'Löschen',
+    edit: 'Bearbeiten',
+    add: 'Hinzufügen',
+    remove: 'Entfernen',
+    search: 'Suchen',
+    filter: 'Filtern',
+    sort: 'Sortieren',
+    reset: 'Zurücksetzen',
+    apply: 'Anwenden',
+    day: 'Tag',
+    days: 'Tage',
+    month: 'Monat',
+    year: 'Jahr',
+    free: 'Kostenlos',
+    total: 'Gesamt',
+    perMonth: '/Monat',
+    perDay: '/Tag',
+  },
+
+  // Navigation
+  nav: {
+    dashboard: 'Übersicht',
+    founder: 'Gründer',
+    games: 'Spiele',
+    employees: 'Mitarbeiter',
+    gacha: 'Gacha',
+    marketing: 'Marketing',
+    finance: 'Finanzen',
+    office: 'Büro',
+    roadmap: 'Roadmap',
+    monetization: 'Monetarisierung',
+    crowdfunding: 'Finanzierung',
+    settings: 'Einstellungen',
+  },
+
+  // Dashboard
+  dashboard: {
+    title: 'Übersicht',
+    employees: 'Mitarbeiter',
+    activeGames: 'Aktive Spiele',
+    inDevelopment: 'In Entwicklung',
+    totalDAU: 'Gesamt TAB',
+    gamesInDevelopment: 'Spiele in Entwicklung',
+    noGamesInDev: 'Keine Spiele in Entwicklung. Starte ein neues Projekt!',
+    liveGames: 'Live-Spiele',
+    noLiveGames: 'Noch keine Live-Spiele. Entwickle und veröffentliche dein erstes Spiel!',
+    employeesAssigned: 'Mitarbeiter zugewiesen',
+    dau: 'TAB',
+    satisfaction: 'Zufriedenheit',
+    progress: 'Fortschritt',
+    companyPerformance: 'Unternehmensleistung',
+    reputation: 'Reputation',
+    monthlyRevenue: 'Monatliche Einnahmen',
+    monthlyExpenses: 'Monatliche Ausgaben',
+  },
+
+  // Start Screen
+  startScreen: {
+    title: 'Gacha Game Company Simulator',
+    subtitle: 'Baue dein Mobile-Gaming-Imperium auf',
+    companyName: 'Firmenname',
+    companyNamePlaceholder: 'Firmennamen eingeben...',
+    founderName: 'Gründername',
+    founderNamePlaceholder: 'Deinen Namen eingeben...',
+    specialization: 'Spezialisierung',
+    experience: 'Erfahrungsstufe',
+    headquarters: 'Hauptsitz',
+    startingFunds: 'Startkapital',
+    startGame: 'Firma gründen',
+    loadGame: 'Spiel laden',
+    selectLocation: 'Wähle deinen Firmenstandort',
+  },
+
+  // Founder
+  founder: {
+    title: 'Gründer',
+    currentActivity: 'Aktuelle Tätigkeit',
+    workingOn: 'Arbeitet an',
+    maintainingLiveGame: 'Betreut Live-Spiel',
+    development: 'Entwicklung',
+    training: 'Training',
+    idle: 'Untätig',
+    assignToProjectOrTrain: 'Einem Projekt zuweisen oder Training starten',
+    experience: 'Erfahrung',
+    daysWorked: 'Tage gearbeitet',
+    gamesCompleted: 'Spiele abgeschlossen',
+    energy: 'Energie',
+    energetic: 'Energiegeladen',
+    normal: 'Normal',
+    tired: 'Müde',
+    skills: 'Fähigkeiten',
+    startTraining: 'Training starten',
+    trainingInProgress: 'Training läuft...',
+    primary: 'Primär',
+    secondary: 'Sekundär',
+    specialization: 'Spezialisierung',
+    learningSpeed: 'Lerngeschwindigkeit',
+    roleEquivalent: 'Rollenäquivalent',
+    selectSkillToTrain: 'Fähigkeit zum Trainieren auswählen',
+    selectTrainingType: 'Trainingsart auswählen',
+    daysRemaining: 'Tage verbleibend',
+    skillLevels: {
+      beginner: 'Anfänger',
+      novice: 'Neuling',
+      competent: 'Kompetent',
+      proficient: 'Versiert',
+      expert: 'Experte',
+      master: 'Meister',
+    },
+  },
+
+  // Skills
+  skills: {
+    programming: 'Programmierung',
+    art: 'Kunst',
+    gameDesign: 'Spieldesign',
+    marketing: 'Marketing',
+    management: 'Management',
+    sound: 'Sound',
+    writing: 'Schreiben',
+  },
+
+  // Specializations
+  specializations: {
+    programmer: 'Programmierer',
+    programmerDesc: 'Starke Programmierkenntnisse mit Spieldesign-Wissen',
+    artist: 'Künstler',
+    artistDesc: 'Kreative Visualisierung mit narrativem Gespür',
+    designer: 'Spieldesigner',
+    designerDesc: 'Spielmechanik-Experte mit Marketing-Bewusstsein',
+    generalist: 'Generalist',
+    generalistDesc: 'Alleskönner, Meister in nichts - aber sehr flexibel',
+  },
+
+  // Experience Levels
+  experienceLevels: {
+    student: 'Berufseinsteiger',
+    studentDesc: 'Gerade fertig mit der Ausbildung, große Träume, kleine Ersparnisse',
+    junior: 'Junior-Entwickler',
+    juniorDesc: 'Ein paar Jahre Berufserfahrung',
+    experienced: 'Erfahrener Entwickler',
+    experiencedDesc: 'Solide Erfolgsbilanz in der Spielebranche',
+    veteran: 'Branchenveteran',
+    veteranDesc: 'Bekannte Persönlichkeit mit Kontakten und Ersparnissen',
+  },
+
+  // Training
+  training: {
+    selfStudy: 'Selbststudium',
+    selfStudyDesc: 'Lernen aus Büchern und kostenlosen Online-Ressourcen',
+    onlineCourse: 'Online-Kurs',
+    onlineCourseDesc: 'Strukturierte Online-Kurse belegen',
+    workshop: 'Professioneller Workshop',
+    workshopDesc: 'Intensive professionelle Workshops besuchen',
+    mentorship: 'Branchen-Mentoring',
+    mentorshipDesc: 'Direkt von Branchenveteranen lernen',
+    handsOn: 'Learning by Doing',
+    handsOnDesc: 'Erfahrung sammeln während du an deinem Spiel arbeitest',
+  },
+
+  // Games
+  games: {
+    title: 'Spiele',
+    newGame: 'Neues Spiel',
+    createGame: 'Neues Spiel erstellen',
+    gameName: 'Spielname',
+    gameNamePlaceholder: 'Spielnamen eingeben...',
+    genre: 'Genre',
+    development: 'Entwicklung',
+    testing: 'Testen',
+    launch: 'Launch',
+    live: 'Live',
+    shutdown: 'Eingestellt',
+    progress: 'Fortschritt',
+    quality: 'Qualität',
+    team: 'Team',
+    assignYourself: 'Dich selbst zuweisen',
+    noOneAssigned: 'Niemand zugewiesen! Weise dich selbst oder Mitarbeiter zu, um Fortschritt zu machen.',
+    members: 'Mitglieder',
+    launchGame: 'Spiel veröffentlichen',
+    shutdownGame: 'Spiel einstellen',
+    viewDetails: 'Details anzeigen',
+  },
+
+  // Employees
+  employees: {
+    title: 'Mitarbeiter',
+    hireEmployee: 'Mitarbeiter einstellen',
+    hireNew: 'Neuen Mitarbeiter einstellen',
+    fire: 'Kündigen',
+    train: 'Trainieren',
+    assign: 'Zuweisen',
+    unassign: 'Abziehen',
+    salary: 'Gehalt',
+    morale: 'Moral',
+    noEmployeesYet: 'Noch keine Mitarbeiter. Stelle dein erstes Teammitglied ein!',
+    expandAll: 'Alle ausklappen',
+    collapseAll: 'Alle einklappen',
+    basementWarning: 'Arbeit aus dem Elternkeller',
+    basementWarningDesc: 'Du arbeitest allein aus dem Keller deiner Eltern. Upgrade auf eine Garagenfirma, um deine ersten Mitarbeiter einzustellen!',
+    upgradeOfficeToHire: 'Büro upgraden, um mehr Mitarbeiter einzustellen',
+  },
+
+  // Office
+  office: {
+    title: 'Büro',
+    currentOffice: 'Aktuelles Büro',
+    upgrade: 'Upgrade',
+    upgradeTo: 'Upgrade auf',
+    maxLevel: 'Maximale Stufe',
+    rent: 'Miete',
+    capacity: 'Kapazität',
+    upgradeCost: 'Upgrade-Kosten',
+    levels: {
+      basement: 'Elternkeller',
+      garage: 'Garagenfirma',
+      smallOffice: 'Kleines Büro',
+      mediumOffice: 'Mittleres Büro',
+      largeStudio: 'Großes Studio',
+      corporateHQ: 'Firmenzentrale',
+    },
+  },
+
+  // Finance
+  finance: {
+    title: 'Finanzen',
+    revenue: 'Einnahmen',
+    expenses: 'Ausgaben',
+    profit: 'Gewinn',
+    loss: 'Verlust',
+    balance: 'Kontostand',
+    funds: 'Kapital',
+    salaries: 'Gehälter',
+    officeRent: 'Büromiete',
+    serverCosts: 'Serverkosten',
+    marketingCosts: 'Marketingkosten',
+    runway: 'Runway',
+    monthsRemaining: 'Monate verbleibend',
+  },
+
+  // Marketing
+  marketing: {
+    title: 'Marketing',
+    campaigns: 'Kampagnen',
+    createCampaign: 'Kampagne erstellen',
+    budget: 'Budget',
+    reach: 'Reichweite',
+    effectiveness: 'Effektivität',
+  },
+
+  // Gacha
+  gacha: {
+    title: 'Gacha-Management',
+    banners: 'Banner',
+    rates: 'Raten',
+    pity: 'Mitleidssystem',
+    revenue: 'Gacha-Einnahmen',
+  },
+
+  // Game Over
+  gameOver: {
+    title: 'Spiel vorbei',
+    daysSurvived: 'Tage überlebt',
+    gamesMade: 'Spiele erstellt',
+    employeesHired: 'Mitarbeiter eingestellt',
+    startNewGame: 'Neues Spiel starten',
+  },
+
+  // Settings
+  settings: {
+    title: 'Einstellungen',
+    language: 'Sprache',
+    selectLanguage: 'Sprache auswählen',
+    english: 'English',
+    german: 'Deutsch',
+    sound: 'Sound',
+    music: 'Musik',
+    notifications: 'Benachrichtigungen',
+    autoSave: 'Automatisches Speichern',
+    saveInterval: 'Speicherintervall',
+  },
+
+  // Roles
+  roles: {
+    programmer: 'Programmierer',
+    artist: 'Künstler',
+    designer: 'Designer',
+    marketer: 'Marketingexperte',
+    producer: 'Produzent',
+    soundDesigner: 'Sound-Designer',
+    writer: 'Autor',
+  },
+
+  // Genres
+  genres: {
+    action: 'Action',
+    puzzle: 'Puzzle',
+    rpg: 'Rollenspiel',
+    idle: 'Idle',
+    strategy: 'Strategie',
+    rhythm: 'Rhythmus',
+  },
+
+  // Tiers
+  tiers: {
+    junior: 'Junior',
+    mid: 'Mittelstufe',
+    senior: 'Senior',
+  },
+
+  // Locations
+  locations: {
+    tokyo: 'Tokio, Japan',
+    tokyoDesc: 'Das Herz der Spieleindustrie mit Zugang zu Top-Talenten',
+    seoul: 'Seoul, Südkorea',
+    seoulDesc: 'Esports-Hauptstadt mit leidenschaftlicher Gaming-Community',
+    shanghai: 'Shanghai, China',
+    shanghaiDesc: 'Zugang zum weltweit größten Mobile-Gaming-Markt',
+    singapore: 'Singapur',
+    singaporeDesc: 'Strategischer Knotenpunkt für südostasiatische Märkte',
+    sanFrancisco: 'San Francisco, USA',
+    sanFranciscoDesc: 'Silicon Valley Tech-Ökosystem und Risikokapital',
+    losAngeles: 'Los Angeles, USA',
+    losAngelesDesc: 'Verbindungen zur Unterhaltungsindustrie und kreative Talente',
+    london: 'London, UK',
+    londonDesc: 'Europäischer Gaming-Hub mit starker Indie-Szene',
+    berlin: 'Berlin, Deutschland',
+    berlinDesc: 'Lebendige Startup-Kultur mit niedrigeren Kosten',
+    stockholm: 'Stockholm, Schweden',
+    stockholmDesc: 'Heimat legendärer Spielestudios und Innovation',
+  },
+} as const;
