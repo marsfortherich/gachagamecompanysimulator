@@ -418,11 +418,11 @@ export function EmployeesView() {
                 {!isCollapsed && (
                   <>
 
-                {/* Skills */}
+                {/* All Skills */}
                 <div className="space-y-2 mb-4 mt-3">
+                  <h4 className="text-xs font-medium text-gray-500 uppercase mb-2">{t.employeeManagement.allSkills}</h4>
                   {(Object.entries(employee.skills) as [SkillType, number][])
                     .sort(([, a], [, b]) => b - a)
-                    .slice(0, 3)
                     .map(([skill, value]) => (
                       <ProgressBar
                         key={skill}

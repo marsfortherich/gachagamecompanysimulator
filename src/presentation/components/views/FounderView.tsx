@@ -279,7 +279,7 @@ export function FounderView() {
       </Card>
 
       {/* Training Progress (if training) */}
-      {isTraining && founder.trainingEndTick && (
+      {isTraining && (
         <Card className="border-green-700 bg-green-900/20">
           <div className="flex items-center justify-between">
             <div>
@@ -294,12 +294,20 @@ export function FounderView() {
               </p>
             </div>
             <div className="text-right">
-              <p className="text-green-400 font-semibold">
-                {Math.max(0, founder.trainingEndTick - state.currentTick)} {t.founder.daysRemaining}
-              </p>
-              <p className="text-sm text-gray-400">
-                +{FOUNDER_TRAINING_CONFIGS[founder.currentTraining!].skillGainPerDay * founder.learningMultiplier}{t.common.perDay}
-              </p>
+              {founder.trainingEndTick ? (
+                <>
+                  <p className="text-green-400 font-semibold">
+                    {Math.max(0, founder.trainingEndTick - state.currentTick)} {t.founder.daysRemaining}
+                  </p>
+                  <p className="text-sm text-gray-400">
+                    +{FOUNDER_TRAINING_CONFIGS[founder.currentTraining!].skillGainPerDay * founder.learningMultiplier}{t.common.perDay}
+                  </p>
+                </>
+              ) : (
+                <p className="text-sm text-gray-400">
+                  +{FOUNDER_TRAINING_CONFIGS[founder.currentTraining!].skillGainPerDay * founder.learningMultiplier}{t.common.perDay}
+                </p>
+              )}
               <Button
                 variant="danger"
                 size="sm"
