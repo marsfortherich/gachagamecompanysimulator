@@ -9,6 +9,8 @@ import {
   EXPERIENCE_CONFIGS,
   FOUNDER_TRAINING_CONFIGS,
   FounderTrainingType,
+  FounderSpecialization,
+  EmployeeRole,
 } from '../../../domain';
 
 type SkillColor = 'blue' | 'purple' | 'green' | 'gold' | 'red';
@@ -67,6 +69,39 @@ export function FounderView() {
       hands_on_practice: 'handsOnDesc',
     };
     return t.training[trainingKeyMap[trainingType]];
+  };
+
+  // Helper to get specialization name from translations
+  const getSpecializationName = (spec: FounderSpecialization): string => {
+    const specKeyMap: Record<FounderSpecialization, keyof typeof t.specializations> = {
+      programmer: 'programmer',
+      artist: 'artist',
+      designer: 'designer',
+      generalist: 'generalist',
+    };
+    return t.specializations[specKeyMap[spec]];
+  };
+
+  const getSpecializationDesc = (spec: FounderSpecialization): string => {
+    const specKeyMap: Record<FounderSpecialization, keyof typeof t.specializations> = {
+      programmer: 'programmerDesc',
+      artist: 'artistDesc',
+      designer: 'designerDesc',
+      generalist: 'generalistDesc',
+    };
+    return t.specializations[specKeyMap[spec]];
+  };
+
+  // Helper to get role name from translations
+  const getRoleName = (role: EmployeeRole): string => {
+    const roleKeyMap: Record<EmployeeRole, keyof typeof t.roles> = {
+      'Programmer': 'programmer',
+      'Artist': 'artist',
+      'Designer': 'designer',
+      'Marketer': 'marketer',
+      'Producer': 'producer',
+    };
+    return t.roles[roleKeyMap[role]];
   };
 
   if (!founder) {
@@ -281,8 +316,8 @@ export function FounderView() {
 
       {/* Specialization Info */}
       <Card>
-        <h3 className="text-lg font-semibold text-white mb-3">{t.founder.specialization}: {specConfig.name}</h3>
-        <p className="text-gray-400 mb-4">{specConfig.description}</p>
+        <h3 className="text-lg font-semibold text-white mb-3">{t.founder.specialization}: {getSpecializationName(founder.specialization)}</h3>
+        <p className="text-gray-400 mb-4">{getSpecializationDesc(founder.specialization)}</p>
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div className="p-3 bg-gray-700/30 rounded-lg">
             <p className="text-gray-400">{t.founder.primary} {t.founder.skills.toLowerCase()}</p>
@@ -302,7 +337,7 @@ export function FounderView() {
           </div>
           <div className="p-3 bg-gray-700/30 rounded-lg">
             <p className="text-gray-400">{t.founder.roleEquivalent}</p>
-            <p className="text-white font-semibold">{specConfig.equivalentRole}</p>
+            <p className="text-white font-semibold">{getRoleName(specConfig.equivalentRole)}</p>
           </div>
         </div>
       </Card>
