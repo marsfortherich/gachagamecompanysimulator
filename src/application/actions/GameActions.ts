@@ -31,6 +31,8 @@ export type GameAction =
   | { type: 'START_GAME_IMPROVEMENT'; payload: { gameId: string; focus: ImprovementFocus } }
   | { type: 'LAUNCH_GAME'; payload: { gameId: string } }
   | { type: 'SHUTDOWN_GAME'; payload: { gameId: string } }
+  | { type: 'DELETE_GAME'; payload: { gameId: string } }
+  | { type: 'RELAUNCH_GAME'; payload: { gameId: string } }
   | { type: 'UNLOCK_GENRE'; payload: { genre: GameGenre } }
   | { type: 'CREATE_BANNER'; payload: { gameId: string; name: string; duration: number } }
   | { type: 'UPDATE_GACHA_RATES'; payload: { gameId: string; rates: Record<string, number> } }
@@ -161,6 +163,16 @@ export const GameActions = {
 
   shutdownGame: (gameId: string): GameAction => ({
     type: 'SHUTDOWN_GAME',
+    payload: { gameId },
+  }),
+
+  deleteGame: (gameId: string): GameAction => ({
+    type: 'DELETE_GAME',
+    payload: { gameId },
+  }),
+
+  relaunchGame: (gameId: string): GameAction => ({
+    type: 'RELAUNCH_GAME',
     payload: { gameId },
   }),
 

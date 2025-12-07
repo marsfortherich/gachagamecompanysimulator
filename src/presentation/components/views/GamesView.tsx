@@ -150,6 +150,24 @@ export function GamesView() {
     }
   };
 
+  const handleDeleteGame = (gameId: string) => {
+    if (confirm(t.games.confirmDelete)) {
+      dispatch(GameActions.deleteGame(gameId));
+    }
+  };
+
+  const handleRelaunchGame = (gameId: string) => {
+    if (confirm(t.games.confirmRelaunch)) {
+      dispatch(GameActions.relaunchGame(gameId));
+    }
+  };
+
+  // Calculate number of employees (excluding founder) for display
+  const getEmployeeCount = (game: typeof games[0]) => {
+    if (!founder) return game.assignedEmployees.length;
+    return game.assignedEmployees.filter(id => id !== founder.id).length;
+  };
+
   const availableEmployees = employees.filter(e => e.isAvailable);
 
   return (
@@ -441,11 +459,11 @@ export function GamesView() {
               {/* Quality Metrics */}
               <div className="grid grid-cols-5 gap-1 mb-4">
                 {[
-                  { label: 'GFX', value: game.quality.graphics },
-                  { label: 'Play', value: game.quality.gameplay },
-                  { label: 'Story', value: game.quality.story },
-                  { label: 'Sound', value: game.quality.sound },
-                  { label: 'Polish', value: game.quality.polish },
+                  { label: t.games.qualityGraphics, value: game.quality.graphics },
+                  { label: t.games.qualityGameplay, value: game.quality.gameplay },
+                  { label: t.games.qualityStory, value: game.quality.story },
+                  { label: t.games.qualitySound, value: game.quality.sound },
+                  { label: t.games.qualityPolish, value: game.quality.polish },
                 ].map((stat) => (
                   <div key={stat.label} className="text-center">
                     <div className="text-xs text-gray-400">{stat.label}</div>
@@ -458,9 +476,25 @@ export function GamesView() {
 
               {/* Assigned Team (including Founder) */}
               <div className="mb-4">
-                <p className="text-sm text-gray-400 mb-2">
-                  {t.games.team} ({game.assignedEmployees.length} {t.games.members}{isFounderAssignedTo(game.id) ? ` + ${t.games.you}` : ''})
-                </p>
+                {(() => {
+                  const employeeCount = getEmployeeCount(game);
+                  const founderAssigned = isFounderAssignedTo(game.id);
+                  let teamDisplay = '';
+                  
+                  if (founderAssigned && employeeCount === 0) {
+                    teamDisplay = t.games.onlyYou;
+                  } else if (founderAssigned) {
+                    teamDisplay = `${t.games.you} + ${employeeCount} ${employeeCount === 1 ? t.games.member : t.games.members}`;
+                  } else {
+                    teamDisplay = `${employeeCount} ${employeeCount === 1 ? t.games.member : t.games.members}`;
+                  }
+                  
+                  return (
+                    <p className="text-sm text-gray-400 mb-2">
+                      {t.games.team} ({teamDisplay})
+                    </p>
+                  );
+                })()}
                 {game.assignedEmployees.length === 0 && !isFounderAssignedTo(game.id) && game.status !== 'live' && game.status !== 'shutdown' && (
                   <div className="text-sm text-yellow-400 bg-yellow-900/30 rounded-lg p-2 mb-2 flex items-center gap-2">
                     <Icon name="warning" size="sm" className="text-yellow-400" /> {t.games.noOneAssignedHire}
@@ -643,9 +677,25 @@ export function GamesView() {
                     <p className="text-xs text-gray-400 mb-2">
                       {t.games.maintenanceTeam} <span className="text-gray-500">{t.games.maintenanceTeamHint}</span>
                     </p>
-                    {game.assignedEmployees.length > 0 ? (
+                    {(game.assignedEmployees.length > 0 || isFounderAssignedTo(game.id)) ? (
                       <div className="flex flex-wrap gap-1 mb-2">
+                        {/* Show founder first if assigned */}
+                        {isFounderAssignedTo(game.id) && founder && (
+                          <div className="flex items-center gap-1 text-xs px-2 py-1 rounded-full border bg-gacha-purple/30 text-gacha-purple border-gacha-purple">
+                            <Icon name="star" size="xs" />
+                            <span>{t.games.you} ({founder.name.split(' ')[0]})</span>
+                            <button
+                              onClick={() => handleUnassignFounder(game.id)}
+                              className="ml-1 hover:text-red-400"
+                              title={t.games.clickToUnassignYourself}
+                            >
+                              <Icon name="close" size="xs" />
+                            </button>
+                          </div>
+                        )}
                         {game.assignedEmployees.map((empId) => {
+                          // Skip founder ID, we show them separately
+                          if (founder && empId === founder.id) return null;
                           const emp = employees.find(e => e.id === empId);
                           if (!emp) return null;
                           const isMarketer = emp.role === 'Marketer';
@@ -704,6 +754,19 @@ export function GamesView() {
                         ))}
                       </select>
                     )}
+                    
+                    {/* Assign Founder Button for Live Games */}
+                    {founder && isFounderAvailable() && (
+                      <Button
+                        fullWidth
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => handleAssignFounder(game.id)}
+                        className="flex items-center justify-center gap-2 mt-2"
+                      >
+                        <Icon name="star" size="sm" /> {t.games.assignYourself}
+                      </Button>
+                    )}
                   </div>
                   
                   {/* Improvement Tasks */}
@@ -748,8 +811,28 @@ export function GamesView() {
 
               {/* Shutdown Game Display */}
               {game.status === 'shutdown' && (
-                <div className="pt-3 border-t border-gray-700">
-                  <p className="text-sm text-red-400 text-center flex items-center justify-center gap-2"><Icon name="blocked" size="sm" className="text-red-400" /> {t.games.gameShutdown}</p>
+                <div className="pt-3 border-t border-gray-700 space-y-3">
+                  <p className="text-sm text-red-400 text-center flex items-center justify-center gap-2">
+                    <Icon name="blocked" size="sm" className="text-red-400" /> {t.games.gameShutdown}
+                  </p>
+                  <div className="flex gap-2">
+                    <Button
+                      fullWidth
+                      variant="success"
+                      onClick={() => handleRelaunchGame(game.id)}
+                      className="flex items-center justify-center gap-2"
+                    >
+                      <Icon name="rocket" size="sm" /> {t.games.relaunchGame}
+                    </Button>
+                    <Button
+                      fullWidth
+                      variant="danger"
+                      onClick={() => handleDeleteGame(game.id)}
+                      className="flex items-center justify-center gap-2"
+                    >
+                      <Icon name="close" size="sm" /> {t.games.deleteGame}
+                    </Button>
+                  </div>
                 </div>
               )}
                 </>

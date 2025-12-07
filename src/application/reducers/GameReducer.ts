@@ -470,6 +470,52 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       };
     }
 
+    case 'DELETE_GAME': {
+      const { gameId } = action.payload;
+      
+      // Find the game
+      const gameToDelete = state.games.find(g => g.id === gameId);
+      if (!gameToDelete || gameToDelete.status !== 'shutdown') return state;
+
+      // Remove the game from the list
+      const updatedGames = state.games.filter(g => g.id !== gameId);
+
+      return {
+        ...state,
+        games: updatedGames,
+      };
+    }
+
+    case 'RELAUNCH_GAME': {
+      const { gameId } = action.payload;
+      
+      // Find the game
+      const gameToRelaunch = state.games.find(g => g.id === gameId);
+      if (!gameToRelaunch || gameToRelaunch.status !== 'shutdown') return state;
+
+      // Relaunch the game as live with reset stats
+      const updatedGames = state.games.map(game => {
+        if (game.id === gameId) {
+          return {
+            ...game,
+            status: 'live' as const,
+            assignedEmployees: [],
+            monetization: {
+              ...game.monetization,
+              dailyActiveUsers: Math.floor(game.monetization.dailyActiveUsers * 0.3), // 30% of previous DAU
+              playerSatisfaction: 60, // Reset to base satisfaction
+            },
+          };
+        }
+        return game;
+      });
+
+      return {
+        ...state,
+        games: updatedGames,
+      };
+    }
+
     case 'UNASSIGN_FROM_PROJECT': {
       const { employeeId, gameId } = action.payload;
       

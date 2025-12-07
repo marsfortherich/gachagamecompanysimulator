@@ -164,6 +164,9 @@ export function FounderView() {
               max={100} 
               color={founder.energy >= 70 ? 'green' : founder.energy >= 40 ? 'gold' : 'red'}
             />
+            <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
+              <Icon name="info" size="xs" /> {t.founder.energyInfo}
+            </p>
           </div>
         </Card>
       </div>

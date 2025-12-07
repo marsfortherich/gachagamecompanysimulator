@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useGame } from '../../context';
-import { Button, Input, Card, Icon } from '../common';
+import { Button, Input, Card, Icon, LanguageSelector } from '../common';
 import { storageService } from '../../../infrastructure';
 import { LOCATIONS, LocationId } from '../../../domain/company/Location';
 import { useI18n } from '../../../infrastructure/i18n';
@@ -79,6 +79,11 @@ export function StartScreen() {
   return (
     <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
+        {/* Language Selector */}
+        <div className="flex justify-end mb-4">
+          <LanguageSelector />
+        </div>
+        
         {/* Logo/Title */}
         <div className="text-center mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 flex items-center justify-center gap-3">
