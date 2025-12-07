@@ -1230,6 +1230,12 @@ function processLiveGames(state: GameState): GameState {
   let totalRevenue = 0;
   const employeeMap = new Map(state.employees.map(e => [e.id, e]));
   
+  // Add founder to employee map so they can maintain live games too
+  const founderEmployee = state.founder ? founderAsEmployee(state.founder) : null;
+  if (founderEmployee) {
+    employeeMap.set(founderEmployee.id, founderEmployee as Employee);
+  }
+  
   const updatedGames = state.games.map(game => {
     if (game.status !== 'live') return game;
 
